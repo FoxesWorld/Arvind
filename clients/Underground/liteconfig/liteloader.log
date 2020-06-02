@@ -1,0 +1,101 @@
+[22:32:35] [Thread-15/INFO]: LiteLoader 1.7.10_03 starting up...
+[22:32:35] [Thread-15/INFO]: Java reports OS="windows 8.1"
+[22:32:36] [Thread-15/INFO]: Enumerating class path...
+[22:32:36] [Thread-15/INFO]: Class path separator=";"
+[22:32:36] [Thread-15/INFO]: Class path entries=(
+   classpathEntry=/C:/Users/miomoor/.Foxesworld/launcher.jar
+)
+[22:32:36] [Thread-15/INFO]: Registering discovery module EnumeratorModuleClassPath: [<Java Class Path>]
+[22:32:36] [Thread-15/INFO]: Registering discovery module EnumeratorModuleFolder: [C:\Users\miomoor\.Foxesworld\Underground\mods]
+[22:32:36] [Thread-15/INFO]: Registering discovery module EnumeratorModuleFolder: [C:\Users\miomoor\.Foxesworld\Underground\mods\1.7.10]
+[22:32:36] [Thread-15/INFO]: Adding supported mod class prefix 'LiteMod'
+[22:32:36] [Thread-15/INFO]: Discovering tweaks on class path...
+[22:32:36] [Thread-15/INFO]: Discovering valid mod files in folder C:\Users\miomoor\.Foxesworld\Underground\mods
+[22:32:36] [Thread-15/INFO]: Considering valid mod file: C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar
+[22:32:36] [Thread-15/INFO]: Adding newest valid mod file 'C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar' at revision 184,0000
+[22:32:36] [Thread-15/INFO]: Discovering valid mod files in folder C:\Users\miomoor\.Foxesworld\Underground\mods\1.7.10
+[22:32:36] [Thread-15/INFO]: Searching for tweaks in 'CodeChickenLib-1.7.10-1.1.3.138-universal.jar'
+[22:32:36] [Thread-15/WARN]: Error parsing manifest entries in 'C:\Users\miomoor\.Foxesworld\Underground\mods\1.7.10\CodeChickenLib-1.7.10-1.1.3.138-universal.jar'
+[22:32:36] [Thread-15/INFO]: Searching for tweaks in 'FixMod.jar'
+[22:32:36] [Thread-15/WARN]: Error parsing manifest entries in 'C:\Users\miomoor\.Foxesworld\Underground\mods\1.7.10\FixMod.jar'
+[22:32:36] [Thread-15/INFO]: Searching for tweaks in '[1.7.10]bspkrsCore-universal-6.15.jar'
+[22:32:36] [Thread-15/WARN]: Error parsing manifest entries in 'C:\Users\miomoor\.Foxesworld\Underground\mods\1.7.10\[1.7.10]bspkrsCore-universal-6.15.jar'
+[22:32:36] [Thread-15/INFO]: LiteLoader PREINIT complete
+[22:32:37] [Thread-15/INFO]: Injecting event prerenderfbo with 1 handlers in method func_71411_J in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting event postrenderfbo with 1 handlers in method func_71411_J in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting event updateframebuffersize with 1 handlers in method func_147119_ah in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting method return callback for onStartupComplete in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onRender in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTimerUpdate in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Injecting profiler invokation callback for onAnimateTick in class net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: Applying overlay com.mumfrey.liteloader.client.overlays.MinecraftOverlay to net.minecraft.client.Minecraft
+[22:32:37] [Thread-15/INFO]: MinecraftOverlayTransformer found INIT injection point, this is good.
+[22:32:37] [Thread-15/INFO]: Injecting event sendchatmessage with 1 handlers in method func_71165_d in class net.minecraft.client.entity.EntityClientPlayerMP
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for onRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:38] [Thread-15/INFO]: Injecting profiler invokation callback for postRenderChat in class net.minecraft.client.gui.GuiIngame
+[22:32:39] [Client thread/INFO]: Injecting method return callback for IntegratedServerCtor in class net.minecraft.server.integrated.IntegratedServer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for preRenderGUI in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for preRenderGUI in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for preRenderGUI in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for onRenderHUD in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for postRenderEntities in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for postRender in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for postRender in class net.minecraft.client.renderer.EntityRenderer
+[22:32:39] [Client thread/INFO]: Injecting profiler invokation callback for onSetupCameraTransform in class net.minecraft.client.renderer.EntityRenderer
+[22:32:40] [Client thread/INFO]: Injecting event renderfbo with 1 handlers in method func_147615_c in class net.minecraft.client.shader.Framebuffer
+[22:32:50] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.ServerCustomPayloadPacketTransformer for iz
+[22:32:57] [Client thread/INFO]: Generating new Event Handler Proxy Class com.mumfrey.liteloader.core.event.EventProxy
+[22:32:57] [Client thread/INFO]: Successfully generated event handler proxy class with 5 handlers(s) and 5 total invokations
+[22:32:58] [Client thread/INFO]: JInput Component Registry initialised, found 14 controller(s) 417 component(s)
+[22:32:58] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.CustomPayloadPacketTransformer for gr
+[22:32:58] [Client thread/INFO]: LiteLoader begin INIT...
+[22:32:58] [Client thread/INFO]: Injecting external mods into class path...
+[22:32:58] [Client thread/INFO]: Successfully injected mod file 'C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar' into classpath
+[22:32:58] [Client thread/INFO]: Injecting external mods into class path...
+[22:32:58] [Client thread/INFO]: Discovering mods on class path...
+[22:32:58] [Client thread/INFO]: Searching C:\Users\miomoor\.Foxesworld\launcher.jar...
+[22:32:58] [Client thread/INFO]: Discovering mods in valid mod files...
+[22:32:58] [Client thread/INFO]: Searching C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar...
+[22:32:58] [Client thread/INFO]: Found 1 potential matches
+[22:32:58] [Client thread/INFO]: Discovering mods in valid mod files...
+[22:32:58] [Client thread/INFO]: Mod class discovery completed
+[22:32:58] [Client thread/INFO]: LiteLoader begin POSTINIT...
+[22:32:58] [Client thread/INFO]: Inhibiting sound handler reload
+[22:32:58] [Client thread/INFO]: Registering interface provider com.mumfrey.liteloader.client.ClientEvents for API LiteLoader core API
+[22:32:58] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.LoginSuccessPacketTransformer for js
+[22:32:58] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.ChatPacketTransformer for gj
+[22:32:58] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.JoinGamePacketTransformer for hd
+[22:32:58] [Client thread/INFO]: PacketTransformer: Running transformer com.mumfrey.liteloader.client.transformers.ServerChatPacketTransformer for ir
+[22:32:58] [Client thread/INFO]: Injecting method return callback for onPlayerLogin in class net.minecraft.server.management.ServerConfigurationManager
+[22:32:58] [Client thread/INFO]: Injecting method return callback for onPlayerLogout in class net.minecraft.server.management.ServerConfigurationManager
+[22:32:58] [Client thread/INFO]: Injecting method return callback for onSpawnPlayer in class net.minecraft.server.management.ServerConfigurationManager
+[22:32:58] [Client thread/INFO]: Injecting method return callback for onRespawnPlayer in class net.minecraft.server.management.ServerConfigurationManager
+[22:32:58] [Client thread/INFO]: Registering interface provider com.mumfrey.liteloader.client.ClientPluginChannelsClient for API LiteLoader core API
+[22:32:58] [Client thread/INFO]: Registering interface provider com.mumfrey.liteloader.core.ServerPluginChannels for API LiteLoader core API
+[22:32:58] [Client thread/INFO]: Discovered 1 total mod(s)
+[22:32:58] [Client thread/INFO]: Loading mod from yalter.mousetweaks.loaders.LiteModMouseTweaks
+[22:32:58] [Client thread/INFO]: Successfully added mod Mouse Tweaks version 2.4.4
+[22:32:58] [Client thread/INFO]: Adding "C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar" to active resource pack set
+[22:32:58] [Client thread/INFO]: Setting up "MouseTweaks_2.4.4_mc1.7.10.jar" as mod resource pack with identifier "Mouse Tweaks"
+[22:32:58] [Client thread/INFO]: Successfully added "C:\Users\miomoor\.Foxesworld\Underground\mods\MouseTweaks_2.4.4_mc1.7.10.jar" to active resource pack set
+[22:32:58] [Client thread/INFO]: Initialising mod Mouse Tweaks version 2.4.4
+[22:33:15] [Client thread/INFO]: Sound handler reload inhibit removed
+[22:33:15] [Client thread/INFO]: Reloading sound handler
+[00:20:48] [Client thread/INFO]: LiteLoader is shutting down, shutting down core providers and syncing configuration
