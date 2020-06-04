@@ -63,10 +63,10 @@ header("Content-Type: text/plain; charset=UTF-8");
 if($_GET['download']){
 	$download = $_GET['download'];
 	if ($download == "jar"){
-		$file = "..//files//updater//FeniumCraft.jar";
+		$file = "files//updater//updater.jar";
 	    header('Content-Description: File Transfer');
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename=' . basename($file));
+		header('Content-Disposition: attachment; filename=' . basename("Foxesworld.jar"));
 		header('Content-Transfer-Encoding: binary');
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate');
@@ -75,10 +75,10 @@ if($_GET['download']){
 		readfile($file);
 		exit;
 	} elseif($download == "exe"){
-		$file = "..//files//updater//FeniumCraft.exe";
+		$file = "files//updater//updater.exe";
 	    header('Content-Description: File Transfer');
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename=' . basename($file));
+		header('Content-Disposition: attachment; filename=' . basename("Foxesworld.exe"));
 		header('Content-Transfer-Encoding: binary');
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate');
