@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.10 Alpha
+ Версия: 0.0.11 Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -20,6 +20,18 @@ header('Content-Type: text/html; charset=utf-8');
 Error_Reporting(E_ALL | E_STRICT);
 Ini_Set('display_errors', true);
 define('INCLUDE_CHECK',true);
+			//Verifying SSL
+			if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || 
+			   $_SERVER['HTTPS'] == 1) ||  
+			   isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&   
+			   $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'))
+			{
+			   $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			   header('HTTP/1.1 301 Moved Permanently');
+			   header('Location: ' . $redirect);
+			   exit();
+			} 
+			
 include ("scripts/functions.inc.php");
 include_once ("scripts/actionScript.php");
 

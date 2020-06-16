@@ -1,6 +1,6 @@
 <?php
 define('INCLUDE_CHECK',true);
-include_once("../connect.php");
+include_once("../database.php");
 include_once("uuid.php");
 @$user = json_decode($HTTP_RAW_POST_DATA);
 try { 

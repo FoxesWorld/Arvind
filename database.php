@@ -1,17 +1,16 @@
 <?php
-    Error_Reporting(E_ALL | E_STRICT);
-    Ini_Set('display_errors', true);
+    //Error_Reporting(E_ALL | E_STRICT);
+    //Ini_Set('display_errors', true);
 
 	if(!defined('INCLUDE_CHECK')) {
 		die("Hacking Attempt!");
 	}
 	
 	include_once("scripts/loger.php");
-	
 	if (extension_loaded('openssl')) {
-		include_once("security/security_openssl.php");
+		include_once("scripts/security/security_openssl.php");
 	} else if(extension_loaded('mcrypt')){
-		include_once("security/security_mcrypt.php");
+		include_once("scripts/security/security_mcrypt.php");
 	} else {
 		exit("Отсутствуют расширения mcrypt и openssl!");
 	}
