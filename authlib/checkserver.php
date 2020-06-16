@@ -1,7 +1,7 @@
 <?php
 	define('INCLUDE_CHECK',true);
-	include("../connect.php");
-	include_once("../loger.php");
+	include("../database.php");
+	include_once("../scripts/loger.php");
 	@$user     = $_GET['user'];
     @$serverid = $_GET['serverId'];
     $logger->WriteLine($log_date." ".$user." ".$serverid); 

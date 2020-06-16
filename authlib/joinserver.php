@@ -1,6 +1,6 @@
 <?php
 	define('INCLUDE_CHECK',true);
-    include_once("../loger.php");
+    include_once("../scripts/loger.php");
 	@$sess       = $_GET['sessionId'];
     @$sessionid  = str_replace('%3A', ':', $sess);
     @$user       = $_GET['user'];
@@ -11,7 +11,7 @@
 		if (sizeof($_GET)!=3 || empty ( $_GET['sessionId'] ) ||  empty ( $_GET['user'] ) || empty ( $_GET['serverId'] ) || !preg_match("/^[a-zA-Z0-9_-]+$/", $user) || !preg_match("/^[a-zA-Z0-9:_-]+$/", $sessionid) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverid)){
           exit ("Bad login");
 		}
-		include("../connect.php");
+		include("../database.php");
 
 		$stmt = $db->prepare("Select user From usersession Where session= :sessionid And user= :user");
 		$stmt->bindValue(':user', $user);

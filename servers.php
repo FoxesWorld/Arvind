@@ -5,7 +5,7 @@
 -----------------------------------------------------
  https://arcjetsystems.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2019 FoxesWorld
+ Copyright (c) 2016-2020  FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
@@ -18,12 +18,16 @@
 */ 
 	header("Content-Type: text/plain; charset=UTF-8");
 	define('INCLUDE_CHECK', true );
-	require "connect.php";
+	require ("database.php");
 	
 	$selector = "SELECT * FROM servers";
-	$dbname = 'fc_launcher';
-	try { $DBH = new PDO("mysql:host=$db_host;dbname=$dbname;charset=UTF8", $db_user, $db_pass); }
-	catch(PDOException $e) { die($e->getMessage()); }
+	$dbname = 'fox_launcher';
+	try { 
+	$DBH = new PDO("mysql:host=$db_host;dbname=$dbname;charset=UTF8", $db_user, $db_pass); 
+	} catch(PDOException $e) { 
+	die($e->getMessage()); 
+	}
+	
 	$STH = $DBH->query("$selector");  
 	$STH->setFetchMode(PDO::FETCH_ASSOC);  
 	while($row = $STH->fetch()) {  
