@@ -24,28 +24,28 @@ if(!defined('INCLUDE_CHECK')) {
 						$key .= $key;
 					}
 					return $str ^ $key;
-				}
+			}
 
 			function strtoint($text) {
 					$res = "";
 					for ($i = 0; $i < strlen($text); $i++) $res .= ord($text{$i}) . "-";
 					$res = substr($res, 0, -1);
 					return $res;
-				}
+			}
 
 			function strlen_8bit($binary_string) {
 					if (function_exists('mb_strlen')) {
 						return mb_strlen($binary_string, '8bit');
 					}
 					return strlen($binary_string);
-				}
+			}
 				
 			function substr_8bit($binary_string, $start, $length) {
 					if (function_exists('mb_substr')) {
 						return mb_substr($binary_string, $start, $length, '8bit');
 					}
 					return substr($binary_string, $start, $length);
-				}
+			}
 				
 			function pass_get_info($hash) {
 					$return = true;
@@ -53,7 +53,7 @@ if(!defined('INCLUDE_CHECK')) {
 						$return = false;
 					}
 					return $return;
-				}
+			}
 				
 			function pass_verify($password, $hash) {
 					$ret = crypt($password, $hash);
@@ -66,7 +66,7 @@ if(!defined('INCLUDE_CHECK')) {
 						$status |= (ord($ret[$i]) ^ ord($hash[$i]));
 					}
 					return $status === 0;
-				}
+			}
 				
 			function hash_name($ncrypt, $realPass, $postPass, $salt) {
 					$cryptPass = false;
@@ -87,7 +87,7 @@ if(!defined('INCLUDE_CHECK')) {
 						}
 					}
 					return $cryptPass;
-				}
+			}
 
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -111,7 +111,7 @@ if(!defined('INCLUDE_CHECK')) {
 					while($max--)
 					$password.=$chars[rand(0,$size)];
 					  return $password;
-					}
+			}
 
 			function imagestype($binary) {
 					if (
@@ -131,8 +131,49 @@ if(!defined('INCLUDE_CHECK')) {
 						6 => 'image/x-ilbm',
 					);
 					return $type[count($hits) - 1];
+			}
+			
+			function getyText(){
+					$TextArray = array(
+					"Куриная основа!",
+					"Секретный план Нотча!",
+					"Не без Эксепшнов!",
+					"Придумано Лисами!",
+					"Основано на реальных событиях!",
+					"Нужно больше золота!",
+					"AidenFox & DarkFox!",
+					"Расскажи своей маме!",
+					"А ты хорош!",
+					"K4dj1t опрятен!",
+					"Может содержать орехи!",
+					"Лучше, чем добыча!",
+					"Автообновление!",
+					"Теперь больше полигонов!",
+					"Пауки везде! Беги Рон!");
+					$ArrayNum = count($TextArray) - 1;
+					$rand = rand (0,$ArrayNum);
+					$text = $TextArray[$rand];
+					
+					$textGet = array(
+					'type' => 'getText',
+					'Message' => $text);
+					$textGet = json_encode($textGet);	
+					
+					return $textGet;
+			}
+			
+			function verifySSL(){
+				if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||  isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'))
+				{
+				   $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				   header('HTTP/1.1 301 Moved Permanently');
+				   header('Location: ' . $redirect);
+				   exit();
 				}
-				
+				return true;
+			}
+			verifySSL();
+			
 		    function parse_online($host, $port){
 				$socket = @fsockopen($host, $port);
 					if ($socket !== false) {
@@ -154,9 +195,19 @@ if(!defined('INCLUDE_CHECK')) {
 					 $playersOnline=IntVal( $info[1] );
 					 $playersMax = IntVal( $info[2] );
 						}
-						return ("$playersOnline\n$playersMax");
+						return ("$playersOnline&$playersMax");
 						}} else {
 						return("offline");
 					}
+			}
+				
+			function ImgHash($img){
+					$file_link = SITE_ROOT."/files/img/$img.png";
+					if(file_exists($file_link)){
+						$answer = md5_file($file_link);
+					} else {
+						$answer = "Image not found!";
 				}
+				return $answer;
+			}
 }

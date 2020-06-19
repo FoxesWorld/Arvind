@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: servers.php
 -----------------------------------------------------
- Версия: 0.1.6 Alpha
+ Версия: 0.1.7 Alpha
 -----------------------------------------------------
  Назначение: Вывод списка серверов в лаунчере
 =====================================================
@@ -31,16 +31,16 @@
 	$STH = $DBH->query("$selector");  
 	$STH->setFetchMode(PDO::FETCH_ASSOC);  
 	while($row = $STH->fetch()) {  
-	echo $row['Server_name'] . ", "; 
-	echo $row['adress'] . ", "; 
-	echo $row['port'] . ", "; 
-	echo $row['version'] . "<::>";
+	echo $row['Server_name'] . "& "; 
+	echo $row['adress'] . "& "; 
+	echo $row['port'] . "& "; 
+	echo $row['version']  . "& ";  
+	echo $row['srv_image']  . "& ";  
+	echo $row['story'] . "<::>";
 	}
 	$STH = null;
 
 
 
 //echo $row['id'] . "\n";  
-//echo $row['srv_image'] . "\n"; 
-//echo $row['story'] . "\n"; 
 ?>

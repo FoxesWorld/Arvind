@@ -11,12 +11,14 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.6 Alpha
+ Версия: 0.1.7 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера, апдейтера и библиотек 
 =====================================================
 */ 
 header("Content-Type: text/plain; charset=UTF-8");
+define('INCLUDE_CHECK',true);
+include_once ("scripts/functions.inc.php");
 	$get_request =  $_SERVER['QUERY_STRING'];
 	if($get_request === ''){
 		die("Hacking Attempt!");

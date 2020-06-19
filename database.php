@@ -2,11 +2,14 @@
     //Error_Reporting(E_ALL | E_STRICT);
     //Ini_Set('display_errors', true);
 
+	//include_once ("scripts/sslRedirect.php");
 	if(!defined('INCLUDE_CHECK')) {
 		die("Hacking Attempt!");
 	}
 	
+	
 	include_once("scripts/loger.php");
+	include_once("scripts/functions.inc.php");
 	if (extension_loaded('openssl')) {
 		include_once("scripts/security/security_openssl.php");
 	} else if(extension_loaded('mcrypt')){
@@ -25,8 +28,8 @@
 	$db_columnId  		= 'user_id'; 
 	$db_columnUser  	= 'name';
 	$db_columnPass  	= 'password';
-	$db_tableOther 		= 'xf_user_authenticate';
-	$db_columnSalt  	= 'members_pass_salt';
+	//$db_tableOther 		= 'xf_user_authenticate';
+	//$db_columnSalt  	= 'members_pass_salt';
     $db_columnIp  		= 'logged_ip';
 	$db_columnDatareg   = 'reg_date';
 	$db_columnMail      = 'email';
