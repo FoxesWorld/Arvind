@@ -14,5 +14,5 @@ try {
     }
     echo '[{"id":"'.str_replace('-', '', @uuidConvert($realUser)).'","name":"'.$realUser.'"}]';
 } catch(PDOException $pe) {
-    die($logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+    die($pe);  //вывод ошибок MySQL в m.log
 }

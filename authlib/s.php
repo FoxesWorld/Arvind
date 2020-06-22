@@ -1,6 +1,5 @@
 <?php
 define('INCLUDE_CHECK',true);
-include_once("../scripts/loger.php");
 @$md5 = $_GET['user'];
 	try {
 		if (!preg_match("/^[a-zA-Z0-9_-]+$/", $md5)){
@@ -63,5 +62,5 @@ include_once("../scripts/loger.php");
 			]
 		}';
 	} catch(PDOException $pe) {
-			die($logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+			die($pe);
 	}

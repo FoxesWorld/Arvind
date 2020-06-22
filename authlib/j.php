@@ -1,6 +1,5 @@
 <?php
 	define('INCLUDE_CHECK',true);
-	include_once("../scripts/loger.php");
 	if (($_SERVER['REQUEST_METHOD'] == 'POST' ) && (stripos($_SERVER["CONTENT_TYPE"], "application/json") === 0)) {
 		$json = json_decode(file_get_contents('php://input'));
 	}
@@ -36,5 +35,5 @@
 		}
 		else exit(json_encode($bad));
 	} catch(PDOException $pe) {
-			die("bad".$logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+			die("bad".$pe);  //вывод ошибок MySQL в m.log
 	}

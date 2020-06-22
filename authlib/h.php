@@ -1,7 +1,6 @@
 <?php
     error_reporting(0);
 	define('INCLUDE_CHECK',true);
-	include_once("../scripts/loger.php");
 	@$user     = $_GET['username'];
     @$serverid = $_GET['serverId'];
 	$bad = array('error' => "Bad login",'errorMessage' => "Bad login");
@@ -55,5 +54,5 @@
 		}
 		else exit(json_encode($bad));
 	} catch(PDOException $pe) {
-			die("Ошибка".$logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+			die("Ошибка".$pe);  //вывод ошибок MySQL в m.log
 	}

@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.7 Alpha
+ Версия: 0.1.8 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера, апдейтера и библиотек 
 =====================================================
@@ -31,15 +31,17 @@ include_once ("scripts/functions.inc.php");
 	$download = $_GET['download'];
 
 	//Хеш-код апдейтера, если обновление есть скрипт отвечает YES, иначе NO
-	if($updater_type){
+	if(isset($updater_type)){
 		$updater_hash = $_GET['hash'];
 		if($updater_type == 'jar'){
 			die($updater_hash == md5_file("files/updater/updater.jar") ? "NO" : "YES");
-			}
-		
-		if($updater_type == 'exe'){
+		} elseif($updater_type == 'exe'){
 			die($updater_hash == md5_file("files/updater/updater.exe") ? "NO" : "YES");
-			}
+		} elseif ($updater_type != 'exe' || $updater_type != 'jar') {
+			die("Unknown updater type!");
+		}
+	} else {
+		die("No sent data!");
 	}
 	
 	//Хеш-код лаунчера, если обновление есть скрипт отвечает YES, иначе NO
@@ -64,7 +66,7 @@ include_once ("scripts/functions.inc.php");
 	}
 
 	//Хеш библиотеки	
-	if($lib_hash){
+	if(isset($lib_hash)){
 		if (file_exists("files/launcher/lib/$lib_hash")) {
 			
 		function lib_hash($lib_name){
@@ -78,7 +80,7 @@ include_once ("scripts/functions.inc.php");
 	}
 	
 	//Download (Скачивание клиента с сайта)
-	if($download){
+	if(isset($download)){
 		if ($download == "jar"){
 			$file = "files//updater//updater.jar";
 			header('Content-Description: File Transfer');

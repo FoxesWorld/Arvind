@@ -1,14 +1,9 @@
 <?php
-    //Error_Reporting(E_ALL | E_STRICT);
-    //Ini_Set('display_errors', true);
-
-	//include_once ("scripts/sslRedirect.php");
 	if(!defined('INCLUDE_CHECK')) {
 		die("Hacking Attempt!");
 	}
 	
 	
-	include_once("scripts/loger.php");
 	include_once("scripts/functions.inc.php");
 	if (extension_loaded('openssl')) {
 		include_once("scripts/security/security_openssl.php");
@@ -28,23 +23,21 @@
 	$db_columnId  		= 'user_id'; 
 	$db_columnUser  	= 'name';
 	$db_columnPass  	= 'password';
-	//$db_tableOther 		= 'xf_user_authenticate';
-	//$db_columnSalt  	= 'members_pass_salt';
     $db_columnIp  		= 'logged_ip';
 	$db_columnDatareg   = 'reg_date';
 	$db_columnMail      = 'email';
 	$banlist            = 'banlist';
 	
-	$useban             =  false; //Бан на сервере = бан в лаунчере (Не готовая разработка)
+	$useban             =  false; //Бан на сервере = бан в лаунчере (Не готовая разработка) //Будет убрано 
 	$useantibrut        =  true; //Защита от частых подборов пароля (Пауза 1 минута, увеличим рост блокировки в геометрической прогрессии))))
 	
-	$masterversion  	= 'final_RC4'; //версия лаунчера (Не пригодилась, md5 всё сам решил, в будущих релизах уберем)
+	$masterversion  	= 'final_RC4'; //версия лаунчера (Не пригодилась, md5 всё сам решил, в будущих релизах уберем) //Будет убрано 
 	$protectionKey		= 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj'; 
-	$key1               = "R2zwuwmv~YZSIJ21";  //16 Character Key Ключ пост запросов
-	$key2               = "oPCwB9S6z{*rEh%V"; //16 Character  Key  Ключ пост запросов
-	$md5launcherjar     = @md5_file("launcher/fix.jar");  // Сверяем MD5
+	$key1               = "R2zwuwmv~YZSIJ21";  //16 Character Key 
+	$key2               = "oPCwB9S6z{*rEh%V"; //16 Character  Key
+	$md5launcherjar     = @md5_file("launcher/fix.jar");  // Сверяем MD5 //Будет убрано 
 	$temp               = false;  //Использовать файлы кеширования для ускорение авторизации и снижение нагрузки на вебсервер.
-	$assetsfolder       = true; //Скачивать assets из папки, или из архива (true=из папки false=из архива)
+	$assetsfolder       = true; //Скачивать assets из папки, или из архива (true=из папки false=из архива) //Будет убрано 
 
 
 	$uploaddirs         = 'MinecraftSkins';  //Папка скинов
@@ -52,4 +45,5 @@
     $skinurl            = 'http://login.foxesworld/site/'.$uploaddirs.'/'; //Ссылка на скины 
     $capeurl            = 'http://login.foxesworld/site/'.$uploaddirp.'/'; //Ссылка на плащи для клиентов 1.7.+	
 	
+	//dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass);
 	require_once ('scripts/databasePrepare.php');

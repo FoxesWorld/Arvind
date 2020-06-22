@@ -11,29 +11,27 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.12 Alpha
+ Версия: 0.0.13 Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
 */
 header('Content-Type: text/html; charset=utf-8');
-Error_Reporting(E_ALL | E_STRICT);
+Error_Reporting(E_ALL);
 Ini_Set('display_errors', true);
-define('INCLUDE_CHECK',true);
-	include ("scripts/functions.inc.php");
-	include_once ("scripts/actionScript.php");
+define('INCLUDE_CHECK',true); //Security Define
+	include ("scripts/functions.inc.php");  //All Functions
+	include_once ("scripts/actionScript.php");  //Action requests
 
 	if(isset($_POST['action'])) {
 		include("database.php");
-		include_once("scripts/loger.php");
-		include_once("authlib/uuid.php");
 		$x  = $_POST['action'];
 		$x = str_replace(" ", "+", $x);
 		$yd = Security::decrypt($x, $key2);
 		
 		if($yd == null) {
-			//die('Access Error!');
-			//exit;
+			die('Access Error!');
+			exit;
 		}
 		
 		@list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $yd);
@@ -133,27 +131,6 @@ define('INCLUDE_CHECK',true);
 			$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($realUser)));
 			$stmt->execute();
 		}
-	
-	if($useban) { //Функция бана в лаунчере (Очень не совершенная и легко обходимая, запрятать файл с логином в системе юзера, чтобы легко отловить незалогиненного)
-	    $time = time();
-	    $tipe = '2';
-		$stmt = $db->prepare("Select name From $banlist Where name= :login And type<'$tipe' And temptime>'$time'");
-		$stmt->bindValue(':login', $login);
-		$stmt->execute();
-	    if($stmt->rowCount()) {
-			$stmt = $db->prepare("Select name,temptime From $banlist Where name= :login And type<'$tipe' And temptime>'$time'");
-			$stmt->bindValue(':login', $login);
-			$stmt->execute();
-			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-			exit(Security::encrypt('Временный бан до '.date('d.m.Yг. H:i', $row['temptime'])." по времени сервера", $key1));
-	    }
-			$stmt = $db->prepare("Select name From $banlist Where name= :login And type<'$tipe' And temptime='0'");
-			$stmt->bindValue(':login', $login);
-			$stmt->execute();
-		if($stmt->rowCount()) {
-	      exit(Security::encrypt("Вечный бан", $key1));
-	    }
-	}
     
 	if($action == 'auth') {
 		
@@ -210,5 +187,5 @@ define('INCLUDE_CHECK',true);
 	
 	
 	} catch(PDOException $pe) {
-		die(Security::encrypt("errorsql<$>", $key1).$logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+		die(Security::encrypt("errorsql<$>", $key1).$pe);
 	}

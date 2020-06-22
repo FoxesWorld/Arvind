@@ -25,7 +25,7 @@
 	try { 
 	$DBH = new PDO("mysql:host=$db_host;dbname=$dbname;charset=UTF8", $db_user, $db_pass); 
 	} catch(PDOException $e) { 
-	die($e->getMessage()); 
+	die($e->getMessage());
 	}
 	
 	$STH = $DBH->query("$selector");  

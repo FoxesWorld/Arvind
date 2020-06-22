@@ -1,10 +1,9 @@
 <?php
 	define('INCLUDE_CHECK',true);
 	include("../database.php");
-	include_once("../scripts/loger.php");
 	@$user     = $_GET['user'];
     @$serverid = $_GET['serverId'];
-    $logger->WriteLine($log_date." ".$user." ".$serverid);
+    echo "$log_date.$user.$serverid";
 	$error_status = array(
 	'error' => 'Bad params for join to server.',
 	'errorMessage' => 'Bad params for join to server.');
@@ -29,5 +28,5 @@
 			die($error_status);
 		}
 	} catch(PDOException $pe) {
-		die("bad".$logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
+		die("bad".$pe);  //вывод ошибок MySQL в m.log
 	}

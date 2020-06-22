@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.2 Alpha
+ Версия: 0.0.3 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -68,6 +68,44 @@ if(!defined('INCLUDE_CHECK')) {
 					return $status === 0;
 			}
 				
+				
+			function dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass){
+				try {
+					$db = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_database", $db_user, $db_pass);
+					$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+					$db->exec("set names utf8");
+				} catch(PDOException $pe) {
+					die(Security::encrypt("errorsql", $key1));
+				}
+				try {
+					$stmt = $db->prepare("
+					CREATE TABLE IF NOT EXISTS `usersession` (
+					`user` varchar(255) DEFAULT 'user',
+					`session` varchar(255) DEFAULT NULL,
+					`server` varchar(255) DEFAULT NULL,
+					`token` varchar(255) DEFAULT NULL,
+					`realmoney` int(255) DEFAULT '0',
+					`md5` varchar(255) DEFAULT '0',
+					PRIMARY KEY (`user`)
+					) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+					");
+					$stmt->execute();
+					$stmt = $db->prepare("
+					CREATE TABLE IF NOT EXISTS `sip` (
+					  `time` varchar(255) NOT NULL,
+					  `id` int(11) NOT NULL AUTO_INCREMENT,
+					  `sip` varchar(16) DEFAULT NULL,
+					  PRIMARY KEY (`id`) USING BTREE
+					) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=0;
+					");
+					$stmt->execute();
+					$stmt->execute();
+				} catch(PDOException $pe) {
+					die(Security::encrypt("errorsql", $key1.$pe));
+				}
+				return true;
+			}
+
 			function hash_name($ncrypt, $realPass, $postPass, $salt) {
 					$cryptPass = false;
 
@@ -88,7 +126,7 @@ if(!defined('INCLUDE_CHECK')) {
 					}
 					return $cryptPass;
 			}
-
+			
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 					$massive = "";
@@ -101,9 +139,43 @@ if(!defined('INCLUDE_CHECK')) {
 							}
 						}
 						return $massive;
-					}
+			}
 
-					function token() {
+			
+			function uuidFromString($string) {
+				$val = md5($string, true);
+				$byte = array_values(unpack('C16', $val));
+			 
+				$tLo = ($byte[0] << 24) | ($byte[1] << 16) | ($byte[2] << 8) | $byte[3];
+				$tMi = ($byte[4] << 8) | $byte[5];
+				$tHi = ($byte[6] << 8) | $byte[7];
+				$csLo = $byte[9];
+				$csHi = $byte[8] & 0x3f | (1 << 7);
+			 
+				if (pack('L', 0x6162797A) == pack('N', 0x6162797A)) {
+					$tLo = (($tLo & 0x000000ff) << 24) | (($tLo & 0x0000ff00) << 8) | (($tLo & 0x00ff0000) >> 8) | (($tLo & 0xff000000) >> 24);
+					$tMi = (($tMi & 0x00ff) << 8) | (($tMi & 0xff00) >> 8);
+					$tHi = (($tHi & 0x00ff) << 8) | (($tHi & 0xff00) >> 8);
+				}
+			 
+				$tHi &= 0x0fff;
+				$tHi |= (3 << 12);
+			   
+				$uuid = sprintf(
+					'%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x',
+					$tLo, $tMi, $tHi, $csHi, $csLo,
+					$byte[10], $byte[11], $byte[12], $byte[13], $byte[14], $byte[15]
+				);
+				return $uuid;
+			}
+ 
+			function uuidConvert($string)
+			{
+				$string = uuidFromString("OfflinePlayer:".$string);
+				return $string;
+			}
+
+			function token() {
 					$chars="0123456789abcdef";
 					$max=64;
 					$size=StrLen($chars)-1;
@@ -144,7 +216,7 @@ if(!defined('INCLUDE_CHECK')) {
 					"AidenFox & DarkFox!",
 					"Расскажи своей маме!",
 					"А ты хорош!",
-					"K4dj1t опрятен!",
+					"K4dj1t ничего не крал!",
 					"Может содержать орехи!",
 					"Лучше, чем добыча!",
 					"Автообновление!",
@@ -159,7 +231,7 @@ if(!defined('INCLUDE_CHECK')) {
 					'Message' => $text);
 					$textGet = json_encode($textGet);	
 					
-					return $textGet;
+					return $text;
 			}
 			
 			function verifySSL(){
@@ -199,7 +271,7 @@ if(!defined('INCLUDE_CHECK')) {
 						}} else {
 						return("offline");
 					}
-			}
+			} 
 				
 			function ImgHash($img){
 					$file_link = SITE_ROOT."/files/img/$img.png";
@@ -211,3 +283,4 @@ if(!defined('INCLUDE_CHECK')) {
 				return $answer;
 			}
 }
+verifySSL();
