@@ -3,7 +3,7 @@
 =====================================================
  Functions
 -----------------------------------------------------
- https://arcjetsystems.ru/
+ https://foxesworld.ru/
 -----------------------------------------------------
  Copyright (c) 2016-2020  FoxesWorld
 -----------------------------------------------------
@@ -11,14 +11,18 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.3 Alpha
+ Версия: 0.0.9 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
+
 if(!defined('INCLUDE_CHECK')) {
-		die("Hacking Attempt!");
-	} else {
+		require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
+}
+	verifySSL();
+//================================================================
+
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
 						$key .= $key;
@@ -75,7 +79,7 @@ if(!defined('INCLUDE_CHECK')) {
 					$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 					$db->exec("set names utf8");
 				} catch(PDOException $pe) {
-					die(Security::encrypt("errorsql", $key1));
+					die(Security::encrypt("errorsql")."Ошибка подключения (Хост, Логин, Пароль)");
 				}
 				try {
 					$stmt = $db->prepare("
@@ -99,11 +103,9 @@ if(!defined('INCLUDE_CHECK')) {
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=0;
 					");
 					$stmt->execute();
-					$stmt->execute();
 				} catch(PDOException $pe) {
-					die(Security::encrypt("errorsql", $key1.$pe));
+					die(Security::encrypt("errorsql")); 
 				}
-				return true;
 			}
 
 			function hash_name($ncrypt, $realPass, $postPass, $salt) {
@@ -135,12 +137,29 @@ if(!defined('INCLUDE_CHECK')) {
 							$isdir = is_dir($name);
 							if ($basename!="." and $basename!=".." and !is_dir($name)){
 								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name).'<:>';
+								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 							}
 						}
 						return $massive;
 			}
-
+			
+			function checkConfig($client) {
+					$path = 'files/clients/'.$client.'/config';
+					if(!is_dir($path)) {
+						die("ERROR! \nDirectory - $path doesn't exist!");
+					}
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					$massive = "";
+						foreach($objects as $name => $object) {
+							$basename = basename($name);
+							$isdir = is_dir($name);
+							if ($basename!="." and $basename!=".." and !is_dir($name)){
+								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."\n";
+							}
+						}
+						return $massive;
+			}
 			
 			function uuidFromString($string) {
 				$val = md5($string, true);
@@ -184,25 +203,10 @@ if(!defined('INCLUDE_CHECK')) {
 					$password.=$chars[rand(0,$size)];
 					  return $password;
 			}
-
-			function imagestype($binary) {
-					if (
-						!preg_match(
-							'/\A(?:(\xff\xd8\xff)|(GIF8[79]a)|(\x89PNG\x0d\x0a)|(BM)|(\x49\x49(?:\x2a\x00|\x00\x4a))|(FORM.{4}ILBM))/',
-							$binary, $hits
-						)
-					) {
-						return 'application/octet-stream';
-					}
-					static $type = array (
-						1 => 'image/jpeg',
-						2 => 'image/gif',
-						3 => 'image/png',
-						4 => 'image/x-windows-bmp',
-						5 => 'image/tiff',
-						6 => 'image/x-ilbm',
-					);
-					return $type[count($hits) - 1];
+			
+			function hashc($client ,$clientsDir) {
+					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
+				return $hash_md5;
 			}
 			
 			function getyText(){
@@ -234,6 +238,60 @@ if(!defined('INCLUDE_CHECK')) {
 					return $text;
 			}
 			
+			function getRealname($login, $db_host, $db_database, $db_user, $db_pass){
+				try {
+					$loginDB = new PDO("mysql:host=$db_host;dbname=$db_database;charset=UTF8", $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+				} catch(PDOException $e) { 
+					die($e->getMessage());
+				}
+				$query = "SELECT * FROM dle_users WHERE name = '$login'";
+				$STH = $loginDB->query($query);  
+				$STH->setFetchMode(PDO::FETCH_OBJ);
+				$row = $STH->fetch();
+				$realname = $row -> fullname;
+				
+				return $realname;
+			}
+			
+			function parse_online($host, $port){
+				$offline = 'offline';
+				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
+
+					if ($socket !== false) {
+					@fwrite($socket, "\xFE");
+					$data = "";
+					$data = @fread($socket, 256);
+					@fclose($socket);
+			 
+				if ($data == false || substr($data, 0, 1) != "\xFF") return;{
+				  $info= substr($data, 3);
+				  $info = iconv('UTF-16BE', 'UTF-8', $info);
+
+					 if($info[1] === "\xA7" && $info[2] === "\x31" ) {
+					 $info = explode( "\x00", $info);
+					 $playersOnline=IntVal($info[4]);
+					 $playersMax = IntVal($info[5]);
+						} else {
+					 $info = Explode("\xA7", $info);
+					 $playersOnline=IntVal($info[1]);
+					 $playersMax = IntVal($info[2]);
+						}
+						return ("$playersOnline&$playersMax");
+						}} else {
+						return $offline;
+					}
+			} 
+				
+			function ImgHash($img){
+					$file_link = "../files/img/$img.png";
+					if(file_exists($file_link)){
+						$answer = md5_file($file_link);
+					} else {
+						$answer = "Image not found!";
+				}
+				return $answer;
+			}
+			
 			function verifySSL(){
 				if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||  isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'))
 				{
@@ -244,43 +302,22 @@ if(!defined('INCLUDE_CHECK')) {
 				}
 				return true;
 			}
-			verifySSL();
-			
-		    function parse_online($host, $port){
-				$socket = @fsockopen($host, $port);
-					if ($socket !== false) {
-					@fwrite($socket, "\xFE");
-					$data = "";
-					$data = @fread($socket, 256);
-					@fclose($socket);
-			 
-				if ($data == false or substr($data, 0, 1) != "\xFF") return;{
-				  $info= substr( $data, 3 );
-				  $info = iconv( 'UTF-16BE', 'UTF-8', $info );
-
-					 if( $info[ 1 ] === "\xA7" && $info[ 2 ] === "\x31" ) {
-					 $info = explode( "\x00", $info );
-					 $playersOnline=IntVal( $info[4] );
-					 $playersMax = IntVal( $info[5] );
-						} else {
-					 $info = Explode( "\xA7", $info );
-					 $playersOnline=IntVal( $info[1] );
-					 $playersMax = IntVal( $info[2] );
-						}
-						return ("$playersOnline&$playersMax");
-						}} else {
-						return("offline");
+		/*	function imagestype($binary) {
+					if (
+						!preg_match(
+							'/\A(?:(\xff\xd8\xff)|(GIF8[79]a)|(\x89PNG\x0d\x0a)|(BM)|(\x49\x49(?:\x2a\x00|\x00\x4a))|(FORM.{4}ILBM))/',
+							$binary, $hits
+						)
+					) {
+						return 'application/octet-stream';
 					}
-			} 
-				
-			function ImgHash($img){
-					$file_link = SITE_ROOT."/files/img/$img.png";
-					if(file_exists($file_link)){
-						$answer = md5_file($file_link);
-					} else {
-						$answer = "Image not found!";
-				}
-				return $answer;
-			}
-}
-verifySSL();
+					static $type = array (
+						1 => 'image/jpeg',
+						2 => 'image/gif',
+						3 => 'image/png',
+						4 => 'image/x-windows-bmp',
+						5 => 'image/tiff',
+						6 => 'image/x-ilbm',
+					);
+					return $type[count($hits) - 1];
+			}*/

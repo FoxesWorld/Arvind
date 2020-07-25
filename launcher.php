@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.13 Alpha
+ Версия: 0.0.15 Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -20,8 +20,9 @@ header('Content-Type: text/html; charset=utf-8');
 Error_Reporting(E_ALL);
 Ini_Set('display_errors', true);
 define('INCLUDE_CHECK',true); //Security Define
-	include ("scripts/functions.inc.php");  //All Functions
-	include_once ("scripts/actionScript.php");  //Action requests
+include ("scripts/functions.inc.php");  //All Functions
+include_once ("scripts/actionScript.php");  //Action requests
+//================================================================
 
 	if(isset($_POST['action'])) {
 		include("database.php");
@@ -43,18 +44,19 @@ define('INCLUDE_CHECK',true); //Security Define
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $login) || !preg_match("/^[a-zA-Z0-9_-]+$/", $postPass) || !preg_match("/^[a-zA-Z0-9_-]+$/", $action)) {
 		exit(Security::encrypt("errorLogin<$>", $key1));
     }
+	
 	if(!file_exists($uploaddirs)) {
-		die ("Путь к скинам не является папкой! Укажите правильный путь.");
+		die ("Путь к скинам не является папкой!");
 	}
 	
 	if(!file_exists($uploaddirp)) {
-		die ("Путь к плащам не является папкой! Укажите правильный путь.");
+		die ("Путь к плащам не является папкой!");
 	}
 	
 
     if($ctoken == "null") {
 			if($crypt === 'hash_md5' || $crypt === 'hash_foxy') {
-				$stmt = $db->prepare("SELECT $db_columnUser,$db_columnPass FROM $db_table WHERE BINARY $db_columnUser= :login");
+				$stmt = $db->prepare("SELECT $db_columnUser,$db_columnPass FROM $db_table WHERE BINARY $db_columnUser = :login");
 				$stmt->bindValue(':login', $login);
 				$stmt->execute();
 				$stmt->bindColumn($db_columnPass, $realPass);
@@ -134,20 +136,17 @@ define('INCLUDE_CHECK',true); //Security Define
     
 	if($action == 'auth') {
 		
-        if($assetsfolder){
-			$z = "/"; 
-			} else { 
-			$z = ".zip"; 
-		}
-		$clientsDir = "files/clients/";
 		if(
-		!file_exists($clientsDir."assets".$z)||
+		!file_exists($clientsDir."assets")||
 		!file_exists($clientsDir.$client."/bin/")||
 		!file_exists($clientsDir.$client."/mods/")||
-		!file_exists($clientsDir.$client."/coremods/")||
 		!file_exists($clientsDir.$client."/natives/")||
 		!file_exists($clientsDir.$client."/config.zip")) {
 			die(Security::encrypt("client<$> $client", $key1));
+		}
+		
+		if(file_exists($clientsDir.$client."/coremods/")) {
+			$arg = "checkfiles($clientsDir.$client.'/coremods/')";
 		}
 
         $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $protectionKey));
@@ -157,30 +156,20 @@ define('INCLUDE_CHECK',true); //Security Define
         $sizeass  = @filesize($clientsDir."assets.zip");
 		$usrsessions = "$masterversion<:>$md5user<:>".$md5zip."<>".$sizezip."<:>".$md5ass."<>".$sizeass."<br>".$realUser.'<:>'.strtoint(xorencode($sessid, $protectionKey)).'<br>'.$acesstoken.'<br>';
 
-        function hashc($assetsfolder,$client) {
-        	$clientsDir = "files/clients/";
-			if($assetsfolder) {	
-	        	$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/coremods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
-			} else {
-		        $hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/coremods/').checkfiles($clientsDir.$client.'/natives/')).'<::>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
-		    }
-		    return $hash_md5;
-        }
-
         if($temp) {
-	        $filecashe = 'temp/'.$client;
-			if (file_exists($filecashe)) {
-				 $fp = fopen($filecashe, "r");
+	        $filecache = $clientsDir.$client.'/'.$client;
+			if (file_exists($filecache)) {
+				 $fp = fopen($filecache, "r");
 				 $hash_md5 = fgets($fp);
 				 fclose($fp);
 			} else {
-				$hash_md5 = hashc($assetsfolder,$client);
-				$fp = fopen($filecashe, "w");
+				$hash_md5 = hashc($client,$clientsDir);
+				$fp = fopen($filecache, "w");
 				fwrite($fp, $hash_md5);
 				fclose($fp);
 			}
 	    } else {
-	    	$hash_md5 = hashc($assetsfolder,$client);
+	    	$hash_md5 = hashc($client,$clientsDir);
 	    }
         echo Security::encrypt($usrsessions.$hash_md5, $key1);
 	}

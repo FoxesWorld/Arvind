@@ -28,7 +28,7 @@
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=0;
 		");
 		$stmt->execute();
-		$stmt->execute();
 	} catch(PDOException $pe) {
 		die(Security::encrypt("errorsql", $key1).$logger->WriteLine($log_date.$pe));  //вывод ошибок MySQL в m.log
 	}
+?>
