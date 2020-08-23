@@ -34,30 +34,21 @@
 				$serverImage = $row['srv_image'];
 				$story = $row['story'];
 				
-				echo $serverName . "& "; 
-				echo $adress . "& "; 
-				echo $port . "& "; 
-				echo $version  . "& ";  
-				echo $serverImage  . "& ";  
-				echo $story . "<::>"; 
+				$JSONServers = array(
+				'serverNum' => "Server-$counter",
+				'serverName' => "$serverName",
+				'adress' => "$adress",
+				'port' => "$port",
+				'version' => "$version",
+				'serverImage' => "$serverImage",
+				'story' => "$story");
+				$JSONServers = json_encode($JSONServers);
+				echo $JSONServers;
+				echo "\n";
+
 				$counter++;
 			}
 
 
 	}
 	$STH = null;
-
-
-
-
-
-	/*$JSONServers = array(
-	'serverNum' => "Server-$counter",
-	'serverName' => "$serverName",
-	'adress' => "$adress",
-	'port' => "$port",
-	'version' => "$version",
-	'serverImage' => "$serverImage",
-	'story' => "$story"); */
-	//$JSONServers = json_encode($JSONServers);
-	//echo $JSONServers;

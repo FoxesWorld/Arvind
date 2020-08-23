@@ -11,12 +11,11 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.0.8 Alpha
+ Версия: 0.0.9 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
-*/ 
-header("Content-Type: text/plain; charset=UTF-8");
+*/
 
   if(!defined('INCLUDE_CHECK')) {
 		die("Hacking Attempt!");
@@ -24,7 +23,7 @@ header("Content-Type: text/plain; charset=UTF-8");
 		require_once ('functions.inc.php');
   }
 		
-		$dbname = 'fox_launcher';
+		//$dbname = 'fox_launcher';
 	if(isset($_GET['adress']) && isset($_GET['port'])){
 			$host = $_GET['adress'];
 			$port = $_GET['port'];
@@ -43,10 +42,11 @@ header("Content-Type: text/plain; charset=UTF-8");
 			
 	} elseif(isset($_GET['getRealname'])){
 			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
-			$login = $_GET['getRealname'];
-			die(getRealname($login, $db_host, $db_database, $db_user, $db_pass));
-			
-	} elseif (isset($_GET['configFiles'])){
-			$clientName = $_GET['configFiles'];
-			die(checkConfig($clientName));
+			$login = $_GET['getRealname'] ?? null;
+			if($login != null){
+				die(getRealname($login, $FoxSiteDB));
+			} else {
+				die("Invalid login!");
+			}
+		
 	}

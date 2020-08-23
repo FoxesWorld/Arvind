@@ -11,18 +11,17 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.9 Alpha
+ Версия: 0.0.10 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
-
-if(!defined('INCLUDE_CHECK')) {
-		require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
-}
 	verifySSL();
+	if(!defined('INCLUDE_CHECK')) {
+			require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
+	}
 //================================================================
-
+header('Content-Type: text/html; charset=utf-8');			
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
 						$key .= $key;
@@ -143,8 +142,8 @@ if(!defined('INCLUDE_CHECK')) {
 						return $massive;
 			}
 			
-			function checkConfig($client) {
-					$path = 'files/clients/'.$client.'/config';
+			function checkfilesRoot($client) {
+					$path = 'files/clients/'.$client;
 					if(!is_dir($path)) {
 						die("ERROR! \nDirectory - $path doesn't exist!");
 					}
@@ -155,7 +154,7 @@ if(!defined('INCLUDE_CHECK')) {
 							$isdir = is_dir($name);
 							if ($basename!="." and $basename!=".." and !is_dir($name)){
 								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."\n";
+								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 							}
 						}
 						return $massive;
@@ -205,7 +204,7 @@ if(!defined('INCLUDE_CHECK')) {
 			}
 			
 			function hashc($client ,$clientsDir) {
-					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/coremods<:b:>'.$client.'/natives<:b:>';
+					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfilesRoot($client).checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>'; //.$client.'/coremods<:b:>'
 				return $hash_md5;
 			}
 			
@@ -225,7 +224,8 @@ if(!defined('INCLUDE_CHECK')) {
 					"Лучше, чем добыча!",
 					"Автообновление!",
 					"Теперь больше полигонов!",
-					"Пауки везде! Беги Рон!");
+					"Пауки везде! Беги Рон!",
+					"Съешь эклипс, чтобы пыхтеть!");
 					$ArrayNum = count($TextArray) - 1;
 					$rand = rand (0,$ArrayNum);
 					$text = $TextArray[$rand];
@@ -238,14 +238,9 @@ if(!defined('INCLUDE_CHECK')) {
 					return $text;
 			}
 			
-			function getRealname($login, $db_host, $db_database, $db_user, $db_pass){
-				try {
-					$loginDB = new PDO("mysql:host=$db_host;dbname=$db_database;charset=UTF8", $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-				} catch(PDOException $e) { 
-					die($e->getMessage());
-				}
+			function getRealname($login, $FoxSiteDB){
 				$query = "SELECT * FROM dle_users WHERE name = '$login'";
-				$STH = $loginDB->query($query);  
+				$STH = $FoxSiteDB->query($query);  
 				$STH->setFetchMode(PDO::FETCH_OBJ);
 				$row = $STH->fetch();
 				$realname = $row -> fullname;
@@ -282,8 +277,8 @@ if(!defined('INCLUDE_CHECK')) {
 					}
 			} 
 				
-			function ImgHash($img){
-					$file_link = "../files/img/$img.png";
+			function ImgHash($img) {
+					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
 						$answer = md5_file($file_link);
 					} else {

@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.15 Alpha
+ Версия: 0.0.15 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -134,14 +134,14 @@ include_once ("scripts/actionScript.php");  //Action requests
 			$stmt->execute();
 		}
     
-	if($action == 'auth') {
+		if($action == 'auth') {
 		
 		if(
 		!file_exists($clientsDir."assets")||
 		!file_exists($clientsDir.$client."/bin/")||
 		!file_exists($clientsDir.$client."/mods/")||
 		!file_exists($clientsDir.$client."/natives/")||
-		!file_exists($clientsDir.$client."/config.zip")) {
+		!file_exists($clientsDir.$client."/servers.dat")) {
 			die(Security::encrypt("client<$> $client", $key1));
 		}
 		
@@ -150,9 +150,9 @@ include_once ("scripts/actionScript.php");  //Action requests
 		}
 
         $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $protectionKey));
-        $md5zip	  = @md5_file($clientsDir.$client."/config.zip");
+        $md5zip	  = @md5_file($clientsDir.$client."/servers.dat");
         $md5ass	  = @md5_file($clientsDir."assets.zip");
-        $sizezip  = @filesize($clientsDir.$client."/config.zip");
+        $sizezip  = @filesize($clientsDir.$client."/servers.dat");
         $sizeass  = @filesize($clientsDir."assets.zip");
 		$usrsessions = "$masterversion<:>$md5user<:>".$md5zip."<>".$sizezip."<:>".$md5ass."<>".$sizeass."<br>".$realUser.'<:>'.strtoint(xorencode($sessid, $protectionKey)).'<br>'.$acesstoken.'<br>';
 
