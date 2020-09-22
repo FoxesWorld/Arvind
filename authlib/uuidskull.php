@@ -1,7 +1,7 @@
 <?php
 define('INCLUDE_CHECK',true);
 include_once("../database.php");
-include_once(SCRIPTS_DIR."functions.inc.php");
+include_once('uuid.php');
 @$user = json_decode($HTTP_RAW_POST_DATA);
 try { 
     $stmt = $db->prepare("SELECT user FROM usersession WHERE user= :user");

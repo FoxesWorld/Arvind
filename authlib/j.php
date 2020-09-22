@@ -35,5 +35,5 @@
 		}
 		else exit(json_encode($bad));
 	} catch(PDOException $pe) {
-			die("bad".$pe);  //вывод ошибок MySQL в m.log
+			die("bad".$pe);
 	}
