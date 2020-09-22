@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.0.9 Alpha
+ Версия: 0.0.10 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -49,4 +49,23 @@
 				die("Invalid login!");
 			}
 		
+	} elseif(isset($_GET['show'])) {
+    require 'SkinViewer2D.class.php';
+    header("Content-type: image/png");
+    $skin_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftSkins/';											//?show=body&file_name=miomoor&side=front
+    $cloak_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftCloaks/';											//show (body,head)
+    $show = $_GET['show'];																							//file_name (username)
+	$name =  empty($_GET['file_name']) ? 'default' : $_GET['file_name'];											//side (front,back)
+    $skin =  $skin_dir . $name . '.png';
+    $cloak =  $cloak_dir . $name . '.png';
+    if (!skinViewer2D::isValidSkin($skin)) {
+        $skin = $skin_dir . 'default.png';
+    }
+    if ($show !== 'head') {
+        $side = isset($_GET['side']) ? $_GET['side'] : false;
+        $img = skinViewer2D::createPreview($skin, $cloak, $side);
+    } else {
+        $img = skinViewer2D::createHead($skin, 64);
+    }
+    imagepng($img);
 	}

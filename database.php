@@ -1,6 +1,6 @@
 <?php
 if(!defined('INCLUDE_CHECK')) {
-	require ($_SERVER['DOCUMENT_ROOT'].'/launcher/404.html');
+	require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
 	exit();
 }
 	
@@ -38,7 +38,7 @@ if(!defined('INCLUDE_CHECK')) {
 	$crypt 				= 'hash_foxy';
 	
 	$useban             =  false; //Бан на сервере = бан в лаунчере (Не готовая разработка) //Будет убрано 
-	$useantibrut        =  true; //Защита от частых подборов пароля (Пауза 1 минута, увеличим рост блокировки в геометрической прогрессии))))
+	$useantibrut        =  true; //Защита от частых подборов пароля (Пауза 1 минута)
 	$temp               = true; //Хранение кеша файлов во временных файлах
 	
 	/*		 Cryptography		 */
@@ -51,8 +51,8 @@ if(!defined('INCLUDE_CHECK')) {
 	/*		 Skins&Cloaks Configuration 		*/
 	$uploaddirs         = 'MinecraftSkins';  //Папка скинов
 	$uploaddirp         = 'MinecraftCloaks'; //Папка плащей
-    $skinurl            = 'https://login.foxesworld/launcher/'.$uploaddirs.'/'; //Ссылка на скины 
-    $capeurl            = 'https://login.foxesworld/launcher/'.$uploaddirp.'/'; //Ссылка на плащи	
+    $skinurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirs.'/'; //Ссылка на скины 
+    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirp.'/'; //Ссылка на плащи	
 
 	require_once ('scripts/databasePrepare.php');
 	

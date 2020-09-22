@@ -72,7 +72,8 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 				
 				
-			function dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass){
+			function dbPrepare(){
+				global $db_host, $db_port, $db_database, $db_user, $db_pass;
 				try {
 					$db = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_database", $db_user, $db_pass);
 					$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -126,6 +127,34 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 					}
 					return $cryptPass;
+			}
+			
+			function serversParser($selector){
+				global $LauncherDB;
+				$STH = $LauncherDB ->query("$selector");  
+				$STH->setFetchMode(PDO::FETCH_ASSOC);  
+				$counter = 0;
+				while($row = $STH->fetch()) { 
+						if($row['enabled'] == 1) {
+							$serverName = $row['Server_name'];
+							$adress = $row['adress'];
+							$port = $row['port'];
+							$version = $row['version'];
+							$serverImage = $row['srv_image'];
+							$story = $row['story'];
+							
+							echo $serverName . "& "; 
+							echo $adress . "& "; 
+							echo $port . "& "; 
+							echo $version  . "& ";  
+							echo $serverImage  . "& ";  
+							echo $story . "<::>"; 
+							$counter++;
+						}
+
+
+				}
+				$STH = null;
 			}
 			
 			function checkfiles($path) {
@@ -209,26 +238,17 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function getyText(){
-					$TextArray = array(
-					"Куриная основа!",
-					"Секретный план Нотча!",
-					"Не без Эксепшнов!",
-					"Придумано Лисами!",
-					"Основано на реальных событиях!",
-					"Нужно больше золота!",
-					"AidenFox & DarkFox!",
-					"Расскажи своей маме!",
-					"А ты хорош!",
-					"K4dj1t ничего не крал!",
-					"Может содержать орехи!",
-					"Лучше, чем добыча!",
-					"Автообновление!",
-					"Теперь больше полигонов!",
-					"Пауки везде! Беги Рон!",
-					"Съешь эклипс, чтобы пыхтеть!");
-					$ArrayNum = count($TextArray) - 1;
+					require ('database.php');
+					$randPhrase = array();
+					$selector = "SELECT * FROM randPhrases";
+					$STH = $LauncherDB->query("$selector");  
+					$STH->setFetchMode(PDO::FETCH_ASSOC);  
+					while($row = $STH->fetch()) { 
+						$randPhrase[] = $row['phrase'];
+					}
+					$ArrayNum = count($randPhrase) - 1;
 					$rand = rand (0,$ArrayNum);
-					$text = $TextArray[$rand];
+					$text = $randPhrase[$rand];
 					
 					$textGet = array(
 					'type' => 'getText',
