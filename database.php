@@ -42,11 +42,12 @@ if(!defined('INCLUDE_CHECK')) {
 	$temp               = true; //Хранение кеша файлов во временных файлах
 	
 	/*		 Cryptography		 */
-	$masterversion  	= 'final_RC4'; //версия лаунчера (Не пригодилась, md5 всё сам решил, в будущих релизах уберем) //Будет убрано 
+	$masterversion  	= 'final_RC4'; 								//версия лаунчера (Не пригодилась, md5 всё сам решил, в будущих релизах уберем) //Будет убрано 
 	$protectionKey		= 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj'; 
-	$key1               = "R2zwuwmv~YZSIJ21";  //16 Character Key 
-	$key2               = "oPCwB9S6z{*rEh%V"; //16 Character  Key
-	$md5launcherjar     = @md5_file("files/launcher/launcher.jar");  // Сверяем MD5 //Будет убрано так как сверяем иначе
+	$key1               = "R2zwuwmv~YZSIJ21";  						//16 Character Key 
+	$key2               = "oPCwB9S6z{*rEh%V"; 						//16 Character  Key
+	$md5launcherjar     = @md5_file("files/launcher/launcher.jar"); //Сверяем MD5 //Будет убрано так как сверяем иначе
+	$cronPass 			= 'Tess2556308';							//Ключ для работы кронТаба 
 
 	/*		 Skins&Cloaks Configuration 		*/
 	$uploaddirs         = 'MinecraftSkins';  //Папка скинов
@@ -55,7 +56,7 @@ if(!defined('INCLUDE_CHECK')) {
     $capeurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirp.'/'; //Ссылка на плащи	
 
 	require_once ('scripts/databasePrepare.php');
-	
+	//dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass);
 	try { 
 		$LauncherDB = new PDO("mysql:host=$db_host;dbname=$dbname_launcher;charset=UTF8", $db_user, $db_pass); 
 	} catch(PDOException $e) { 
@@ -67,5 +68,3 @@ if(!defined('INCLUDE_CHECK')) {
 	} catch(PDOException $e) { 
 		die($e->getMessage());
 	}
-
-	//dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass);

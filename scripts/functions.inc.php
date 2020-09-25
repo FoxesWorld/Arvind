@@ -151,8 +151,6 @@ header('Content-Type: text/html; charset=utf-8');
 							echo $story . "<::>"; 
 							$counter++;
 						}
-
-
 				}
 				$STH = null;
 			}
@@ -259,7 +257,7 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function getRealname($login, $FoxSiteDB){
-				$query = "SELECT * FROM dle_users WHERE name = '$login'";
+				$query = "SELECT fullname FROM dle_users WHERE name = '$login'";
 				$STH = $FoxSiteDB->query($query);  
 				$STH->setFetchMode(PDO::FETCH_OBJ);
 				$row = $STH->fetch();
@@ -269,7 +267,6 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function parse_online($host, $port){
-				$offline = 'offline';
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
 					if ($socket !== false) {
@@ -291,11 +288,38 @@ header('Content-Type: text/html; charset=utf-8');
 					 $playersOnline=IntVal($info[1]);
 					 $playersMax = IntVal($info[2]);
 						}
+					if(!$info[1] || !$info[2]){
+						return 'offline';
+					}
 						return ("$playersOnline&$playersMax");
 						}} else {
-						return $offline;
+						return 'offline';
 					}
-			} 
+			}
+			
+			function clearMD5Cache($DBH){
+				$selector = "SELECT Server_name FROM servers";
+				$STH = $DBH->query("$selector");  
+				$STH->setFetchMode(PDO::FETCH_ASSOC);  
+				while($row = $STH->fetch()) {  
+					if ($handle = opendir(SITE_ROOT.'/files/clients/'.$row['Server_name'])) {
+						while (false !== ($file = readdir($handle)))   {
+							if ($file != "." && $file != ".." && $file != "mods" && $file != "bin" && $file != "config" && $file != "natives" && $file != "config.zip"){
+							$delPath = '../files/clients/'.$file."/".$file;
+								if (file_exists($delPath)) {
+									$unlink = unlink($delPath);
+									if($unlink == true){
+										echo "Deleted: $delPath<br>";
+									} else {
+										echo "Error deleting $delPath<br>";
+									}
+								}
+							}
+						}
+						closedir($handle);
+						}
+				}
+			}
 				
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";

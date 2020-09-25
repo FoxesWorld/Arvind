@@ -20,15 +20,3 @@
 	define('INCLUDE_CHECK', true );
 	require ("database.php");
 	die(serversParser("SELECT * FROM servers"));
-
-
-	/*$JSONServers = array(
-	'serverNum' => "Server-$counter",
-	'serverName' => "$serverName",
-	'adress' => "$adress",
-	'port' => "$port",
-	'version' => "$version",
-	'serverImage' => "$serverImage",
-	'story' => "$story"); */
-	//$JSONServers = json_encode($JSONServers);
-	//echo $JSONServers;

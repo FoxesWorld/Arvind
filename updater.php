@@ -46,36 +46,6 @@ include_once ("scripts/functions.inc.php");
 	if(isset($launcher_hash)){
 		die($launcher_hash == md5_file("files/launcher/launcher.jar") ? "NO" : "YES");
 	}
-
-	/*//Библиотеки	
-	if(isset($lib_load)){
-	if ($handle = opendir('files/launcher/lib')) {
-	while (false !== ($file = readdir($handle)))   {
-		if ($file != "." && $file != "..")
-		{
-		echo "$file"; 
-		echo "\n";
-		if(!$file){ 
-			die("ERROR\n no Lib Found!");
-			}
-		}									}
-		closedir($handle);
-		}
-	}
-
-	//Хеш библиотеки	
-	if(isset($lib_hash)){
-		if (file_exists("files/launcher/lib/$lib_hash")) {
-			
-		function lib_hash($lib_name){
-		$hash = md5_file("files/launcher/lib/$lib_name");		
-		return $hash;}
-		
-		die (lib_hash($lib_hash));
-		} else {
-			die("Library does not exist");
-		}
-	} */
 	
 	//Download (Скачивание апдейтера с сайта)
 	if(isset($download)){

@@ -18,6 +18,7 @@
 */
 define('INCLUDE_CHECK',true);
 @$md5 = $_GET['user'];
+$exists1;
 	try {
 		
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $md5)){
