@@ -16,7 +16,7 @@
  Назначение: Действия при определенных запросах
 =====================================================
 */
-
+  //define ('INCLUDE_CHECK',true);
   if(!defined('INCLUDE_CHECK')) {
 		require ('../../index.html');
   } else {

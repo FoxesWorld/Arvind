@@ -18,6 +18,7 @@
 */
 header('Content-Type: text/html; charset=utf-8');
 Error_Reporting(E_ALL);
+$_TIME = time();
 Ini_Set('display_errors', true);
 define('INCLUDE_CHECK',true); //Security Define
 include ("scripts/functions.inc.php");  //All Functions
@@ -133,8 +134,12 @@ include_once ("scripts/actionScript.php");  //Action requests
 			$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($realUser)));
 			$stmt->execute();
 		}
-    
+		$ip=$_SERVER['REMOTE_ADDR'];
+		$hash = generateLoginHash();
+		$db->query("UPDATE LOW_PRIORITY dle_users SET lastdate='{$_TIME}', logged_ip='$ip',hash='$hash' WHERE name='$login'");
 		if($action == 'auth') {
+			$geoBase = new IPGeoBase();
+			$geoBase->getIP($ip);
 		
 		if(
 		!file_exists($clientsDir."assets")||

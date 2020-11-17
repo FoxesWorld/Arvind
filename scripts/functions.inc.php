@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.10 Alpha
+ Версия: 0.0.14 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -70,8 +70,7 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 					return $status === 0;
 			}
-				
-				
+							
 			function dbPrepare(){
 				global $db_host, $db_port, $db_database, $db_user, $db_pass;
 				try {
@@ -129,6 +128,20 @@ header('Content-Type: text/html; charset=utf-8');
 					return $cryptPass;
 			}
 			
+			function generateLoginHash(){
+				if(function_exists('openssl_random_pseudo_bytes')) {
+				$stronghash = md5(openssl_random_pseudo_bytes(15));
+				} else { 
+				$stronghash = md5(uniqid( mt_rand(), TRUE )); }
+				$salt = sha1( str_shuffle("abcdefghjkmnpqrstuvwxyz0123456789") . $stronghash );
+				$hash = '';					
+				for($i = 0; $i < 9; $i ++) {
+					$hash .= $salt[mt_rand( 0, 39 )];
+				}
+				$hash = md5( $hash );
+				
+				return $hash;
+			}
 			function serversParser($selector){
 				global $LauncherDB;
 				$STH = $LauncherDB ->query("$selector");  
@@ -187,6 +200,33 @@ header('Content-Type: text/html; charset=utf-8');
 						return $massive;
 			}
 			
+			function checkfilesRootJSON($client) {
+					$path = $_SERVER['DOCUMENT_ROOT'].'/launcher/files/clients/'.$client;
+					if(!is_dir($path)) {
+						die("ERROR! \nDirectory - $path doesn't exist!");
+					}
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					$massive = "";
+						foreach($objects as $name => $object) {
+							$basename = basename($name);
+							$isdir = is_dir($name);
+							if ($basename!="." and $basename!=".." and !is_dir($name)){
+								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+								$array = array (
+								  $str => 
+								  array (
+									'hash' => md5($str),
+									'size' => filesize($str),
+								  )
+								);
+								$array = json_encode($array);
+								$JSON[] = $array;
+								//$JSON[] = implode(',', $array);
+							}
+						}
+						return $JSON;
+			}
+			
 			function uuidFromString($string) {
 				$val = md5($string, true);
 				$byte = array_values(unpack('C16', $val));
@@ -214,8 +254,7 @@ header('Content-Type: text/html; charset=utf-8');
 				return $uuid;
 			}
  
-			function uuidConvert($string)
-			{
+			function uuidConvert($string) {
 				$string = uuidFromString("OfflinePlayer:".$string);
 				return $string;
 			}
@@ -227,7 +266,7 @@ header('Content-Type: text/html; charset=utf-8');
 					$password=null;
 					while($max--)
 					$password.=$chars[rand(0,$size)];
-					  return $password;
+					return $password;
 			}
 			
 			function hashc($client ,$clientsDir) {
@@ -266,6 +305,18 @@ header('Content-Type: text/html; charset=utf-8');
 				return $realname;
 			}
 			
+			function getUserData($login,$data){
+				require ('database.php');
+				//global $FoxSiteDB;
+				$query = "SELECT * FROM dle_users WHERE name = '$login'";
+				$STH = $FoxSiteDB->query($query);  
+				$STH->setFetchMode(PDO::FETCH_OBJ);
+				$row = $STH->fetch();
+				$answer = $row -> fullname;
+				
+				return $answer;
+			}
+			
 			function parse_online($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
@@ -297,9 +348,10 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 			}
 			
-			function clearMD5Cache($DBH){
+			function clearMD5Cache(){
+				global $LauncherDB;
 				$selector = "SELECT Server_name FROM servers";
-				$STH = $DBH->query("$selector");  
+				$STH = $LauncherDB->query("$selector");  
 				$STH->setFetchMode(PDO::FETCH_ASSOC);  
 				while($row = $STH->fetch()) {  
 					if ($handle = opendir(SITE_ROOT.'/files/clients/'.$row['Server_name'])) {
@@ -317,7 +369,7 @@ header('Content-Type: text/html; charset=utf-8');
 							}
 						}
 						closedir($handle);
-						}
+					}
 				}
 			}
 				
@@ -341,22 +393,64 @@ header('Content-Type: text/html; charset=utf-8');
 				}
 				return true;
 			}
-		/*	function imagestype($binary) {
-					if (
-						!preg_match(
-							'/\A(?:(\xff\xd8\xff)|(GIF8[79]a)|(\x89PNG\x0d\x0a)|(BM)|(\x49\x49(?:\x2a\x00|\x00\x4a))|(FORM.{4}ILBM))/',
-							$binary, $hits
-						)
-					) {
-						return 'application/octet-stream';
+
+		class IPGeoBase {
+			private $fhandleCIDR, $fhandleCities, $fSizeCIDR, $fsizeCities;
+			
+			private function ipLocation($ip){
+					$ip_data = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=".$ip)); 
+					if($ip_data && $ip_data->geoplugin_countryName != null){
+						$ipLocation = $ip_data->geoplugin_countryCode;
+						$ipRegion = $ip_data->geoplugin_region;
+					} else {
+						$ipLocation = 'Unknown';
+						$ipRegion = $ip_data->geoplugin_region;
 					}
-					static $type = array (
-						1 => 'image/jpeg',
-						2 => 'image/gif',
-						3 => 'image/png',
-						4 => 'image/x-windows-bmp',
-						5 => 'image/tiff',
-						6 => 'image/x-ilbm',
-					);
-					return $type[count($hits) - 1];
-			}*/
+					return array($ipLocation,$ipRegion);
+			}
+			
+			private function addCityCount($city){
+				global $LauncherDB;
+				$query = "SELECT * FROM ipCity WHERE cityName = '$city'";
+				$STH = $LauncherDB->query($query);  
+				$STH->setFetchMode(PDO::FETCH_OBJ);
+				$row = $STH->fetchObject();
+				
+				if(!isset($row->cityName)){
+					$query = "INSERT INTO `ipCity`(`cityName`) VALUES ('$city')";
+				} else {
+					$query = "UPDATE `ipCity` SET `cityCount`= cityCount+1 WHERE cityName = '$city'";	
+				}
+				$LauncherDB->query($query);
+			}
+			
+			public function getIP($ip,$log=false){
+				global $LauncherDB;
+				if($ip){
+					if(!isset($_COOKIE['ipAdded'])){
+						$STH = $LauncherDB->query("SELECT * FROM `ipDatabase` WHERE ip = '$ip'"); 
+						$STH->setFetchMode(PDO::FETCH_OBJ);
+						$row = $STH->fetchObject();
+						if (!isset($row->ip)) {
+							$date="[".date("d m Y H:i")."] ";
+							$ipLocation = $this->ipLocation($ip)[0];
+							$ipRegion = $this->ipLocation($ip)[1];
+							$LauncherDB->query("INSERT INTO `ipDatabase`(`ipLocation`, `ipRegion`, `ip`) VALUES ('$ipLocation','$ipRegion','$ip')");  
+							$this->addCityCount($ipRegion);
+							if($log === true){
+								echo 'Adding '.$ip.' - '.$ipLocation.'('.$ipRegion.') '.'to IP database';
+							}
+							setcookie("ipAdded", $ip, time()+36000);
+						} else {
+							if($log === true){
+								echo 'Cookie was not found but Ip - '.$userIP.' is already added in the Database, thanks for helping us to build server statistics';
+							}
+						}
+					} else {
+						if($log === true){
+							echo 'Cookie was set for ip - '.$_COOKIE['ipAdded'];
+						}
+					}
+				}
+			}
+		}
