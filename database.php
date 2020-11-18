@@ -24,6 +24,7 @@ if(!defined('INCLUDE_CHECK')) {
 	$db_pass			= 'P$Ak$O2sJZSu$aAKOBqkokf@Vs5%YCj'; 
 	$db_database		= 'fox_dle';
 	$dbname_launcher    = 'fox_launcher';
+	$db_name_userdata	= 'fox_userdata';
 	$db_table       	= 'dle_users'; 
 	$db_columnId  		= 'user_id'; 
 	$db_columnUser  	= 'name';
@@ -67,4 +68,11 @@ if(!defined('INCLUDE_CHECK')) {
 		$FoxSiteDB = new PDO("mysql:host=$db_host;dbname=$db_database;charset=UTF8", $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 	} catch(PDOException $e) { 
 		die($e->getMessage());
+	}
+	
+	try {  
+	  $UDT = new PDO("mysql:host=$db_host;dbname=$db_name_userdata", $db_user, $db_pass);  
+	}  
+	catch(PDOException $e) {  
+		echo $e->getMessage();  
 	}

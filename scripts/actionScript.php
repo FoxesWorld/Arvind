@@ -11,14 +11,14 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.0.10 Alpha
+ Версия: 0.0.11 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
 */
-  //define ('INCLUDE_CHECK',true);
+
   if(!defined('INCLUDE_CHECK')) {
-		require ('../../index.html');
+		require ('../../index.php');
   } else {
 		require_once ('functions.inc.php');
   }
@@ -43,7 +43,7 @@
 			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
 			$login = $_GET['getRealname'] ?? null;
 			if($login != null){
-				die(getRealname($login, $FoxSiteDB));
+				die(getUserData($login,'fullname'));
 			} else {
 				die("Invalid login!");
 			}
@@ -67,4 +67,12 @@
 				$img = skinViewer2D::createHead($skin, 64);
 			}
 			imagepng($img);
+	} elseif (isset($_GET['getProfileBG'])){
+		if($_GET['getProfileBG'] !== null) {
+		$profileBG = usersBackgrounds($_GET['getProfileBG']);
+		$backgrounds = $profileBG->Images;
+		die($backgrounds);
+		} else {
+			die("No data!");
+		}
 	}

@@ -24,7 +24,9 @@ define('INCLUDE_CHECK',true); //Security Define
 include ("scripts/functions.inc.php");  //All Functions
 include_once ("scripts/actionScript.php");  //Action requests
 //================================================================
-
+	if(!$_REQUEST){
+		require ('../index.php');
+	}
 	if(isset($_POST['action'])) {
 		include("database.php");
 		$x  = $_POST['action'];

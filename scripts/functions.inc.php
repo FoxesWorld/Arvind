@@ -11,14 +11,14 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.14 Alpha
+ Версия: 0.0.15 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
 	verifySSL();
 	if(!defined('INCLUDE_CHECK')) {
-			require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
+			require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
 	}
 //================================================================
 header('Content-Type: text/html; charset=utf-8');			
@@ -295,26 +295,26 @@ header('Content-Type: text/html; charset=utf-8');
 					return $text;
 			}
 			
-			function getRealname($login, $FoxSiteDB){
-				$query = "SELECT fullname FROM dle_users WHERE name = '$login'";
-				$STH = $FoxSiteDB->query($query);  
-				$STH->setFetchMode(PDO::FETCH_OBJ);
-				$row = $STH->fetch();
-				$realname = $row -> fullname;
-				
-				return $realname;
-			}
-			
 			function getUserData($login,$data){
-				require ('database.php');
-				//global $FoxSiteDB;
+				global $FoxSiteDB;
 				$query = "SELECT * FROM dle_users WHERE name = '$login'";
 				$STH = $FoxSiteDB->query($query);  
 				$STH->setFetchMode(PDO::FETCH_OBJ);
 				$row = $STH->fetch();
-				$answer = $row -> fullname;
+				$answer = $row -> {$data};
 				
 				return $answer;
+			}
+			
+			function usersBackgrounds($login){
+				//global $UDT;
+				require ('database.php');
+				$query = "SELECT Images FROM `userBgImg` WHERE  userlogin = '$login'";
+				$STB = $UDT -> query($query);
+				$STB->setFetchMode(PDO::FETCH_OBJ);
+				$row = $STB->fetch();
+				
+				return $row;
 			}
 			
 			function parse_online($host, $port){
