@@ -11,17 +11,25 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.15 Alpha
+ Версия: 0.0.16.5 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
 	verifySSL();
 	if(!defined('INCLUDE_CHECK')) {
-			require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
+		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
 	}
+	
+	if(defined('DEBUG_LOGS')){
+		Error_Reporting(E_ALL);
+		Ini_Set('display_errors', true);
+	}
+	
+
 //================================================================
-header('Content-Type: text/html; charset=utf-8');			
+header('Content-Type: text/html; charset=utf-8');
+
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
 						$key .= $key;
@@ -142,6 +150,7 @@ header('Content-Type: text/html; charset=utf-8');
 				
 				return $hash;
 			}
+			
 			function serversParser($selector){
 				global $LauncherDB;
 				$STH = $LauncherDB ->query("$selector");  
@@ -168,6 +177,57 @@ header('Content-Type: text/html; charset=utf-8');
 				$STH = null;
 			}
 			
+			function availableServers($login){
+				if(!$login){
+					$userGroup='nologin';
+				} else {
+					$userGroup = getUserData($login,'user_group');
+				}
+				
+				switch ($userGroup){
+					case 1:
+					$query = "SELECT * FROM servers";
+					break;
+					
+					default:
+					$query = "SELECT * FROM servers WHERE srv_group = 4";
+				}
+						
+				return $query;
+			}
+			
+			function serversParserJSON($login){
+				global $LauncherDB;
+				$JSONServers = array();
+				$selector = availableServers($login);
+				$STH = $LauncherDB ->query("$selector");
+				$STH->setFetchMode(PDO::FETCH_ASSOC);  
+				$counter = 0;
+				while($row = $STH->fetch()) { 
+						if($row['enabled'] == 1) {
+							$serverName = $row['Server_name'];
+							$adress = $row['adress'];
+							$port = $row['port'];
+							$version = $row['version'];
+							$serverImage = $row['srv_image'];
+							$story = $row['story'];
+							
+							$JSONServers[] = array(
+							'serverNum' => "Server-$counter",
+							'serverName' => "$serverName",
+							'adress' => "$adress",
+							'port' => "$port",
+							'version' => "$version",
+							'serverImage' => "$serverImage",
+							'story' => "$story");
+							$counter++;
+						}
+				}
+				$JSONServers = json_encode($JSONServers);
+				$STH = null;
+				return $JSONServers;
+			}
+			
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 					$massive = "";
@@ -180,6 +240,29 @@ header('Content-Type: text/html; charset=utf-8');
 							}
 						}
 						return $massive;
+			}
+			
+			function checkfilesJSON($path) {
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					$fileOBJ = array();
+						foreach($objects as $name => $object) {
+							$basename = basename($name);
+							$isdir = is_dir($name);
+							if ($basename!="." and $basename!=".." and !is_dir($name)){
+								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+								//$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
+								$fileOBJ[] = array (
+									'filename' => $str.$basename,
+								  'fileInfo' => 
+								  array (
+									'hash' => md5($name),
+									'size' => filesize($name),
+								  )
+								); 
+							}
+						}
+						$fileOBJ = json_encode($fileOBJ);
+						return $fileOBJ;
 			}
 			
 			function checkfilesRoot($client) {
@@ -201,30 +284,30 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function checkfilesRootJSON($client) {
-					$path = $_SERVER['DOCUMENT_ROOT'].'/launcher/files/clients/'.$client;
-					if(!is_dir($path)) {
-						die("ERROR! \nDirectory - $path doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$massive = "";
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$array = array (
-								  $str => 
-								  array (
-									'hash' => md5($str),
-									'size' => filesize($str),
-								  )
-								);
-								$array = json_encode($array);
-								$JSON[] = $array;
-								//$JSON[] = implode(',', $array);
-							}
+				$path = 'files/clients/'.$client;
+				$files = array();
+				if(!is_dir($path)) {
+					//die("ERROR! \nDirectory - $path doesn't exist!");
+					exit();
+				}
+				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					foreach($objects as $name => $object) {
+						$basename = basename($name);
+						$isdir = is_dir($name);
+						if ($basename!="." and $basename!=".." and !is_dir($name)){
+							$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+							$files[] = array (
+								'filename' => $str.$basename,
+							  'fileInfo' => 
+							  array (
+								'hash' => md5($name),
+								'size' => filesize($name),
+							  )
+							);		
 						}
-						return $JSON;
+					}
+					$files = json_encode($files);
+					return $files;
 			}
 			
 			function uuidFromString($string) {
@@ -275,24 +358,27 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function getyText(){
-					require ('database.php');
+					require_once ('database.php');
 					$randPhrase = array();
 					$selector = "SELECT * FROM randPhrases";
 					$STH = $LauncherDB->query("$selector");  
 					$STH->setFetchMode(PDO::FETCH_ASSOC);  
 					while($row = $STH->fetch()) { 
 						$randPhrase[] = $row['phrase'];
+						$rarity[] = $row['rarity'];
 					}
 					$ArrayNum = count($randPhrase) - 1;
 					$rand = rand (0,$ArrayNum);
 					$text = $randPhrase[$rand];
+					$TextRarity = $rarity[$rand];
 					
 					$textGet = array(
 					'type' => 'getText',
+					'rarity' => $TextRarity,
 					'Message' => $text);
 					$textGet = json_encode($textGet);	
 					
-					return $text;
+					return $textGet;
 			}
 			
 			function getUserData($login,$data){
@@ -301,20 +387,46 @@ header('Content-Type: text/html; charset=utf-8');
 				$STH = $FoxSiteDB->query($query);  
 				$STH->setFetchMode(PDO::FETCH_OBJ);
 				$row = $STH->fetch();
-				$answer = $row -> {$data};
+				if($row){
+					$answer = $row -> {$data};
+				} else {
+					$answer = 'login not found';
+				}
 				
 				return $answer;
 			}
 			
-			function usersBackgrounds($login){
-				//global $UDT;
-				require ('database.php');
+			function userBGArray($login,$UDT){
 				$query = "SELECT Images FROM `userBgImg` WHERE  userlogin = '$login'";
 				$STB = $UDT -> query($query);
-				$STB->setFetchMode(PDO::FETCH_OBJ);
-				$row = $STB->fetch();
+				$STB->setFetchMode(PDO::FETCH_NUM);
+				$usersBg = $STB->fetch();
+				$usersImages = $usersBg[0];
 				
-				return $row;
+				return $usersImages;
+			}
+			
+			function usersBackgrounds($login){
+				require_once ('database.php');
+				$counter = 0;
+				$ImagesJSON = array();
+				$usersImages = userBGArray($login,$UDT);
+				$usersImagesArray = explode(",",$usersImages);
+				$countImages = count($usersImagesArray);
+				while ($counter < $countImages){
+					$CurrentImage = $usersImagesArray[$counter];
+					$query = "SELECT * FROM `BgImagesList` WHERE FileName = '$CurrentImage'";
+					$STB = $UDT -> query($query);
+					$STB->setFetchMode(PDO::FETCH_OBJ);
+					$row = $STB->fetch();;
+					$rarity = $row->Rarity;
+					$ImagesJSON[] = array(
+					'ImageName' => $CurrentImage,
+					'ImageRarity' => $rarity);
+					$counter++;
+				}
+				$ImagesJSON = json_encode($ImagesJSON);
+				return $ImagesJSON;
 			}
 			
 			function parse_online($host, $port){
