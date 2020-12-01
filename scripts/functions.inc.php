@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.16.5 Alpha
+ Версия: 0.0.17.5 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -78,7 +78,13 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 					return $status === 0;
 			}
-							
+			//Full JSON (Answers in JSON (2 rows))
+			function JSONanswer($typeName, $typeValue, $messageName, $messageValue){
+				$array = array($typeName => $typeValue,$messageName => $messageValue);
+				$array = json_encode($array);
+				return $array;
+			}
+			//Must be removed	
 			function dbPrepare(){
 				global $db_host, $db_port, $db_database, $db_user, $db_pass;
 				try {
@@ -150,7 +156,7 @@ header('Content-Type: text/html; charset=utf-8');
 				
 				return $hash;
 			}
-			
+			//NO JSON (Will be removed)
 			function serversParser($selector){
 				global $LauncherDB;
 				$STH = $LauncherDB ->query("$selector");  
@@ -176,22 +182,36 @@ header('Content-Type: text/html; charset=utf-8');
 				}
 				$STH = null;
 			}
-			
+			//Full JSON (Need migration)
 			function availableServers($login){
 				if(!$login){
-					$userGroup='nologin';
+					$userGroup = 4;
 				} else {
 					$userGroup = getUserData($login,'user_group');
 				}
-				
+					$userGroup = json_decode($userGroup);
+					if($userGroup != 4){
+						if($userGroup -> type == 'error'){
+							$userGroup = 4;
+						} else {
+							$userGroup = $userGroup -> user_group;
+						}
+					}
+				//Deciding what to show in case of that user's group
+				//By default user has user_group - '4'
 				switch ($userGroup){
 					case 1:
 					$query = "SELECT * FROM servers";
 					break;
 					
+					case 4:
+					$query = "SELECT * FROM servers WHERE srv_group = 4";
+					break;
+					
 					default:
 					$query = "SELECT * FROM servers WHERE srv_group = 4";
 				}
+				//====================================================
 						
 				return $query;
 			}
@@ -227,7 +247,7 @@ header('Content-Type: text/html; charset=utf-8');
 				$STH = null;
 				return $JSONServers;
 			}
-			
+			//No JSON (Will be removed)
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 					$massive = "";
@@ -241,7 +261,7 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 						return $massive;
 			}
-			
+			//Full JSON (Need migration)
 			function checkfilesJSON($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 					$fileOBJ = array();
@@ -264,7 +284,7 @@ header('Content-Type: text/html; charset=utf-8');
 						$fileOBJ = json_encode($fileOBJ);
 						return $fileOBJ;
 			}
-			
+			//No JSON (Will be removed)
 			function checkfilesRoot($client) {
 					$path = 'files/clients/'.$client;
 					if(!is_dir($path)) {
@@ -282,7 +302,7 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 						return $massive;
 			}
-			
+			//Full JSON (Need migration)
 			function checkfilesRootJSON($client) {
 				$path = 'files/clients/'.$client;
 				$files = array();
@@ -356,7 +376,7 @@ header('Content-Type: text/html; charset=utf-8');
 					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfilesRoot($client).checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>'; //.$client.'/coremods<:b:>'
 				return $hash_md5;
 			}
-			
+			//Full JSON (Need miration)
 			function getyText(){
 					require_once ('database.php');
 					$randPhrase = array();
@@ -380,7 +400,7 @@ header('Content-Type: text/html; charset=utf-8');
 					
 					return $textGet;
 			}
-			
+			//Full JSON
 			function getUserData($login,$data){
 				global $FoxSiteDB;
 				$query = "SELECT * FROM dle_users WHERE name = '$login'";
@@ -388,9 +408,11 @@ header('Content-Type: text/html; charset=utf-8');
 				$STH->setFetchMode(PDO::FETCH_OBJ);
 				$row = $STH->fetch();
 				if($row){
-					$answer = $row -> {$data};
+					$gotData = $row -> {$data};
+					$answer = array('type' => 'success', 'username' => $login, $data => $gotData);
+					$answer = json_encode($answer);
 				} else {
-					$answer = 'login not found';
+					$answer = JSONanswer('type', 'error', 'message', 'login not found');
 				}
 				
 				return $answer;
@@ -405,7 +427,7 @@ header('Content-Type: text/html; charset=utf-8');
 				
 				return $usersImages;
 			}
-			
+			//Full JSON (Need writing Java code)
 			function usersBackgrounds($login){
 				require_once ('database.php');
 				$counter = 0;
@@ -428,7 +450,7 @@ header('Content-Type: text/html; charset=utf-8');
 				$ImagesJSON = json_encode($ImagesJSON);
 				return $ImagesJSON;
 			}
-			
+			//Full JSON (Need migration)
 			function parse_online($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
@@ -454,10 +476,16 @@ header('Content-Type: text/html; charset=utf-8');
 					if(!$info[1] || !$info[2]){
 						return 'offline';
 					}
-						return ("$playersOnline&$playersMax");
+						$answer = array('host' => $host,'port' => $port,'status' => 'online','currentOnline' => $playersOnline,'maxOnline' => $playersMax);
+						$answer = json_encode($answer);
+						$answerOld = "$playersOnline&$playersMax";
+						return ($answerOld);
 						}} else {
-						return 'offline';
-					}
+							$answer = array('host' => $host,'port' => $port,'status' => 'onffline');
+							$answer = json_encode($answer);
+							$answerOld = 'offline';
+							return $answerOld;
+						}
 			}
 			
 			function clearMD5Cache(){
@@ -484,13 +512,15 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 				}
 			}
-				
+			//Full JSON (Need migration)
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
-						$answer = md5_file($file_link);
+						$ImgHash = md5_file($file_link);
+						//$answer = JSONanswer('ImgName', $img, 'ImgHash', $ImgHash);	Future JSON migration
+						$answer = $ImgHash; //Temporary output
 					} else {
-						$answer = "Image not found!";
+						$answer = JSONanswer('type', 'error', 'message', 'Невозможно продолжить выполнение!');
 				}
 				return $answer;
 			}
