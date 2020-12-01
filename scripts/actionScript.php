@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.0.11 Alpha
+ Версия: 0.1.12 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -21,31 +21,34 @@
 		require ('../../index.php');
   } else {
 		require_once ('functions.inc.php');
+		$not_allow_symbol = array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" );
   }
 		
 	if(isset($_GET['adress']) && isset($_GET['port'])){
-			$host = $_GET['adress'];
-			$port = $_GET['port'];
+			$host = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['adress']))));
+			$port = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['port']))));
 			die(parse_online($host, $port));
 			
 	} elseif(isset($_GET['radio'])){
+			$radio = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['radio']))));
 			//require_once (SCRIPTS_DIR."radio.php");
 			die("Not supported yet.");
 			
 	} elseif(isset($_GET['getText'])){
+			$getText = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getText']))));
 			die(getyText());
 	
 	} elseif(isset($_GET['Image'])){
-			$Image = $_GET['Image'];
+			$Image = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['Image']))));
 			die (ImgHash($Image));
 			
 	} elseif(isset($_GET['getRealname'])){
 			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
-			$login = $_GET['getRealname'] ?? null;
+			$login = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
 			if($login != null){
 				die(getUserData($login,'fullname'));
 			} else {
-				die("Invalid login!");
+				die(JSONanswer('type', 'error', 'message', 'Invalid login'));
 			}
 		
 	} elseif(isset($_GET['show'])) {
@@ -53,8 +56,9 @@
 			header("Content-type: image/png");
 			$skin_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftSkins/';
 			$cloak_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftCloaks/';
-			$show = $_GET['show'];											
-			$name =  empty($_GET['file_name']) ? 'default' : $_GET['file_name'];
+			$show = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['show'])))) ?? null;
+			$file_name = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['file_name'])))) ?? null;
+			$name =  empty($file_name) ? 'default' : $file_name;
 			$skin =  $skin_dir . $name . '.png';
 			$cloak =  $cloak_dir . $name . '.png';
 			if (!skinViewer2D::isValidSkin($skin)) {
@@ -67,12 +71,23 @@
 				$img = skinViewer2D::createHead($skin, 64);
 			}
 			imagepng($img);
+			
 	} elseif (isset($_GET['getProfileBG'])){
-		if($_GET['getProfileBG'] !== null) {
-		$profileBG = usersBackgrounds($_GET['getProfileBG']);
-		$backgrounds = $profileBG->Images;
-		die($backgrounds);
+		$getProfileBG = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
+		if($getProfileBG !== null) {
+		die(usersBackgrounds($getProfileBG));
 		} else {
 			die("No data!");
 		}
+		
+	} elseif(isset($_GET['rootJSON'])) {
+		die(checkfilesRootJSON($_GET['rootJSON']));
+		
+	} elseif(isset($_GET['serversJSON'])){
+		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+		die(serversParserJSON($_GET['serversJSON']));
+	
+	} elseif (isset($_GET['tes'])){
+		die (checkfilesJSON('files/clients/Classic/bin/'));
 	}
+	
