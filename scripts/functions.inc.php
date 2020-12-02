@@ -189,16 +189,22 @@ header('Content-Type: text/html; charset=utf-8');
 				} else {
 					$userGroup = getUserData($login,'user_group');
 				}
-					$userGroup = json_decode($userGroup);
 					if($userGroup != 4){
+						$userGroup = json_decode($userGroup);
 						if($userGroup -> type == 'error'){
 							$userGroup = 4;
 						} else {
-							$userGroup = $userGroup -> user_group;
+						$type = $userGroup -> type;
+							if($type == "error"){
+								$userGroup = 4;
+							} else {
+								$userGroup = $userGroup -> user_group;
+							}
 						}
 					}
 				//Deciding what to show in case of that user's group
 				//By default user has user_group - '4'
+				
 				switch ($userGroup){
 					case 1:
 					$query = "SELECT * FROM servers";
