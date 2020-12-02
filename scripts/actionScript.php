@@ -22,6 +22,9 @@
   } else {
 		require_once ('functions.inc.php');
 		$not_allow_symbol = array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" );
+		if(!isset($_POST['action'])){
+			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+		}
   }
 		
 	if(isset($_GET['adress']) && isset($_GET['port'])){
@@ -31,25 +34,19 @@
 			
 	} elseif(isset($_GET['radio'])){
 			$radio = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['radio']))));
-			//require_once (SCRIPTS_DIR."radio.php");
-			die("Not supported yet.");
+			die("Not supported yet.".$radio);
 			
 	} elseif(isset($_GET['getText'])){
 			$getText = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getText']))));
-			die(getyText());
+			die(Security::encrypt(getyText(), $key1));
 	
 	} elseif(isset($_GET['Image'])){
 			$Image = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['Image']))));
-			die (ImgHash($Image));
+			die(Security::encrypt(ImgHash($Image), $key1));
 			
 	} elseif(isset($_GET['getRealname'])){
-			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
 			$login = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
-			if($login != null){
-				die(getUserData($login,'fullname'));
-			} else {
-				die(JSONanswer('type', 'error', 'message', 'Invalid login'));
-			}
+			die(getRealName($login));
 		
 	} elseif(isset($_GET['show'])) {
 			require 'SkinViewer2D.class.php';
@@ -84,7 +81,6 @@
 		die(checkfilesRootJSON($_GET['rootJSON']));
 		
 	} elseif(isset($_GET['serversJSON'])){
-		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
 		die(serversParserJSON($_GET['serversJSON']));
 	
 	} elseif (isset($_GET['tes'])){

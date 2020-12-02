@@ -376,9 +376,9 @@ header('Content-Type: text/html; charset=utf-8');
 					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfilesRoot($client).checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>'; //.$client.'/coremods<:b:>'
 				return $hash_md5;
 			}
-			//Full JSON (Need miration)
+			//Full JSON (Need migration)
 			function getyText(){
-					require_once ('database.php');
+					global $LauncherDB;
 					$randPhrase = array();
 					$selector = "SELECT * FROM randPhrases";
 					$STH = $LauncherDB->query("$selector");  
@@ -418,6 +418,41 @@ header('Content-Type: text/html; charset=utf-8');
 				return $answer;
 			}
 			
+			function getRandomName(){
+				$array = array('Феспис',
+							   'Неизвестная личность',
+							   'Безимянный Лис',
+							   'Таинственный незнакомец',
+							   'Тот чьё имя нельзя называть',
+							   'Скрытный незнакомец',
+							   'Шпион');
+				$arraySize = count($array)-1;
+				$randWord = rand(0, $arraySize);
+				$word = $array[$randWord];
+				
+				return $word;
+			}
+			
+			function getRealName($login){
+				if(isset($login)){
+					$answer = getUserData($login,'fullname');
+					$decodedAnswer = json_decode($answer);
+					$type = $decodedAnswer -> type;
+					if($type == "error"){
+						$answer = JSONanswer('type', 'success', 'fullname', getRandomName());
+					} else {
+						$fullname = $decodedAnswer -> fullname;
+						if(empty($fullname)){
+							$answer = JSONanswer('type', 'success', 'fullname', getRandomName());
+						}
+					}
+				} else {
+					$answer = JSONanswer('type', 'error', 'message', 'Invalid login');
+				}
+				
+				return $answer;
+			}
+			
 			function userBGArray($login,$UDT){
 				$query = "SELECT Images FROM `userBgImg` WHERE  userlogin = '$login'";
 				$STB = $UDT -> query($query);
@@ -429,7 +464,7 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			//Full JSON (Need writing Java code)
 			function usersBackgrounds($login){
-				require_once ('database.php');
+				global $UDT;
 				$counter = 0;
 				$ImagesJSON = array();
 				$usersImages = userBGArray($login,$UDT);
@@ -481,10 +516,10 @@ header('Content-Type: text/html; charset=utf-8');
 						$answerOld = "$playersOnline&$playersMax";
 						return ($answerOld);
 						}} else {
-							$answer = array('host' => $host,'port' => $port,'status' => 'onffline');
+							$answer = array('host' => $host,'port' => $port,'status' => 'offline');
 							$answer = json_encode($answer);
 							$answerOld = 'offline';
-							return $answerOld;
+							return $answer;
 						}
 			}
 			
@@ -517,10 +552,11 @@ header('Content-Type: text/html; charset=utf-8');
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
 						$ImgHash = md5_file($file_link);
-						//$answer = JSONanswer('ImgName', $img, 'ImgHash', $ImgHash);	Future JSON migration
-						$answer = $ImgHash; //Temporary output
+						$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
+						$answer = json_encode($answer);
+						//$answer = $ImgHash; //Temporary output
 					} else {
-						$answer = JSONanswer('type', 'error', 'message', 'Невозможно продолжить выполнение!');
+						$answer = JSONanswer('type', 'error', 'message', 'Unable to continue!');
 				}
 				return $answer;
 			}
