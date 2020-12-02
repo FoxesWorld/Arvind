@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.17.5 Alpha
+ Версия: 0.0.18.5 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -473,22 +473,31 @@ header('Content-Type: text/html; charset=utf-8');
 				global $UDT;
 				$counter = 0;
 				$ImagesJSON = array();
-				$usersImages = userBGArray($login,$UDT);
-				$usersImagesArray = explode(",",$usersImages);
-				$countImages = count($usersImagesArray);
-				while ($counter < $countImages){
-					$CurrentImage = $usersImagesArray[$counter];
-					$query = "SELECT * FROM `BgImagesList` WHERE FileName = '$CurrentImage'";
-					$STB = $UDT -> query($query);
-					$STB->setFetchMode(PDO::FETCH_OBJ);
-					$row = $STB->fetch();;
-					$rarity = $row->Rarity;
-					$ImagesJSON[] = array(
-					'ImageName' => $CurrentImage,
-					'ImageRarity' => $rarity);
-					$counter++;
+				if(!empty($login)){
+					$usersImages = userBGArray($login,$UDT);
+					if(empty($usersImages)){
+						die(JSONanswer('type', 'error', 'message', 'No login found!'));
+					}
+					$usersImagesArray = explode(",",$usersImages);
+					$countImages = count($usersImagesArray);
+					while ($counter < $countImages){
+						$CurrentImage = $usersImagesArray[$counter];
+						$query = "SELECT * FROM `BgImagesList` WHERE FileName = '$CurrentImage'";
+						$STB = $UDT -> query($query);
+						$STB->setFetchMode(PDO::FETCH_OBJ);
+						$row = $STB->fetch();;
+						$rarity = $row->Rarity;
+						$ImagesJSON[] = array(
+						'ImageName' => $CurrentImage,
+						'ImageRarity' => $rarity);
+						$counter++;
+					}
+					$ImagesJSON = json_encode($ImagesJSON);
+					
+				} else {
+					$ImagesJSON = JSONanswer('type', 'error', 'message', 'No login to search!');
 				}
-				$ImagesJSON = json_encode($ImagesJSON);
+				
 				return $ImagesJSON;
 			}
 			//Full JSON (Need migration)
