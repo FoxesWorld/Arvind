@@ -86,14 +86,8 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			//Must be removed	
 			function dbPrepare(){
-				global $db_host, $db_port, $db_database, $db_user, $db_pass;
-				try {
-					$db = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_database", $db_user, $db_pass);
-					$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-					$db->exec("set names utf8");
-				} catch(PDOException $pe) {
-					die(Security::encrypt("errorsql")."Ошибка подключения (Хост, Логин, Пароль)");
-				}
+				global $db;
+
 				try {
 					$stmt = $db->prepare("
 					CREATE TABLE IF NOT EXISTS `usersession` (
@@ -567,9 +561,9 @@ header('Content-Type: text/html; charset=utf-8');
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
 						$ImgHash = md5_file($file_link);
-						$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
-						$answer = json_encode($answer);
-						//$answer = $ImgHash; //Temporary output
+						//$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
+						//$answer = json_encode($answer);
+						$answer = $ImgHash; //Temporary output
 					} else {
 						$answer = JSONanswer('type', 'error', 'message', 'Unable to continue!');
 				}

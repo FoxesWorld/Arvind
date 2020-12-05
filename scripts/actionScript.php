@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.1.12 Alpha
+ Версия: 0.1.13 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -19,33 +19,33 @@
 
   if(!defined('INCLUDE_CHECK')) {
 		require ('../../index.php');
+		exit();
   } else {
 		require_once ('functions.inc.php');
-		$not_allow_symbol = array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" );
 		if(!isset($_POST['action'])){
 			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
 		}
   }
 		
 	if(isset($_GET['adress']) && isset($_GET['port'])){
-			$host = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['adress']))));
-			$port = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['port']))));
+			$host = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['adress']))));
+			$port = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['port']))));
 			die(parse_online($host, $port));
 			
 	} elseif(isset($_GET['radio'])){
-			$radio = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['radio']))));
-			die("Not supported yet.".$radio);
+			$radio = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['radio']))));
+			die(JSONanswer('type', 'error', 'message', 'Not supported yet: '.$radio));
 			
 	} elseif(isset($_GET['getText'])){
-			$getText = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getText']))));
+			$getText = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getText']))));
 			die(Security::encrypt(getyText(), $key1));
 	
 	} elseif(isset($_GET['Image'])){
-			$Image = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['Image']))));
+			$Image = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['Image']))));
 			die(Security::encrypt(ImgHash($Image), $key1));
 			
 	} elseif(isset($_GET['getRealname'])){
-			$login = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
+			$login = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
 			die(getRealName($login));
 		
 	} elseif(isset($_GET['show'])) {
@@ -53,8 +53,8 @@
 			header("Content-type: image/png");
 			$skin_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftSkins/';
 			$cloak_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftCloaks/';
-			$show = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['show'])))) ?? null;
-			$file_name = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['file_name'])))) ?? null;
+			$show = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['show'])))) ?? null;
+			$file_name = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['file_name'])))) ?? null;
 			$name =  empty($file_name) ? 'default' : $file_name;
 			$skin =  $skin_dir . $name . '.png';
 			$cloak =  $cloak_dir . $name . '.png';
@@ -70,20 +70,19 @@
 			imagepng($img);
 			
 	} elseif (isset($_GET['getProfileBG'])){
-		$getProfileBG = trim(str_replace($not_allow_symbol,'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
+		$getProfileBG = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
 		if($getProfileBG !== null) {
 		die(usersBackgrounds($getProfileBG));
 		} else {
-			die("No data!");
+			die(JSONanswer('type', 'error', 'message', 'No login to search!'));
 		}
 		
 	} elseif(isset($_GET['rootJSON'])) {
 		die(checkfilesRootJSON($_GET['rootJSON']));
 		
 	} elseif(isset($_GET['serversJSON'])){
-		die(serversParserJSON($_GET['serversJSON']));
+		$ServersJSONlogin = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['serversJSON'])))) ?? null;
+		die(serversParserJSON($ServersJSONlogin));
 	
-	} elseif (isset($_GET['tes'])){
-		die (checkfilesJSON('files/clients/Classic/bin/'));
 	}
 	

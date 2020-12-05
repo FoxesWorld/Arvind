@@ -17,16 +17,15 @@
 =====================================================
 */
 define('INCLUDE_CHECK',true);
-Error_Reporting(E_ALL);
-Ini_Set('display_errors', true);
+define('DEBUG_LOGS',true);
 require ('../database.php');
-//================================================================
-	$key = $_GET['key'] ?? null;
-	if($key == $cronPass){
-	//===========Running CronTab Jobs==================
-		clearMD5Cache($LauncherDB);
+//===================================================
+	$key = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['key']))));
+	if($key == $cronPass && $key !== null){
+	//===========Running CronTab Jobs================
+		clearMD5Cache();
 	
-	//=================================================
+	//===============================================
 	} else {
 		require ('../../index.html');
 	}

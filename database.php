@@ -48,6 +48,7 @@ if(!defined('INCLUDE_CHECK')) {
 	$key1               = "R2zwuwmv~YZSIJ21";  						//16 Character Key 
 	$key2               = "oPCwB9S6z{*rEh%V"; 						//16 Character  Key
 	$md5launcherjar     = @md5_file("files/launcher/launcher.jar"); //Сверяем MD5 //Будет убрано так как сверяем иначе
+	$not_allowed_symbol = array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" );
 	$cronPass 			= 'Tess2556308';							//Ключ для работы кронТаба 
 
 	/*		 Skins&Cloaks Configuration 		*/
@@ -56,8 +57,16 @@ if(!defined('INCLUDE_CHECK')) {
     $skinurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirs.'/'; //Ссылка на скины 
     $capeurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirp.'/'; //Ссылка на плащи	
 
-	require_once ('scripts/databasePrepare.php');
-	//dbPrepare($db_host, $db_port, $db_database, $db_user, $db_pass);
+	try {
+		$db = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_database", $db_user, $db_pass);
+		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$db->exec("set names utf8");
+		dbPrepare();
+    } catch(PDOException $pe) {
+		die(Security::encrypt("errorsql", $key1).$logger->WriteLine($log_date."Ошибка подключения (Хост, Логин, Пароль)"));
+	}
+	
+	
 	try { 
 		$LauncherDB = new PDO("mysql:host=$db_host;dbname=$dbname_launcher;charset=UTF8", $db_user, $db_pass); 
 	} catch(PDOException $e) { 
