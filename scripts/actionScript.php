@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.1.13 Alpha
+ Версия: 0.1.14 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -30,7 +30,7 @@
 	if(isset($_GET['adress']) && isset($_GET['port'])){
 			$host = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['adress']))));
 			$port = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['port']))));
-			die(parse_online($host, $port));
+			die(Security::encrypt(parse_online($host, $port), $key1));
 			
 	} elseif(isset($_GET['radio'])){
 			$radio = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['radio']))));
@@ -72,9 +72,9 @@
 	} elseif (isset($_GET['getProfileBG'])){
 		$getProfileBG = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
 		if($getProfileBG !== null) {
-		die(usersBackgrounds($getProfileBG));
+		die(Security::encrypt(usersBackgrounds($getProfileBG), $key1));
 		} else {
-			die(JSONanswer('type', 'error', 'message', 'No login to search!'));
+			die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $key1));
 		}
 		
 	} elseif(isset($_GET['rootJSON'])) {
@@ -84,5 +84,8 @@
 		$ServersJSONlogin = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['serversJSON'])))) ?? null;
 		die(serversParserJSON($ServersJSONlogin));
 	
+	} elseif(isset($_GET['JREnames'])){
+		$bitDepth = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
+		die(scanRuntimeDir($bitDepth));
 	}
 	

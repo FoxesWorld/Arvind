@@ -11,16 +11,15 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.16 Stable Alpha
+ Версия: 0.0.16.1 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
 */
 header('Content-Type: text/html; charset=utf-8');
-Error_Reporting(E_ALL);
 $_TIME = time();
-Ini_Set('display_errors', true);
 define('INCLUDE_CHECK',true); //Security Define
+define('DEBUG_LOGS',true);
 include ("scripts/functions.inc.php");  //All Functions
 include_once ("scripts/actionScript.php");  //Action requests
 //================================================================
@@ -140,8 +139,8 @@ include_once ("scripts/actionScript.php");  //Action requests
 		$hash = generateLoginHash();
 		$db->query("UPDATE LOW_PRIORITY dle_users SET lastdate='{$_TIME}', logged_ip='$ip',hash='$hash' WHERE name='$login'");
 		if($action == 'auth') {
-			$geoBase = new IPGeoBase();
-			$geoBase->getIP($ip);
+			//$geoBase = new IPGeoBase();
+			//$geoBase->getIP($ip);
 		
 		if(
 		!file_exists($clientsDir."assets")||

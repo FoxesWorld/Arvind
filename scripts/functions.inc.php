@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.18.5 Alpha
+ Версия: 0.0.18.7 Alpha
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -109,6 +109,21 @@ header('Content-Type: text/html; charset=utf-8');
 					  PRIMARY KEY (`id`) USING BTREE
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=0;
 					");
+					$stmt->execute();
+					$stmt = $db->prepare("
+					CREATE TABLE `servers` (
+					  `id` int(100) NOT NULL,
+					  `Server_name` varchar(120) NOT NULL,
+					  `adress` varchar(100) NOT NULL,
+					  `port` int(90) NOT NULL,
+					  `srv_image` varchar(100) NOT NULL,
+					  `version` varchar(100) NOT NULL,
+					  `story` varchar(900) NOT NULL,
+					  `srv_group` int(100) NOT NULL,
+					  `enabled` int(1) NOT NULL DEFAULT 1
+					) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+					ALTER TABLE `servers`  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT,
+					AUTO_INCREMENT=12; COMMIT;");
 					$stmt->execute();
 				} catch(PDOException $pe) {
 					die(Security::encrypt("errorsql")); 
@@ -494,6 +509,27 @@ header('Content-Type: text/html; charset=utf-8');
 				
 				return $ImagesJSON;
 			}
+			//Gets the version of Java
+			function scanRuntimeDir($bitDepth){
+				if($bitDepth) {
+					$directory = FILES_DIR.'runtime/';
+					$scandir = scandir($directory);
+					for ($i=0; $i<count($scandir); $i++) {
+						if ($scandir[$i] != '.' && $scandir[$i] != '..' && strpos($scandir[$i], $bitDepth)) {
+						  $outputJREArch = $scandir[$i];
+						  $outputJREArch = explode('.',$outputJREArch);
+						  if($outputJREArch[1] == "zip") {
+							$outputJRE = $outputJREArch[0];
+						  }
+						}
+					}
+					$outputJSON = array('type' => 'success','JREname' => $outputJRE);
+					$outputJRE = json_encode($outputJSON);
+				} else {
+					$outputJRE = JSONanswer('type', 'error', 'message', 'Not specifyed JRE bit depth!');
+				}
+				return $outputJRE;
+			}
 			//Full JSON (Need migration)
 			function parse_online($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
@@ -561,9 +597,9 @@ header('Content-Type: text/html; charset=utf-8');
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
 						$ImgHash = md5_file($file_link);
-						//$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
-						//$answer = json_encode($answer);
-						$answer = $ImgHash; //Temporary output
+						$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
+						$answer = json_encode($answer);
+						//$answer = $ImgHash; //Temporary output
 					} else {
 						$answer = JSONanswer('type', 'error', 'message', 'Unable to continue!');
 				}

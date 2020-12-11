@@ -11,40 +11,55 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.13 Alpha
+ Версия: 0.1.16 Alpha
 -----------------------------------------------------
- Назначение: Проверка хеша лаунчера, апдейтера и библиотек 
+ Назначение: Проверка хеша лаунчера и апдейтера
 =====================================================
 */ 
 header("Content-Type: text/plain; charset=UTF-8");
 define('INCLUDE_CHECK',true);
 include_once ("scripts/functions.inc.php");
+
 	$get_request =  $_SERVER['QUERY_STRING'];
 	if($get_request === ''){
 		die("Hacking Attempt!");
 	}
 	
+	$launcherRepositoryPath = "files/launcher/launcher.jar";
+	$updaterRepositoryPath = "files/updater/updater.";
 	$updater_type = $_GET['updater_type'] ?? null;
 	$updater_hash = $_GET['hash'] ?? null;
 	$launcher_hash = $_GET['ver'] ?? null;
-	$lib_load = $_GET['lib_load'] ?? null;
-	$lib_hash = $_GET['lib_hash'] ?? null;
 	$download = $_GET['download'] ?? null;
 
 	//Хеш-код апдейтера, если обновление есть скрипт отвечает YES, иначе NO
 	if(isset($updater_type)){
-		if($updater_type == 'jar'){
-			die($updater_hash == md5_file("files/updater/updater.jar") ? "NO" : "YES");
-		} elseif($updater_type == 'exe'){
-			die($updater_hash == md5_file("files/updater/updater.exe") ? "NO" : "YES");
+		$file = "updater";
+		if($updater_type === 'jar'){
+			$fileName = $file.'.'.$updater_type;
+			$updaterHashLocal = md5_file($updaterRepositoryPath.$updater_type);
+			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
+			
+		} elseif($updater_type === 'exe'){
+			$fileName = $file.'.'.$updater_type;
+			$updaterHashLocal = md5_file($updaterRepositoryPath.$updater_type);
+			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
+			
 		} elseif ($updater_type != 'exe' || $updater_type != 'jar') {
-			die("Unknown updater type!");
+			$updateState = "Unknown updater type!";
 		}
+		$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
+		$answer = json_encode($answer);
+		die($answer);
 	}
 	
 	//Хеш-код лаунчера, если обновление есть скрипт отвечает YES, иначе NO
 	if(isset($launcher_hash)){
-		die($launcher_hash == md5_file("files/launcher/launcher.jar") ? "NO" : "YES");
+		$launcherRepositoryHash = md5_file($launcherRepositoryPath);
+		$launcherState = $launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
+		$answer = array('fileName' =>$launcherRepositoryPath, 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
+		$answer = json_encode($answer);
+		die($answer);
 	}
 	
 	//Download (Скачивание апдейтера с сайта)

@@ -15,6 +15,7 @@ if(!defined('INCLUDE_CHECK')) {
 	
 	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
 	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
+	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
 	define('SITE_ROOT', ROOT_DIR.'/launcher');
 	
 	/*		 DB_Config		 */
