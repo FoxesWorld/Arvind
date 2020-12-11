@@ -84,7 +84,7 @@ header('Content-Type: text/html; charset=utf-8');
 				$array = json_encode($array);
 				return $array;
 			}
-			//Must be removed	
+
 			function dbPrepare(){
 				global $db;
 
@@ -126,7 +126,8 @@ header('Content-Type: text/html; charset=utf-8');
 					AUTO_INCREMENT=12; COMMIT;");
 					$stmt->execute();
 				} catch(PDOException $pe) {
-					die(Security::encrypt("errorsql")); 
+					//die(Security::encrypt("errorsql")); 
+					//die("errorsql");
 				}
 			}
 
