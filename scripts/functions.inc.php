@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.18.7 Alpha
+ Версия: 0.0.19.7 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -50,14 +50,14 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 					return strlen($binary_string);
 			}
-				
+	
 			function substr_8bit($binary_string, $start, $length) {
 					if (function_exists('mb_substr')) {
 						return mb_substr($binary_string, $start, $length, '8bit');
 					}
 					return substr($binary_string, $start, $length);
 			}
-				
+
 			function pass_get_info($hash) {
 					$return = true;
 					if (substr_8bit($hash, 0, 4) == '$2y$' && strlen_8bit($hash) == 60) {
@@ -65,7 +65,7 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 					return $return;
 			}
-				
+	
 			function pass_verify($password, $hash) {
 					$ret = crypt($password, $hash);
 					
@@ -111,7 +111,7 @@ header('Content-Type: text/html; charset=utf-8');
 					");
 					$stmt->execute();
 					$stmt = $db->prepare("
-					CREATE TABLE `servers` (
+					CREATE TABLE IF NOT EXISTS `servers` (
 					  `id` int(100) NOT NULL,
 					  `Server_name` varchar(120) NOT NULL,
 					  `adress` varchar(100) NOT NULL,
@@ -122,12 +122,11 @@ header('Content-Type: text/html; charset=utf-8');
 					  `srv_group` int(100) NOT NULL,
 					  `enabled` int(1) NOT NULL DEFAULT 1
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-					ALTER TABLE `servers`  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT,
-					AUTO_INCREMENT=12; COMMIT;");
+					ALTER TABLE `servers`  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT");
 					$stmt->execute();
 				} catch(PDOException $pe) {
-					//die(Security::encrypt("errorsql")); 
-					//die("errorsql");
+					$query = strval($stmt->queryString);
+					die(display_error($pe->getMessage(), $error_num = 200, $query));
 				}
 			}
 
@@ -151,7 +150,7 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 					return $cryptPass;
 			}
-			
+		
 			function generateLoginHash(){
 				if(function_exists('openssl_random_pseudo_bytes')) {
 				$stronghash = md5(openssl_random_pseudo_bytes(15));
@@ -166,32 +165,45 @@ header('Content-Type: text/html; charset=utf-8');
 				
 				return $hash;
 			}
-			//NO JSON (Will be removed)
-			function serversParser($selector){
-				global $LauncherDB;
-				$STH = $LauncherDB ->query("$selector");  
-				$STH->setFetchMode(PDO::FETCH_ASSOC);  
+			//Parses All servers for any needs
+			function serversListArray($selector){
+				global $config;
+				$serversList = array();
 				$counter = 0;
-				while($row = $STH->fetch()) { 
-						if($row['enabled'] == 1) {
-							$serverName = $row['Server_name'];
-							$adress = $row['adress'];
-							$port = $row['port'];
-							$version = $row['version'];
-							$serverImage = $row['srv_image'];
-							$story = $row['story'];
-							
-							echo $serverName . "& "; 
-							echo $adress . "& "; 
-							echo $port . "& "; 
-							echo $version  . "& ";  
-							echo $serverImage  . "& ";  
-							echo $story . "<::>"; 
-							$counter++;
-						}
+				$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
+				$data = $db->getRows($selector);
+				foreach ($data as $row) {
+					$serversList[] = array(
+					'serverName' => $row['Server_name'],
+					'adress' => $row['adress'],
+					'port' => $row['port'],
+					'version' => $row['version'],
+					'serverImage' => $row['srv_image'],
+					'story' => $row['story'],
+					'status' => $row['enabled']);
+					$counter++;
 				}
-				$STH = null;
+				return $serversList;
 			}
+			
+			//Displays All avialable servers (NO JSON!!)
+			function serversParser($selector) {
+				$serversList = serversListArray($selector);
+				$counter = 0;
+				$srvCount = count($serversList);
+				while($counter < $srvCount) {
+					if($serversList[$counter]['status'] == 1) {
+							echo $serversList[$counter]['serverName'] . "& "; 
+							echo $serversList[$counter]['adress'] . "& "; 
+							echo $serversList[$counter]['port'] . "& "; 
+							echo $serversList[$counter]['version']  . "& ";  
+							echo $serversList[$counter]['serverImage']  . "& ";  
+							echo $serversList[$counter]['story'] . "<::>"; 
+							$counter++;
+					}
+				}
+			}
+
 			//Full JSON (Need migration)
 			function availableServers($login){
 				if(!$login){
@@ -214,7 +226,6 @@ header('Content-Type: text/html; charset=utf-8');
 					}
 				//Deciding what to show in case of that user's group
 				//By default user has user_group - '4'
-				
 				switch ($userGroup){
 					case 1:
 					$query = "SELECT * FROM servers";
@@ -228,39 +239,29 @@ header('Content-Type: text/html; charset=utf-8');
 					$query = "SELECT * FROM servers WHERE srv_group = 4";
 				}
 				//====================================================
-						
 				return $query;
 			}
 			
 			function serversParserJSON($login){
-				global $LauncherDB;
 				$JSONServers = array();
 				$selector = availableServers($login);
-				$STH = $LauncherDB ->query("$selector");
-				$STH->setFetchMode(PDO::FETCH_ASSOC);  
+				$serversList = serversListArray($selector);
+				$srvCount = count($serversList);
 				$counter = 0;
-				while($row = $STH->fetch()) { 
-						if($row['enabled'] == 1) {
-							$serverName = $row['Server_name'];
-							$adress = $row['adress'];
-							$port = $row['port'];
-							$version = $row['version'];
-							$serverImage = $row['srv_image'];
-							$story = $row['story'];
-							
+				while($counter < $srvCount) { 
+						if($serversList[$counter]['status'] == 1) {
 							$JSONServers[] = array(
 							'serverNum' => "Server-$counter",
-							'serverName' => "$serverName",
-							'adress' => "$adress",
-							'port' => "$port",
-							'version' => "$version",
-							'serverImage' => "$serverImage",
-							'story' => "$story");
+							'serverName' => $serversList[$counter]['serverName'],
+							'adress' => $serversList[$counter]['adress'],
+							'port' => $serversList[$counter]['port'],
+							'version' => $serversList[$counter]['version'],
+							'serverImage' => $serversList[$counter]['serverImage'],
+							'story' => $serversList[$counter]['story']);
 							$counter++;
 						}
 				}
 				$JSONServers = json_encode($JSONServers);
-				$STH = null;
 				return $JSONServers;
 			}
 			//No JSON (Will be removed)
@@ -297,8 +298,8 @@ header('Content-Type: text/html; charset=utf-8');
 								); 
 							}
 						}
-						$fileOBJ = json_encode($fileOBJ);
-						return $fileOBJ;
+				$fileOBJ = json_encode($fileOBJ);
+				return $fileOBJ;
 			}
 			//No JSON (Will be removed)
 			function checkfilesRoot($client) {
@@ -318,7 +319,7 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 						return $massive;
 			}
-			//Full JSON (Need migration)
+			//Full JSON
 			function checkfilesRootJSON($client) {
 				$path = 'files/clients/'.$client;
 				$files = array();
@@ -392,14 +393,14 @@ header('Content-Type: text/html; charset=utf-8');
 					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfilesRoot($client).checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>'; //.$client.'/coremods<:b:>'
 				return $hash_md5;
 			}
-			//Full JSON (Need migration)
+			//Full JSON
 			function getyText(){
-					global $LauncherDB;
+					global $config;
 					$randPhrase = array();
 					$selector = "SELECT * FROM randPhrases";
-					$STH = $LauncherDB->query("$selector");  
-					$STH->setFetchMode(PDO::FETCH_ASSOC);  
-					while($row = $STH->fetch()) { 
+					$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
+					$data = $db->getRows($selector);
+					foreach ($data as $row) {				
 						$randPhrase[] = $row['phrase'];
 						$rarity[] = $row['rarity'];
 					}
@@ -418,19 +419,17 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			//Full JSON
 			function getUserData($login,$data){
-				global $FoxSiteDB;
-				$query = "SELECT * FROM dle_users WHERE name = '$login'";
-				$STH = $FoxSiteDB->query($query);  
-				$STH->setFetchMode(PDO::FETCH_OBJ);
-				$row = $STH->fetch();
-				if($row){
-					$gotData = $row -> {$data};
-					$answer = array('type' => 'success', 'username' => $login, $data => $gotData);
-					$answer = json_encode($answer);
-				} else {
-					$answer = JSONanswer('type', 'error', 'message', 'login not found');
-				}
-				
+				global $config;
+				$query = "SELECT $data FROM dle_users WHERE name = '$login'";
+				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
+				$selectedValue = $db->getRow($query);
+					if($selectedValue["$data"]){
+							$gotData = $selectedValue["$data"];
+							$answer = array('type' => 'success', 'username' => $login, $data => $gotData);
+							$answer = json_encode($answer);
+						} else {
+							$answer = JSONanswer('type', 'error', 'message', 'login not found');
+						}
 				return $answer;
 			}
 			
@@ -441,14 +440,14 @@ header('Content-Type: text/html; charset=utf-8');
 							   'Таинственный незнакомец',
 							   'Тот чьё имя нельзя называть',
 							   'Скрытный незнакомец',
-							   'Шпион');
+							   'Шпиён');
 				$arraySize = count($array)-1;
 				$randWord = rand(0, $arraySize);
 				$word = $array[$randWord];
 				
 				return $word;
 			}
-			
+		
 			function getRealName($login){
 				if(isset($login)){
 					$answer = getUserData($login,'fullname');
@@ -465,26 +464,24 @@ header('Content-Type: text/html; charset=utf-8');
 				} else {
 					$answer = JSONanswer('type', 'error', 'message', 'Invalid login');
 				}
-				
 				return $answer;
 			}
-			
-			function userBGArray($login,$UDT){
+
+			function userBGArray($login){
+				global $config;
 				$query = "SELECT Images FROM `userBgImg` WHERE  userlogin = '$login'";
-				$STB = $UDT -> query($query);
-				$STB->setFetchMode(PDO::FETCH_NUM);
-				$usersBg = $STB->fetch();
-				$usersImages = $usersBg[0];
-				
+				$db = new db($config['db_user'],$config['db_pass'],$config['db_name_userdata']);
+				$data = $db->getRow($query);
+				$usersImages = $data['Images'];
 				return $usersImages;
 			}
 			//Full JSON (Need writing Java code)
 			function usersBackgrounds($login){
-				global $UDT;
+				global $config;
 				$counter = 0;
 				$ImagesJSON = array();
 				if(!empty($login)){
-					$usersImages = userBGArray($login,$UDT);
+					$usersImages = userBGArray($login);
 					if(empty($usersImages)){
 						die(JSONanswer('type', 'error', 'message', 'No login found!'));
 					}
@@ -493,10 +490,11 @@ header('Content-Type: text/html; charset=utf-8');
 					while ($counter < $countImages){
 						$CurrentImage = $usersImagesArray[$counter];
 						$query = "SELECT * FROM `BgImagesList` WHERE FileName = '$CurrentImage'";
-						$STB = $UDT -> query($query);
-						$STB->setFetchMode(PDO::FETCH_OBJ);
-						$row = $STB->fetch();;
-						$rarity = $row->Rarity;
+						$db = new db($config['db_user'],$config['db_pass'],$config['db_name_userdata']);
+						$data = $db->getRows($query);
+						foreach ($data as $item) {
+							$rarity = $item['Rarity'];
+						}
 						$ImagesJSON[] = array(
 						'ImageName' => $CurrentImage,
 						'ImageRarity' => $rarity);
@@ -507,7 +505,6 @@ header('Content-Type: text/html; charset=utf-8');
 				} else {
 					$ImagesJSON = JSONanswer('type', 'error', 'message', 'No login to search!');
 				}
-				
 				return $ImagesJSON;
 			}
 			//Gets the version of Java
@@ -570,14 +567,14 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 			
 			function clearMD5Cache(){
-				global $LauncherDB;
-				$selector = "SELECT Server_name FROM servers";
-				$STH = $LauncherDB->query("$selector");  
-				$STH->setFetchMode(PDO::FETCH_ASSOC);  
-				while($row = $STH->fetch()) {  
-					if ($handle = opendir(SITE_ROOT.'/files/clients/'.$row['Server_name'])) {
+				$selector = "SELECT * FROM servers";
+				$srvList = serversListArray($selector);
+				$counter = 0;
+				$srvCount = count($srvList);
+				while($counter < $srvCount) {  
+					if ($handle = opendir(SITE_ROOT.'/files/clients/'.$srvList[$counter]['serverName'])) {
 						while (false !== ($file = readdir($handle)))   {
-							if ($file != "." && $file != ".." && $file != "mods" && $file != "bin" && $file != "config" && $file != "natives" && $file != "config.zip"){
+							if ($file != "." && $file != ".." && $file != "mods" && $file != "bin" && $file != "config" && $file != "natives"){
 							$delPath = '../files/clients/'.$file."/".$file;
 								if (file_exists($delPath)) {
 									$unlink = unlink($delPath);
@@ -591,16 +588,16 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 						closedir($handle);
 					}
+					$counter++;
 				}
 			}
-			//Full JSON (Need migration)
+			//Full JSON
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
 					if(file_exists($file_link)){
 						$ImgHash = md5_file($file_link);
 						$answer = array('type' => 'success', 'ImgName' => $img, 'ImgHash' => $ImgHash);	//Future JSON migration
 						$answer = json_encode($answer);
-						//$answer = $ImgHash; //Temporary output
 					} else {
 						$answer = JSONanswer('type', 'error', 'message', 'Unable to continue!');
 				}
@@ -617,8 +614,73 @@ header('Content-Type: text/html; charset=utf-8');
 				}
 				return true;
 			}
+			
+			function display_error($error ='No errors', $error_num = 100, $query) {
+					$error = htmlspecialchars($error, ENT_QUOTES, 'ISO-8859-1');
+					$trace = debug_backtrace();
 
-		class IPGeoBase {
+					$level = 0;
+					if ($trace[1]['function'] == "query" ) $level = 1;
+					$trace[$level]['file'] = str_replace(ROOT_DIR, "", $trace[$level]['file']);
+
+					echo '
+							<?xml version="1.0" encoding="iso-8859-1"?>
+							<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+							<html xmlns="http://www.w3.org/1999/xhtml">
+							<head>
+							<title>MySQL Fatal Error | Arvind</title>
+							<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+							<style type="text/css">
+							<!--
+							body {
+								font-family: Verdana, Arial, Helvetica, sans-serif;
+								font-size: 11px;
+								font-style: normal;
+								color: #000000;
+							}
+							.top {
+							  color: #ffffff;
+							  font-size: 15px;
+							  font-weight: bold;
+							  padding-left: 20px;
+							  padding-top: 10px;
+							  padding-bottom: 10px;
+							  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+							  background-image: -moz-linear-gradient(top, #ab8109, #998f5a);
+							  background-image: -ms-linear-gradient(top, #ab8109, #998f5a);
+							  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ab8109), to(#998f5a));
+							  background-image: -webkit-linear-gradient(top, #ab8109, #998f5a);
+							  background-image: -o-linear-gradient(top, #ab8109, #998f5a);
+							  background-image: linear-gradient(top, #ab8109, #998f5a);
+							  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#ab8109", endColorstr="#998f5a",GradientType=0); 
+							  background-repeat: repeat-x;
+							  border-bottom: 1px solid #ffffff;
+							}
+							.box {
+								margin: 10px;
+								padding: 4px;
+								background-color: #EFEDED;
+								border: 1px solid #DEDCDC;
+
+							}
+							-->
+							</style>
+							</head>
+							<body>
+								<div style="width: 700px;margin: 20px; border: 1px solid #D9D9D9; background-color: #F1EFEF; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3); box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);" >
+									<div class="top" >MySQ: Error! | Arvind</div>
+									<div class="box" ><b>MySQL error</b> in file: <b>'.$trace[$level]['file'],'</b> at line <b>'.$trace[$level]['line'].'</b></div>
+									<div class="box" >Error Number: <b>'.$error_num.'</b></div>
+									<div class="box" >The Error returned was: <b>'.$error.'</b></div>
+									<div class="box" ><b>SQL query:</b><br />'.$query.'</div>
+									</div>		
+							</body>
+							</html>
+					';
+				exit();
+			}
+/* 		Now Disabled for reconstruction due to many bugs with it
+class IPGeoBase {
 			private $fhandleCIDR, $fhandleCities, $fSizeCIDR, $fsizeCities;
 			
 			private function ipLocation($ip){
@@ -678,3 +740,4 @@ header('Content-Type: text/html; charset=utf-8');
 				}
 			}
 		}
+*/

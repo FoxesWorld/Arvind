@@ -1,4 +1,21 @@
 <?php
+/*
+=====================================================
+ HasJoined| AuthLib
+-----------------------------------------------------
+ https://Foxesworld.ru/
+-----------------------------------------------------
+ Copyright (c) 2016-2020  FoxesWorld
+-----------------------------------------------------
+ Данный код защищен авторскими правами
+-----------------------------------------------------
+ Файл: h.php
+-----------------------------------------------------
+ Версия: 0.0.4 Alpha
+-----------------------------------------------------
+ Назначение: Присоединение игрока на сервер
+=====================================================
+*/
     error_reporting(0);
 	define('INCLUDE_CHECK',true);
 	@$user     = $_GET['username'];
@@ -9,6 +26,7 @@
 			exit(json_encode($bad));
 		}
 		include ("../database.php");
+		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 		$stmt = $db->prepare("SELECT user,md5 FROM usersession WHERE user = :user and server = :serverid");
 		$stmt->bindValue(':user', $user);
 		$stmt->bindValue(':serverid', $serverid);
@@ -20,7 +38,7 @@
 		{
 			$time = time();
 			$file = $capeurl.$realUser.'.png';
-			$exists = file_exists($uploaddirp.'/'.$realUser.'.png');
+			$exists = file_exists($config['uploaddirp'].'/'.$realUser.'.png');
 			if ($exists) {
 			    $cape = 
 			',

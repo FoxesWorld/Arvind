@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.16.1 Stable Alpha
+ Версия: 0.0.17.1 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -26,11 +26,13 @@ include_once ("scripts/actionScript.php");  //Action requests
 	if(!$_REQUEST){
 		require ('../index.php');
 	}
+
 	if(isset($_POST['action'])) {
 		include("database.php");
+		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 		$x  = $_POST['action'];
 		$x = str_replace(" ", "+", $x);
-		$yd = Security::decrypt($x, $key2);
+		$yd = Security::decrypt($x, $config['key2']);
 		
 		if($yd == null) {
 			die('Access Error!');
@@ -44,30 +46,30 @@ include_once ("scripts/actionScript.php");  //Action requests
 
 	try {
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $login) || !preg_match("/^[a-zA-Z0-9_-]+$/", $postPass) || !preg_match("/^[a-zA-Z0-9_-]+$/", $action)) {
-		exit(Security::encrypt("errorLogin<$>", $key1));
+		exit(Security::encrypt("errorLogin<$>", $config['key1']));
     }
 	
-	if(!file_exists($uploaddirs)) {
+	if(!file_exists($config['uploaddirs'])) {
 		die ("Путь к скинам не является папкой!");
 	}
 	
-	if(!file_exists($uploaddirp)) {
+	if(!file_exists($config['uploaddirp'])) {
 		die ("Путь к плащам не является папкой!");
 	}
 	
 
     if($ctoken == "null") {
-			if($crypt === 'hash_md5' || $crypt === 'hash_foxy') {
-				$stmt = $db->prepare("SELECT $db_columnUser,$db_columnPass FROM $db_table WHERE BINARY $db_columnUser = :login");
+			if($config['crypt'] === 'hash_md5' || $config['crypt'] === 'hash_foxy') {
+				$stmt = $db->prepare("SELECT ".$config['db_columnUser'].",".$config['db_columnPass']." FROM ".$config['db_table']." WHERE BINARY ".$config['db_columnUser']." = :login");
 				$stmt->bindValue(':login', $login);
 				$stmt->execute();
-				$stmt->bindColumn($db_columnPass, $realPass);
-				$stmt->bindColumn($db_columnUser, $realUser);
+				$stmt->bindColumn($config['db_columnPass'], $realPass);
+				$stmt->bindColumn($config['db_columnUser'], $realUser);
 				$stmt->fetch();
 			}
-			$checkPass = hash_name($crypt, $realPass, $postPass, @$salt);
+			$checkPass = hash_name($config['crypt'], $realPass, $postPass, @$salt);
 
-			if($useantibrut) {
+			if($config['useantibrut']) {
 				$ip  = getenv('REMOTE_ADDR');	
 				$time = time();
 				$bantime = $time+(10);
@@ -78,22 +80,22 @@ include_once ("scripts/actionScript.php");  //Action requests
 				if($ip == $real) {
 					$stmt = $db->prepare("DELETE FROM sip WHERE time < '$time';");
 					$stmt->execute();
-					exit(Security::encrypt("temp<$>", $key1));
+					exit(Security::encrypt("temp<$>", $config['key1']));
 				}
 				
 				if ($login != $realUser) {
 					$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('$ip', '$bantime')");
 					$stmt->execute();
-					exit(Security::encrypt("errorLogin<$>", $key1));
+					exit(Security::encrypt("errorLogin<$>", $config['key1']));
 				}
 				if(!strcmp($realPass,$checkPass) == 0 || !$realPass) {
 					$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('$ip', '$bantime')");
 					$stmt->execute();
-					exit(Security::encrypt("errorLogin<$>", $key1));
+					exit(Security::encrypt("errorLogin<$>", $config['key1']));
 				}
 
 			} else {
-				if($checkPass !=  $realPass)  die(Security::encrypt('errorLogin<$>', $key1));
+				if($checkPass !=  $realPass)  die(Security::encrypt('errorLogin<$>', $config['key1']));
 			}
 	}
 
@@ -114,7 +116,7 @@ include_once ("scripts/actionScript.php");  //Action requests
 
         if($ctoken != "null") {
 			if($rU['token'] != $acesstoken || $login != $realUser) {
-	        	exit(Security::encrypt("errorLogin<$>", $key1));
+	        	exit(Security::encrypt("errorLogin<$>", $config['key1']));
 			}
 	    }
 		
@@ -141,46 +143,49 @@ include_once ("scripts/actionScript.php");  //Action requests
 		if($action == 'auth') {
 			//$geoBase = new IPGeoBase();
 			//$geoBase->getIP($ip);
-		
+
 		if(
-		!file_exists($clientsDir."assets")||
-		!file_exists($clientsDir.$client."/bin/")||
-		!file_exists($clientsDir.$client."/mods/")||
-		!file_exists($clientsDir.$client."/natives/")||
-		!file_exists($clientsDir.$client."/servers.dat")) {
-			die(Security::encrypt("client<$> $client", $key1));
+		!file_exists($config['clientsDir']."assets")||
+		!file_exists($config['clientsDir'].$client."/bin/")||
+		!file_exists($config['clientsDir'].$client."/mods/")||
+		!file_exists($config['clientsDir'].$client."/natives/")||
+		!file_exists($config['clientsDir'].$client."/servers.dat")) {
+			die(Security::encrypt("client<$> $client", $config['key1']));
 		}
 		
-		if(file_exists($clientsDir.$client."/coremods/")) {
-			$arg = "checkfiles($clientsDir.$client.'/coremods/')";
+		if(file_exists($config['clientsDir'].$client."/coremods/")) {
+			$arg = "checkfiles(".$config['clientsDir'].".$client."/coremods/")";
 		}
 
-        $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $protectionKey));
-        $md5zip	  = @md5_file($clientsDir.$client."/servers.dat");
-        $md5ass	  = @md5_file($clientsDir."assets.zip");
-        $sizezip  = @filesize($clientsDir.$client."/servers.dat");
-        $sizeass  = @filesize($clientsDir."assets.zip");
-		$usrsessions = "$masterversion<:>$md5user<:>".$md5zip."<>".$sizezip."<:>".$md5ass."<>".$sizeass."<br>".$realUser.'<:>'.strtoint(xorencode($sessid, $protectionKey)).'<br>'.$acesstoken.'<br>';
+        $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $config['protectionKey']));
+        $md5zip	  = @md5_file($config['clientsDir'].$client."/servers.dat");
+        $md5ass	  = @md5_file($config['clientsDir']."assets.zip");
+        $sizezip  = @filesize($config['clientsDir'].$client."/servers.dat");
+        $sizeass  = @filesize($config['clientsDir']."assets.zip");
+		$usrsessions = $config['masterversion']."<:>".$md5user."<:>".$md5zip."<>".$sizezip."<:>".$md5ass."<>".$sizeass."<br>".$realUser.'<:>'.strtoint(xorencode($sessid, $config['protectionKey'])).'<br>'.$acesstoken.'<br>';
 
-        if($temp) {
-	        $filecache = $clientsDir.$client.'/'.$client;
+        if($config['temp']) {
+	        $filecache = $config['clientsDir'].$client.'/'.$client;
 			if (file_exists($filecache)) {
 				 $fp = fopen($filecache, "r");
 				 $hash_md5 = fgets($fp);
 				 fclose($fp);
 			} else {
-				$hash_md5 = hashc($client,$clientsDir);
+				$hash_md5 = hashc($client,$config['clientsDir']);
+				try {
 				$fp = fopen($filecache, "w");
 				fwrite($fp, $hash_md5);
 				fclose($fp);
+				} catch(Exception $e){
+					die($e);
+				}
 			}
 	    } else {
-	    	$hash_md5 = hashc($client,$clientsDir);
+	    	$hash_md5 = hashc($client,$config['clientsDir']);
 	    }
-        echo Security::encrypt($usrsessions.$hash_md5, $key1);
+        echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
 	}
 	
-	
 	} catch(PDOException $pe) {
-		die(Security::encrypt("errorsql<$>", $key1).$pe);
+		die(Security::encrypt("errorsql<$>", $config['key1']).$pe);
 	}

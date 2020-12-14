@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- Skins - look nice today!
+ Skins - you look nice today!| AuthLib
 -----------------------------------------------------
  https://arcjetsystems.ru/
 -----------------------------------------------------
@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: skins.php
 -----------------------------------------------------
- Версия: 0.0.3 Stable Alpha
+ Версия: 0.0.4 Stable Alpha
 -----------------------------------------------------
  Назначение: Парсит скины и плащи
 =====================================================
@@ -26,6 +26,7 @@ $exists1;
 	}
 			
 	include("../database.php");
+	$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 	$stmt = $db->prepare("SELECT user FROM usersession WHERE md5= :md5");
 	$stmt->bindValue(':md5', $md5);
 	$stmt->execute();
@@ -37,9 +38,9 @@ $exists1;
 		
 		$time = time();
 		$file1 = $capeurl.$realUser.'.png';
-		$exists1 = file_exists('../'.$uploaddirp.'/'.$realUser.'.png');
+		$exists1 = file_exists('../'.$config['uploaddirp'].'/'.$realUser.'.png');
 		$file2 = $skinurl.$realUser.'.png';
-		$exists2 = file_exists('../'.$uploaddirs.'/'.$realUser.'.png');
+		$exists2 = file_exists('../'.$config['uploaddirs'].'/'.$realUser.'.png');
 		
 		//If cape exists
 		if ($exists1) {

@@ -1,10 +1,33 @@
 <?php
+/*
+=====================================================
+ Database
+-----------------------------------------------------
+ https://Foxesworld.ru/
+-----------------------------------------------------
+ Copyright (c) 2016-2020  FoxesWorld
+-----------------------------------------------------
+ Данный код защищен авторскими правами
+-----------------------------------------------------
+ Файл: database.php
+-----------------------------------------------------
+ Версия: 0.0.10.3 Release Candidate
+-----------------------------------------------------
+ Назначение: Класс для работы с БД
+=====================================================
+*/
 if(!defined('INCLUDE_CHECK')) {
-	require ($_SERVER['DOCUMENT_ROOT'].'/index.html');
+	require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
 	exit();
-}
+}	
 	
-	include_once("scripts/functions.inc.php");
+	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
+	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
+	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
+	define('SITE_ROOT', ROOT_DIR.'/launcher');
+	
+	require ('config.php');
+	include_once("scripts/functions.inc.php");		
 	if (extension_loaded('openssl')) {
 		include_once("scripts/security/security_openssl.php");
 	} else if(extension_loaded('mcrypt')){
@@ -12,77 +35,133 @@ if(!defined('INCLUDE_CHECK')) {
 	} else {
 		exit("Отсутствуют расширения mcrypt и openssl!");
 	}
-	
-	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
-	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
-	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
-	define('SITE_ROOT', ROOT_DIR.'/launcher');
-	
-	/*		 DB_Config		 */
-	$db_host			= 'localhost'; 
-	$db_port			= '3306';
-	$db_user			= 'root'; 
-	$db_pass			= 'P$Ak$O2sJZSu$aAKOBqkokf@Vs5%YCj'; 
-	$db_database		= 'fox_dle';
-	$dbname_launcher    = 'fox_launcher';
-	$db_name_userdata	= 'fox_userdata';
-	$db_table       	= 'dle_users'; 
-	$db_columnId  		= 'user_id'; 
-	$db_columnUser  	= 'name';
-	$db_columnPass  	= 'password';
-    $db_columnIp  		= 'logged_ip';
-	$db_columnDatareg   = 'reg_date';
-	$db_columnMail      = 'email';
-	
-	
-	$banlist            = 'banlist';
-	$clientsDir = "files/clients/";
-	$crypt 				= 'hash_foxy';
-	
-	$useban             =  false; //Бан на сервере = бан в лаунчере (Не готовая разработка) //Будет убрано 
-	$useantibrut        =  true; //Защита от частых подборов пароля (Пауза 1 минута)
-	$temp               = false; //Хранение кеша файлов во временных файлах
-	
-	/*		 Cryptography		 */
-	$masterversion  	= 'final_RC4'; 								//версия лаунчера (Не пригодилась, md5 всё сам решил, в будущих релизах уберем) //Будет убрано 
-	$protectionKey		= 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj'; 
-	$key1               = "R2zwuwmv~YZSIJ21";  						//16 Character Key 
-	$key2               = "oPCwB9S6z{*rEh%V"; 						//16 Character  Key
-	$md5launcherjar     = @md5_file("files/launcher/launcher.jar"); //Сверяем MD5 //Будет убрано так как сверяем иначе
-	$not_allowed_symbol = array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" );
-	$cronPass 			= 'Tess2556308';							//Ключ для работы кронТаба 
 
-	/*		 Skins&Cloaks Configuration 		*/
-	$uploaddirs         = 'MinecraftSkins';  //Папка скинов
-	$uploaddirp         = 'MinecraftCloaks'; //Папка плащей
-    $skinurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirs.'/'; //Ссылка на скины 
-    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$uploaddirp.'/'; //Ссылка на плащи	
+	
 
-	try {
-		$db = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_database", $db_user, $db_pass);
-		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$db->exec("set names utf8");
-		dbPrepare();
-    } catch(PDOException $pe) {
-		die(Security::encrypt("errorsql", $key1).$logger->WriteLine($log_date."Ошибка подключения (Хост, Логин, Пароль)"));
-	}
-	
-	
-	try { 
-		$LauncherDB = new PDO("mysql:host=$db_host;dbname=$dbname_launcher;charset=UTF8", $db_user, $db_pass); 
-	} catch(PDOException $e) { 
-		die($e->getMessage());
-	}
-	
-	try {
-		$FoxSiteDB = new PDO("mysql:host=$db_host;dbname=$db_database;charset=UTF8", $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-	} catch(PDOException $e) { 
-		die($e->getMessage());
-	}
-	
-	try {  
-	  $UDT = new PDO("mysql:host=$db_host;dbname=$db_name_userdata", $db_user, $db_pass);  
-	}  
-	catch(PDOException $e) {  
-		echo $e->getMessage();  
-	}
+
+class db {
+
+  const CHARSET = 'utf8';
+ 
+  static private $db;
+  protected static $instance = null;
+
+  public function __construct($db_user, $db_pass, $db_name, $db_location = 'localhost', $show_error=1){
+    if (self::$instance === null){
+      try {
+        self::$db = new PDO(
+          'mysql:host='.$db_location.';dbname='.$db_name,
+          $db_user,
+          $db_pass,
+          $options = [
+              PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+              PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+              PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".self::CHARSET
+          ]
+        );
+      } catch (PDOException $e) {
+		  $query = strval($e->queryString);
+		  $message = $e->getMessage();
+		  display_error($message, $query, '1');
+      }
+    }
+    return self::$instance;
+  }
+ 
+  /**
+   * @param $stmt
+   * @return PDOStatement
+   */
+  public static function query($stmt)  {
+    return self::$db->query($stmt);
+  }
+ 
+  /**
+   * @param $stmt
+   * @return PDOStatement
+   */
+  public static function prepare($stmt)  {
+    return self::$db->prepare($stmt);
+  }
+ 
+  /**
+   * @param $query
+   * @return int
+   */
+  static public function exec($query) {
+    return self::$db->exec($query);
+  }
+ 
+  /**
+   * @return string
+   */
+  static public function lastInsertId() {
+    return self::$db->lastInsertId();
+  }
+ 
+  /**
+   * @param $query
+   * @param array $args
+   * @return PDOStatement
+   * @throws Exception
+   */
+  public static function run($query, $args = [])  {
+    try{
+      if (!$args) {
+        return self::query($query);
+      }
+      $stmt = self::prepare($query);
+      $stmt->execute($args);
+      return $stmt;
+    } catch (PDOException $e) {
+          $query = strval($e->queryString);
+		  $message = $e->getMessage();
+		  display_error($message, $query, '1');
+    }
+  }
+
+  /**
+   * @param $query
+   * @param array $args
+   * @return mixed
+   */
+  public static function getRow($query, $args = [])  {
+    return self::run($query, $args)->fetch();
+  }
+
+  /**
+   * @param $query
+   * @param array $args
+   * @return array
+   */
+  public static function getRows($query, $args = [])  {
+    return self::run($query, $args)->fetchAll();
+  }
+
+  /**
+   * @param $query
+   * @param array $args
+   * @return mixed
+   */
+  public static function getValue($query, $args = [])  {
+    $result = self::getRow($query, $args);
+    if (!empty($result)) {
+      $result = array_shift($result);
+    }
+    return $result;
+  }
+
+  /**
+   * @param $query
+   * @param array $args
+   * @return array
+   */
+  public static function getColumn($query, $args = [])  {
+    return self::run($query, $args)->fetchAll(PDO::FETCH_COLUMN);
+  }
+
+  public static function sql($query, $args = [])
+  {
+    self::run($query, $args);
+  }
+}

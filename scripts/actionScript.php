@@ -28,24 +28,24 @@
   }
 		
 	if(isset($_GET['adress']) && isset($_GET['port'])){
-			$host = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['adress']))));
-			$port = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['port']))));
-			die(Security::encrypt(parse_online($host, $port), $key1));
+			$host = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['adress']))));
+			$port = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['port']))));
+			die(Security::encrypt(parse_online($host, $port), $config['key1']));
 			
 	} elseif(isset($_GET['radio'])){
-			$radio = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['radio']))));
+			$radio = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['radio']))));
 			die(JSONanswer('type', 'error', 'message', 'Not supported yet: '.$radio));
 			
 	} elseif(isset($_GET['getText'])){
-			$getText = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getText']))));
-			die(Security::encrypt(getyText(), $key1));
+			$getText = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getText']))));
+			die(getyText());
 	
 	} elseif(isset($_GET['Image'])){
-			$Image = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['Image']))));
-			die(Security::encrypt(ImgHash($Image), $key1));
+			$Image = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['Image']))));
+			die(Security::encrypt(ImgHash($Image), $config['key1']));
 			
 	} elseif(isset($_GET['getRealname'])){
-			$login = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
+			$login = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
 			die(getRealName($login));
 		
 	} elseif(isset($_GET['show'])) {
@@ -53,8 +53,8 @@
 			header("Content-type: image/png");
 			$skin_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftSkins/';
 			$cloak_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftCloaks/';
-			$show = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['show'])))) ?? null;
-			$file_name = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['file_name'])))) ?? null;
+			$show = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['show'])))) ?? null;
+			$file_name = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['file_name'])))) ?? null;
 			$name =  empty($file_name) ? 'default' : $file_name;
 			$skin =  $skin_dir . $name . '.png';
 			$cloak =  $cloak_dir . $name . '.png';
@@ -70,22 +70,24 @@
 			imagepng($img);
 			
 	} elseif (isset($_GET['getProfileBG'])){
-		$getProfileBG = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
+		$getProfileBG = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
 		if($getProfileBG !== null) {
-		die(Security::encrypt(usersBackgrounds($getProfileBG), $key1));
+		die(usersBackgrounds($getProfileBG));
 		} else {
-			die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $key1));
+			die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $config['key1']));
 		}
 		
 	} elseif(isset($_GET['rootJSON'])) {
 		die(checkfilesRootJSON($_GET['rootJSON']));
 		
 	} elseif(isset($_GET['serversJSON'])){
-		$ServersJSONlogin = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['serversJSON'])))) ?? null;
+		$ServersJSONlogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversJSON'])))) ?? null;
 		die(serversParserJSON($ServersJSONlogin));
 	
 	} elseif(isset($_GET['JREnames'])){
-		$bitDepth = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
+		$bitDepth = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
 		die(scanRuntimeDir($bitDepth));
+	} elseif(isset($_GET['tes'])){ 
+
 	}
 	

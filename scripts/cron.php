@@ -21,12 +21,12 @@ define('DEBUG_LOGS',true);
 require ('../database.php');
 //===================================================
 	$key = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['key']))));
-	if($key == $cronPass && $key !== null){
+	if(isset($key) && $key == $config['cronPass']){
 	//===========Running CronTab Jobs================
 		clearMD5Cache();
 	
 	//===============================================
 	} else {
-		require ('../../index.html');
+		require ('../../index.php');
 	}
 
