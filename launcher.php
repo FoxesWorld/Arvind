@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- Launcher - this is my core!
+ This is my core! | Launcher
 -----------------------------------------------------
  https://arcjetsystems.ru/
 -----------------------------------------------------
@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.17.1 Stable Alpha
+ Версия: 0.0.17.2 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -22,7 +22,7 @@ define('INCLUDE_CHECK',true); //Security Define
 define('DEBUG_LOGS',true);
 include ("scripts/functions.inc.php");  //All Functions
 include_once ("scripts/actionScript.php");  //Action requests
-//================================================================
+//===================================================
 	if(!$_REQUEST){
 		require ('../index.php');
 	}
@@ -141,8 +141,9 @@ include_once ("scripts/actionScript.php");  //Action requests
 		$hash = generateLoginHash();
 		$db->query("UPDATE LOW_PRIORITY dle_users SET lastdate='{$_TIME}', logged_ip='$ip',hash='$hash' WHERE name='$login'");
 		if($action == 'auth') {
-			//$geoBase = new IPGeoBase();
-			//$geoBase->getIP($ip);
+			require ('scripts/geoIP.class.php');
+			$geoplugin = new geoPlugin();
+			//$geoplugin->locate();
 
 		if(
 		!file_exists($config['clientsDir']."assets")||

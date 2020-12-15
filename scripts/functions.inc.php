@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.19.8 Release Candidate
+ Версия: 0.0.19.9 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -679,65 +679,3 @@ header('Content-Type: text/html; charset=utf-8');
 					';
 				exit();
 			}
-/* 		Now Disabled for reconstruction due to many bugs with it
-class IPGeoBase {
-			private $fhandleCIDR, $fhandleCities, $fSizeCIDR, $fsizeCities;
-			
-			private function ipLocation($ip){
-					$ip_data = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=".$ip)); 
-					if($ip_data && $ip_data->geoplugin_countryName != null){
-						$ipLocation = $ip_data->geoplugin_countryCode;
-						$ipRegion = $ip_data->geoplugin_region;
-					} else {
-						$ipLocation = 'Unknown';
-						$ipRegion = $ip_data->geoplugin_region;
-					}
-					return array($ipLocation,$ipRegion);
-			}
-			
-			private function addCityCount($city){
-				global $LauncherDB;
-				$query = "SELECT * FROM ipCity WHERE cityName = '$city'";
-				$STH = $LauncherDB->query($query);  
-				$STH->setFetchMode(PDO::FETCH_OBJ);
-				$row = $STH->fetchObject();
-				
-				if(!isset($row->cityName)){
-					$query = "INSERT INTO `ipCity`(`cityName`) VALUES ('$city')";
-				} else {
-					$query = "UPDATE `ipCity` SET `cityCount`= cityCount+1 WHERE cityName = '$city'";	
-				}
-				$LauncherDB->query($query);
-			}
-			
-			public function getIP($ip,$log=false){
-				global $LauncherDB;
-				if($ip){
-					if(!isset($_COOKIE['ipAdded'])){
-						$STH = $LauncherDB->query("SELECT * FROM `ipDatabase` WHERE ip = '$ip'"); 
-						$STH->setFetchMode(PDO::FETCH_OBJ);
-						$row = $STH->fetchObject();
-						if (!isset($row->ip)) {
-							$date="[".date("d m Y H:i")."] ";
-							$ipLocation = $this->ipLocation($ip)[0];
-							$ipRegion = $this->ipLocation($ip)[1];
-							$LauncherDB->query("INSERT INTO `ipDatabase`(`ipLocation`, `ipRegion`, `ip`) VALUES ('$ipLocation','$ipRegion','$ip')");  
-							$this->addCityCount($ipRegion);
-							if($log === true){
-								echo 'Adding '.$ip.' - '.$ipLocation.'('.$ipRegion.') '.'to IP database';
-							}
-							setcookie("ipAdded", $ip, time()+36000);
-						} else {
-							if($log === true){
-								echo 'Cookie was not found but Ip - '.$userIP.' is already added in the Database, thanks for helping us to build server statistics';
-							}
-						}
-					} else {
-						if($log === true){
-							echo 'Cookie was set for ip - '.$_COOKIE['ipAdded'];
-						}
-					}
-				}
-			}
-		}
-*/
