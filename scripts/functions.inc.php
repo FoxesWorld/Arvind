@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.19.7 Release Candidate
+ Версия: 0.0.19.8 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -86,8 +86,8 @@ header('Content-Type: text/html; charset=utf-8');
 			}
 
 			function dbPrepare(){
-				global $db;
-
+				global $config;
+				$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
 				try {
 					$stmt = $db->prepare("
 					CREATE TABLE IF NOT EXISTS `usersession` (
