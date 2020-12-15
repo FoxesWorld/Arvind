@@ -11,22 +11,21 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.16 Alpha
+ Версия: 0.1.17 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера и апдейтера
 =====================================================
 */ 
 header("Content-Type: text/plain; charset=UTF-8");
 define('INCLUDE_CHECK',true);
+define('CONFIG', true);
+include_once ("config.php");
 include_once ("scripts/functions.inc.php");
-
 	$get_request =  $_SERVER['QUERY_STRING'];
 	if($get_request === ''){
 		die("Hacking Attempt!");
 	}
-	
-	$launcherRepositoryPath = "files/launcher/launcher.jar";
-	$updaterRepositoryPath = "files/updater/updater.";
+
 	$updater_type = $_GET['updater_type'] ?? null;
 	$updater_hash = $_GET['hash'] ?? null;
 	$launcher_hash = $_GET['ver'] ?? null;
@@ -37,12 +36,12 @@ include_once ("scripts/functions.inc.php");
 		$file = "updater";
 		if($updater_type === 'jar'){
 			$fileName = $file.'.'.$updater_type;
-			$updaterHashLocal = md5_file($updaterRepositoryPath.$updater_type);
+			$updaterHashLocal = md5_file($config['updaterRepositoryPath'].$updater_type);
 			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
 			
 		} elseif($updater_type === 'exe'){
 			$fileName = $file.'.'.$updater_type;
-			$updaterHashLocal = md5_file($updaterRepositoryPath.$updater_type);
+			$updaterHashLocal = md5_file($config['updaterRepositoryPath'].$updater_type);
 			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
 			
 		} elseif ($updater_type != 'exe' || $updater_type != 'jar') {
@@ -55,9 +54,9 @@ include_once ("scripts/functions.inc.php");
 	
 	//Хеш-код лаунчера, если обновление есть скрипт отвечает YES, иначе NO
 	if(isset($launcher_hash)){
-		$launcherRepositoryHash = md5_file($launcherRepositoryPath);
+		$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
 		$launcherState = $launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
-		$answer = array('fileName' =>$launcherRepositoryPath, 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
+		$answer = array('fileName' =>$config['launcherRepositoryPath'], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
 		$answer = json_encode($answer);
 		die($answer);
 	}

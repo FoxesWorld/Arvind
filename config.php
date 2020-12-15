@@ -11,16 +11,21 @@
 -----------------------------------------------------
  Файл: servers.php
 -----------------------------------------------------
- Версия: 0.0.2 Alpha
+ Версия: 0.0.3 Alpha
 -----------------------------------------------------
  Назначение: Настройки веб сервиса
 =====================================================
 */
-if(!defined('INCLUDE_CHECK')) {
+if(!defined('CONFIG')) {
 	require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
 	exit();
 }
 
+	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
+	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
+	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
+	define('SITE_ROOT', ROOT_DIR.'/launcher');
+	
 $config = array(
 	/* Database Settings*/
 	'db_host' 			=> 'localhost',
@@ -56,7 +61,11 @@ $config = array(
 	'md5launcherjar'    => @md5_file("files/launcher/launcher.jar"),
 	'not_allowed_symbol'=> array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" ),
 	'cronPass' 			=> 'Tess2556308',//CronTab secure key
-	'crypt' 			=> 'hash_foxy'
+	'crypt' 			=> 'hash_foxy',
+	
+	/* Updater */
+	'launcherRepositoryPath' => "files/launcher/launcher.jar",
+	'updaterRepositoryPath' => "files/updater/updater."
 );
 
     $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Ссылка на скины 

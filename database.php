@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: database.php
 -----------------------------------------------------
- Версия: 0.0.10.3 Release Candidate
+ Версия: 0.0.10.4 Release Candidate
 -----------------------------------------------------
  Назначение: Класс для работы с БД
 =====================================================
@@ -20,12 +20,7 @@ if(!defined('INCLUDE_CHECK')) {
 	require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
 	exit();
 }	
-	
-	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
-	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
-	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
-	define('SITE_ROOT', ROOT_DIR.'/launcher');
-	
+	define('CONFIG', true);
 	require ('config.php');
 	include_once("scripts/functions.inc.php");		
 	if (extension_loaded('openssl')) {
@@ -86,7 +81,7 @@ class db {
  
   /**
    * @param $query
-   * @return int
+   * @return boolean
    */
   static public function exec($query) {
     return self::$db->exec($query);
