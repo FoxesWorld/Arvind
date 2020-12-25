@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.19.9 Release Candidate
+ Версия: 0.0.20.9 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -402,8 +402,9 @@ header('Content-Type: text/html; charset=utf-8');
 					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 					$version = $serverInfo[0]['version'];
 					$versionPath = 'files/clients/versions/'.$version;
-					$hash_md5    = checkfiles($versionPath).checkfilesRoot($client).checkfiles($config['clientsDir'].$client.'/mods/').checkfiles($config['clientsDir'].'assets').'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>';
-					return $hash_md5;
+					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot($client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>versions/'.$version.'<:b:>'.$client;
+				
+				return $hash_md5;
 			}
 			
 			//Full JSON

@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.17.3 Stable Alpha
+ Версия: 0.0.18.3 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -142,12 +142,14 @@ include_once ("scripts/actionScript.php");  //Action requests
 	$geoplugin = new geoPlugin();
 
 /* Проверка структуры клиента и отдача файлов + Хеш */
-
-		/* Basic client structure (WIP) */
+				$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
+				$version = $serverInfo[0]['version'];
+		/* Basic client structure (Alpha) */
 			if(!file_exists($config['clientsDir']."assets")||
-			!file_exists($config['clientsDir'].$client."/bin/")||
+			!file_exists($config['clientsDir']."versions/".$version)||
 			!file_exists($config['clientsDir'].$client."/mods/")||
-			!file_exists($config['clientsDir'].$client."/natives/")||
+			!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar")||
+			!file_exists($config['clientsDir']."versions/".$version."/natives/")||
 			!file_exists($config['clientsDir'].$client."/servers.dat")) {
 				die(Security::encrypt("client<$> $client", $config['key1']));
 			}
@@ -181,7 +183,7 @@ include_once ("scripts/actionScript.php");  //Action requests
 			}
 		}
 	} else {
-            $hash_md5 = hashc($client);
+            $hash_md5 = hashcVersion($client);
 	}
             echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
     }
