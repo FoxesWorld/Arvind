@@ -188,8 +188,9 @@ header('Content-Type: text/html; charset=utf-8');
 			
 			//Displays All avialable servers (NO JSON!!)
 			function serversParser($selector) {
-				$serversList = serversListArray($selector);
 				$counter = 0;
+				$srvCount = 0;
+				$serversList = serversListArray($selector);
 				$srvCount = count($serversList);
 				while($counter < $srvCount) {
 					if($serversList[$counter]['status'] == 1) {
@@ -198,9 +199,9 @@ header('Content-Type: text/html; charset=utf-8');
 							echo $serversList[$counter]['port'] . "& "; 
 							echo $serversList[$counter]['version']  . "& ";  
 							echo $serversList[$counter]['serverImage']  . "& ";  
-							echo $serversList[$counter]['story'] . "<::>"; 
-							$counter++;
+							echo $serversList[$counter]['story'] . "<::>"; 		
 					}
+					$counter++;
 				}
 			}
 
@@ -388,11 +389,23 @@ header('Content-Type: text/html; charset=utf-8');
 					$password.=$chars[rand(0,$size)];
 					return $password;
 			}
+			//Will be replaced on hashcVersion
+			function hashc($client) {
+				global $config;
+					$hash_md5    = str_replace("\\", "/",checkfiles($config['clientsDir'].$client.'/bin/').checkfilesRoot($client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>';
 			
-			function hashc($client ,$clientsDir) {
-					$hash_md5    = str_replace("\\", "/",checkfiles($clientsDir.$client.'/bin/').checkfilesRoot($client).checkfiles($clientsDir.$client.'/mods/').checkfiles($clientsDir.$client.'/natives/').checkfiles($clientsDir.'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>'; //.$client.'/coremods<:b:>'
 				return $hash_md5;
 			}
+			//New function for clients (Gets the client version and loads the proper version of the game) P.S WIP	
+			function hashcVersion($client) {
+				global $config;
+					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
+					$version = $serverInfo[0]['version'];
+					$versionPath = 'files/clients/versions/'.$version;
+					$hash_md5    = checkfiles($versionPath).checkfilesRoot($client).checkfiles($config['clientsDir'].$client.'/mods/').checkfiles($config['clientsDir'].'assets').'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>';
+					return $hash_md5;
+			}
+			
 			//Full JSON
 			function getyText(){
 					global $config;

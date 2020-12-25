@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: geoIP.class.php
 -----------------------------------------------------
- Версия: 0.0.3 Alpha
+ Версия: 0.0.4 Alpha
 -----------------------------------------------------
  Назначение: Определение и запись места входа в БазуДанных
 =====================================================
@@ -68,20 +68,17 @@ class geoPlugin {
         $this->currencyCode = $data['geoplugin_currencyCode'];
         $this->currencySymbol = $data['geoplugin_currencySymbol'];
         $this->currencyConverter = $data['geoplugin_currencyConverter'];
-		$this->getIP($this->ip,$this->countryName,$this->city,false);
+		geoPlugin::getIP($this->ip,$this->countryName,$this->city,false);
     }
  
-    function fetch($host) {
- 
+    private function fetch($host) {
         if (function_exists('curl_init')) {
- 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $host);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_USERAGENT, 'geoPlugin PHP Class v1.0');
             $response = curl_exec($ch);
             curl_close ($ch);
- 
         } elseif(ini_get('allow_url_fopen')) {
             $response = file_get_contents($host, 'r');
         } else {
@@ -92,7 +89,7 @@ class geoPlugin {
         return $response;
     }
  
-    function convert($amount, $float=2, $symbol=true) {
+    private function convert($amount, $float=2, $symbol=true) {
         if ( !is_numeric($this->currencyConverter) || $this->currencyConverter == 0 ) {
             trigger_error('geoPlugin class Notice: currencyConverter has no value.', E_USER_NOTICE);
             return $amount;
@@ -108,7 +105,7 @@ class geoPlugin {
         }
     }
  
-    function nearby($radius=10, $limit=null) {
+    private function nearby($radius=10, $limit=null) {
  
         if ( !is_numeric($this->latitude) || !is_numeric($this->longitude) ) {
             trigger_error ('geoPlugin class Warning: Incorrect latitude or longitude values.', E_USER_NOTICE);
@@ -120,10 +117,9 @@ class geoPlugin {
             $host .= "&limit={$limit}";
  
         return unserialize( $this->fetch($host) );
- 
     }
 	
-	public function getIP($ip,$ipLocation,$ipRegion,$log=false){
+	private static function getIP($ip,$ipLocation,$ipRegion,$log=false){
 		global $config;
 		if($ip){
 			$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
@@ -131,10 +127,15 @@ class geoPlugin {
 				$query = "SELECT * FROM `ipDatabase` WHERE ip = '$ip'";
 				$data = $db->getValue($query);
 				if (!isset($data) || $data === false) {
-					$date="[".date("d m Y H:i")."] ";
-					
+					//$date="[".date("d m Y H:i")."] ";
+						if(!$ipLocation){
+							$ipLocation = 'Nowhere';
+						}
+						if(!$ipRegion){
+							$ipRegion = 'Land Of Fools';
+						}					
 					$db->run("INSERT INTO `ipDatabase`(`ipLocation`, `ipRegion`, `ip`) VALUES ('$ipLocation','$ipRegion','$ip')");  
-					$this->addCityCount($ipRegion);
+					geoPlugin::addCityCount($ipRegion);
 					if($log === true){
 						echo 'Adding '.$ip.' - '.$ipLocation.'('.$ipRegion.') '.'to IP database';
 					}
@@ -151,10 +152,12 @@ class geoPlugin {
 					echo 'Cookie was set for ip - '.$_COOKIE['ipAdded'];
 				}
 			}
+		} else {
+			echo "That can't happen!";
 		}
 	}
 
-	private function addCityCount($city){
+	private static function addCityCount($city){
 		global $config;
 		$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
 		$query = "SELECT * FROM ipCity WHERE cityName = '$city'";

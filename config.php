@@ -45,7 +45,7 @@ $config = array(
 	
 	/* Clients Settings */
 	'clientsDir' 		=> 'files/clients/',
-	'temp' 				=> true, //Use temporary files
+	'temp' 				=> false, //Use temporary files
 	'useban' 			=> false, //Doesn't work
 	'useantibrut' 		=>  true,
 	
@@ -54,7 +54,6 @@ $config = array(
 	'uploaddirp'  		=> 'MinecraftCloaks',
 	
 	/* Cryptography */
-	'masterversion'  	=> 'final_RC4', //To remove (OLD Stuff)
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
 	'key1'              => "R2zwuwmv~YZSIJ21",  //Encryption Key 1
 	'key2'              => "oPCwB9S6z{*rEh%V", //Encryption Key 2
@@ -65,8 +64,18 @@ $config = array(
 	
 	/* Updater */
 	'launcherRepositoryPath' => "files/launcher/launcher.jar",
-	'updaterRepositoryPath' => "files/updater/updater."
-);
-
+	'updaterRepositoryPath' => "files/updater/updater.",
+	
+	/* E-mail */
+	'adminEmail'		=> 'lisssicin@ya.ru',
+	'letterHeadLine' 	=> 'FoxesWorld | Arvind',
+	'sendMethod' 		=> 'SMTP',
+	'sendHost'			=> 'smtp.yandex.ru',
+	'SMTPport'			=> 465,
+	'SMTPMail'			=> 'no-reply@foxesworld.ru',
+	'SMTPpass'			=> 'dvhbdxutiscpbmof',
+	'SMTPsecProtocol'	=> 'SSL');
     $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Ссылка на скины 
     $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Ссылка на плащи
+	
+	//echo $config['launcherMD5'].' '.$config['md5launcherjar'];

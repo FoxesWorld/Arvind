@@ -47,6 +47,7 @@ include_once ("scripts/functions.inc.php");
 		} elseif ($updater_type != 'exe' || $updater_type != 'jar') {
 			$updateState = "Unknown updater type!";
 		}
+
 		$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
 		$answer = json_encode($answer);
 		die($answer);
@@ -56,7 +57,8 @@ include_once ("scripts/functions.inc.php");
 	if(isset($launcher_hash)){
 		$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
 		$launcherState = $launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
-		$answer = array('fileName' =>$config['launcherRepositoryPath'], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
+		$fileName = explode('/',$config['launcherRepositoryPath']); 
+		$answer = array('fileName' =>$fileName[2], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
 		$answer = json_encode($answer);
 		die($answer);
 	}
