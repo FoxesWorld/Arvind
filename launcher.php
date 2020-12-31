@@ -17,7 +17,6 @@
 =====================================================
 */
 header('Content-Type: text/html; charset=utf-8');
-$_TIME = time();
 define('INCLUDE_CHECK',true); //Security Define
 define('DEBUG_LOGS',true);
 include ("scripts/functions.inc.php");  //All Functions
@@ -147,10 +146,11 @@ include_once ("scripts/actionScript.php");  //Action requests
 		/* Basic client structure (Alpha) */
 			if(!file_exists($config['clientsDir']."assets")||
 			!file_exists($config['clientsDir']."versions/".$version)||
-			!file_exists($config['clientsDir'].$client."/mods/")||
-			!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar")||
+			!file_exists($config['clientsDir']."versions/".$version."/libraries")||
+			//!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar")||
 			!file_exists($config['clientsDir']."versions/".$version."/natives/")||
-			!file_exists($config['clientsDir'].$client."/servers.dat")) {
+			!file_exists($config['clientsDir']."clients/".$client."/mods/")||
+			!file_exists($config['clientsDir']."clients/".$client."/servers.dat")) {
 				die(Security::encrypt("client<$> $client", $config['key1']));
 			}
 		/* If a file or folder is abscent dies with an error */

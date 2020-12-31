@@ -1,0 +1,23 @@
+{
+    "language": {
+        "en_us": {
+            "region": "US",
+            "name": "English",
+            "bidirectional": false
+        },
+		"ru_ru": {
+            "region": "\u0420\u043e\u0441\u0441\u0438\u044f",
+            "name": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+            "bidirectional": false
+        },
+		"uk_ua": {
+            "region": "\u0423\u043a\u0440\u0430\u0457\u043d\u0430",
+            "name": "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+            "bidirectional": false
+        }
+    },
+    "pack": {
+        "description": "Стандартный вид Foxesworld",
+        "pack_format": 6
+    }
+}

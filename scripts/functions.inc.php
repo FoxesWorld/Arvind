@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.20.9 Release Candidate
+ Версия: 0.0.21.10 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -25,10 +25,11 @@
 		Error_Reporting(E_ALL);
 		Ini_Set('display_errors', true);
 	}
-	
 
 //================================================================
-header('Content-Type: text/html; charset=utf-8');
+			header('Content-Type: text/html; charset=utf-8');
+			$_TIME = time();
+			$dateToday = date("d.m.Y");
 
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
@@ -402,7 +403,8 @@ header('Content-Type: text/html; charset=utf-8');
 					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 					$version = $serverInfo[0]['version'];
 					$versionPath = 'files/clients/versions/'.$version;
-					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot($client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>versions/'.$version.'<:b:>'.$client;
+					$clientPath = 'files/clients/clients/'.$client;
+					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>versions/'.$version.'<:b:>clients/'.$client.'/mods<:b:>clients/'.$client.'/config<:b:>clients/'.$client.'/resourcepacks<:b:>clients/'.$client.'/shaderpacks';
 				
 				return $hash_md5;
 			}
@@ -445,6 +447,18 @@ header('Content-Type: text/html; charset=utf-8');
 							$answer = JSONanswer('type', 'error', 'message', 'login not found');
 						}
 				return $answer;
+			}
+			
+			function countFilesNum($dirPath){
+				$count = 0;
+				$dir = opendir($dirPath);
+				while($file = readdir($dir)){
+					if($file == '.' || $file == '..' || is_dir($dir.'/' . $file)){
+						continue;
+					}
+					$count++;
+				}
+				return $count;
 			}
 			
 			function getRandomName(){
@@ -627,6 +641,96 @@ header('Content-Type: text/html; charset=utf-8');
 				   exit();
 				}
 				return true;
+			}
+			
+			function eventNow(){
+				global $dateToday;
+				$soundsPath = FILES_DIR."eventSounds";
+				$pathJSON = "/launcher/files/eventSounds";
+				$eventName;
+					//Date explosion
+					$dateExploded = explode ('.',$dateToday);
+					$dayToday = $dateExploded[0];
+					$monthToday = $dateExploded[1];
+					$yearToday = $dateToday[2];
+					
+				//Checking each of 12 monthes
+				switch($monthToday){
+					case 1:
+						switch($dayToday){
+							case($dayToday < 12):
+								$eventName = "winterHolidays";
+							break;
+						}
+					break;
+					
+					case 2:
+					break;
+					
+					case 3:
+					break;
+					
+					case 4:
+					break;
+					
+					case 5:
+					break;
+					
+					case 6:
+					break;
+					
+					case 7:
+					break;
+					
+					case 8:
+					break;
+					
+					case 9:
+					break;
+					
+					case 10:
+					break;
+					
+					case 11:
+					break;
+					
+					case 12:
+						switch($dayToday){
+							case($dayToday < 31 && $dayToday != 20 && $dayToday != 31):
+								$eventName = "winterHolidays";
+							break;
+							
+							case 20:
+								$eventName = "twistOfTheSun";
+							break;
+							
+							case 31:
+								$eventName = "newYear";
+							break;
+							
+							default:
+							
+						}
+					break;
+				}
+				
+				$musFilesNum = countFilesNum($soundsPath.'/mus');
+				$RandMusic = rand(1,$musFilesNum);
+				$selectedMusic = "mus".$RandMusic.".mp3";
+				if(isset($eventName)){
+					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName);	
+					$selectedSound = rand(1,$eventSoundsNum);
+					$eventSound = $eventName.$selectedSound.'.mp3';
+					$outputArray = array("Status" => "Event", "filesDir" => $pathJSON.'/',"eventName" => $eventName,"selectedSound" => $eventSound,"selectedMusic" => $selectedMusic);
+
+				} else {
+					$commonFilesNum = countFilesNum($soundsPath.'/common');
+					$selectedSound = rand(1,$commonFilesNum);
+					$selectedSound = "voice".$selectedSound.".mp3";
+					$outputArray = array("Status" => "noEvent", "filesDir" => $pathJSON.'/', "selectedSound" => $selectedSound,"selectedMusic" => $selectedMusic, "eventName" => "common");
+				}
+				$outputJSON = json_encode($outputArray);
+				return $outputJSON;
 			}
 			
 			function display_error($error ='No errors', $error_num = 100, $query) {

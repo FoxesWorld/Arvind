@@ -1,0 +1,31 @@
+JRE adding rules - Arvind 2.0.7
+Foxesworld.ru| All rights reserved
+=======================================
+If you've decided to add a new archive of JRE,
+you should remember these rules. The archive name
+MUST start from jre, then you need to place the `-`
+sybol, after that write the numeric version of the
+environment archive, after the version of that archive
+goes the system bit depth (One of the most important!),
+write there 32 or 64 bits and don't forget to split them 
+by `-`, after that updater will locate it and use for your system.
+REMEMBER, archive has to be .zip
+
+ 		  
+				  $$$        $$$$$      $$$$         $$$$     $$$$$                                 
+                  $$$       $$$$$$$     $$$$         $$$$    $$$$$$$                                
+                  $$$       $$$$$$$     $$$$$       $$$$$    $$$$$$$                                
+                  $$$       $$$$$$$      $$$$       $$$$     $$$$$$$                                
+                  $$$      $$$$ $$$$     $$$$$     $$$$$    $$$$ $$$$                               
+                  $$$      $$$$ $$$$      $$$$     $$$$     $$$$ $$$$                               
+                  $$$     $$$$$ $$$$$     $$$$     $$$$    $$$$$ $$$$$                              
+                  $$$     $$$$   $$$$     $$$$$   $$$$$    $$$$   $$$$                              
+                  $$$     $$$$   $$$$      $$$$   $$$$     $$$$   $$$$                              
+                  $$$    $$$$$   $$$$$     $$$$$ $$$$$    $$$$$   $$$$$                             
+                  $$$    $$$$$$$$$$$$$      $$$$ $$$$     $$$$$$$$$$$$$                             
+          $$$$   $$$$    $$$$$$$$$$$$$      $$$$ $$$$     $$$$$$$$$$$$$                             
+          $$$$   $$$$   $$$$$$$$$$$$$$$      $$$$$$$     $$$$$$$$$$$$$$$                            
+          $$$$$ $$$$$   $$$$       $$$$      $$$$$$$     $$$$       $$$$                            
+          $$$$$$$$$$$  $$$$$       $$$$$     $$$$$$$    $$$$$       $$$$$                           
+           $$$$$$$$$   $$$$         $$$$      $$$$$     $$$$         $$$$                           
+            $$$$$$$    $$$$         $$$$      $$$$$     $$$$         $$$$                           
