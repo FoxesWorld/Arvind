@@ -77,7 +77,12 @@
 			die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $config['key1']));
 		}
 		
-	} elseif(isset($_GET['rootJSON'])) {
+	} elseif (isset($_GET['userSelected'])) {
+		$userSelected = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['userSelected'])))) ?? null;
+		die(selectedUserBg($userSelected));
+	}
+	
+	elseif(isset($_GET['rootJSON'])) {
 		die(checkfilesRootJSON($_GET['rootJSON']));
 		
 	} elseif(isset($_GET['serversJSON'])){

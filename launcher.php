@@ -166,22 +166,22 @@ include_once ("scripts/actionScript.php");  //Action requests
         $sizeass  = @filesize($config['clientsDir']."assets.zip");
 		$usrsessions = $config['md5launcherjar']."<:>".$md5user."<:>".$md5ServersDat."<>".$sizeServersDat."<:><br>".$realUser.'<:>'.strtoint(xorencode($sessid, $config['protectionKey'])).'<br>'.$acesstoken.'<br>';
 
-        if($config['temp']) {
-            $filecache = $config['clientsDir'].$client.'/'.$client;
+        if($config['temp'] === true) {
+        $filecache = $config['clientsDir']."clients/".$client.'/'.$client;
                 if (file_exists($filecache)) {
                      $fp = fopen($filecache, "r");
                      $hash_md5 = fgets($fp);
                      fclose($fp);
                 } else {
-                    $hash_md5 = hashc($client);
-                     try {
-			$fp = fopen($filecache, "w");
-			fwrite($fp, $hash_md5);
-			fclose($fp);
-			} catch(Exception $e){
-				die($e);
-			}
-		}
+                    $hash_md5 = hashcVersion($client);
+					try {
+						$fp = fopen($filecache, "w");
+						fwrite($fp, $hash_md5);
+						fclose($fp);
+					} catch(Exception $e){
+						die($e);
+					}
+				}
 	} else {
             $hash_md5 = hashcVersion($client);
 	}

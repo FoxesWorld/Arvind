@@ -174,15 +174,17 @@
 				$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
 				$data = $db->getRows($selector);
 				foreach ($data as $row) {
-					$serversList[] = array(
-					'serverName' => $row['Server_name'],
-					'adress' => $row['adress'],
-					'port' => $row['port'],
-					'version' => $row['version'],
-					'serverImage' => $row['srv_image'],
-					'story' => $row['story'],
-					'status' => $row['enabled']);
-					$counter++;
+					if($row['enabled']){
+						$serversList[] = array(
+						'serverName' => $row['Server_name'],
+						'adress' => $row['adress'],
+						'port' => $row['port'],
+						'version' => $row['version'],
+						'serverImage' => $row['srv_image'],
+						'story' => $row['story'],
+						'status' => $row['enabled']);
+						$counter++;
+					}
 				}
 				return $serversList;
 			}
@@ -390,13 +392,7 @@
 					$password.=$chars[rand(0,$size)];
 					return $password;
 			}
-			//Will be replaced on hashcVersion
-			function hashc($client) {
-				global $config;
-					$hash_md5    = str_replace("\\", "/",checkfiles($config['clientsDir'].$client.'/bin/').checkfilesRoot($client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>'.$client.'/bin<:b:>'.$client.'/mods<:b:>'.$client.'/natives<:b:>';
-			
-				return $hash_md5;
-			}
+
 			//New function for clients (Gets the client version and loads the proper version of the game) P.S WIP	
 			function hashcVersion($client) {
 				global $config;
@@ -404,7 +400,7 @@
 					$version = $serverInfo[0]['version'];
 					$versionPath = 'files/clients/versions/'.$version;
 					$clientPath = 'files/clients/clients/'.$client;
-					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>assets/virtual<:b:>versions/'.$version.'<:b:>clients/'.$client.'/mods<:b:>clients/'.$client.'/config<:b:>clients/'.$client.'/resourcepacks<:b:>clients/'.$client.'/shaderpacks';
+					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>versions/'.$version.'<:b:>clients/'.$client.'/mods<:b:>clients/'.$client.'/config<:b:>clients/'.$client.'/resourcepacks<:b:>clients/'.$client.'/shaderpacks';
 				
 				return $hash_md5;
 			}
@@ -535,6 +531,11 @@
 				}
 				return $ImagesJSON;
 			}
+			
+			function selectedUserBg($login){
+				$usersSelectedBG = getUserData($login,'profilePhoto');
+				die($usersSelectedBG);
+			}
 			//Gets the version of Java
 			function scanRuntimeDir($bitDepth){
 				if($bitDepth) {
@@ -594,23 +595,31 @@
 						}
 			}
 			
-			function clearMD5Cache(){
+			function clearMD5Cache($logFile){
 				$selector = "SELECT * FROM servers";
 				$srvList = serversListArray($selector);
 				$counter = 0;
 				$srvCount = count($srvList);
 				while($counter < $srvCount) {  
-					if ($handle = opendir(SITE_ROOT.'/files/clients/'.$srvList[$counter]['serverName'])) {
+					$openDir = FILES_DIR.'clients/clients/'.$srvList[$counter]['serverName'];
+					if ($handle = opendir($openDir)) {
 						while (false !== ($file = readdir($handle)))   {
-							if ($file != "." && $file != ".." && $file != "mods" && $file != "bin" && $file != "config" && $file != "natives"){
-							$delPath = '../files/clients/'.$file."/".$file;
+							if ($file != "." && $file != ".." && $file == $srvList[$counter]){
+							$delPath = FILES_DIR.'clients/clients/'.$file."/".$file;
 								if (file_exists($delPath)) {
 									$unlink = unlink($delPath);
 									if($unlink == true){
-										echo "Deleted: $delPath<br>";
+										$deletedFile = '	-	Deleted: '.$delPath;
+										echo $deletedFile."<br>";
+										writeLogFile($logFile,$deletedFile);
 									} else {
-										echo "Error deleting $delPath<br>";
+										$CantDelete =  '	-	'.$delPath.' couldn`t be deleted';
+										writeLogFile($logFile,$CantDelete);
+										echo $CantDelete."<br>";
 									}
+								} else {
+									$noFileToDelete =  '	-	'.$delPath.' was not found';
+									writeLogFile($logFile,$noFileToDelete);
 								}
 							}
 						}
@@ -643,10 +652,31 @@
 				return true;
 			}
 			
+			function writeLogFile($file,$text){					
+				$fp = fopen($file, "a+");
+					if($fp) {
+						fwrite($fp,$text."\n");
+					} else {
+						echo "Error writing file ".$file;
+					}
+				fclose($fp);
+			}
+			
+			function clearLogFile($file) {
+				$fp = fopen($file,"a+");
+					if($fp) {
+						ftruncate($fp,0);
+					} else {
+						$this->error = "Error truncating file ".$file;
+					}
+				fclose($fp);
+			}
+			
 			function eventNow(){
 				global $dateToday;
 				$soundsPath = FILES_DIR."eventSounds";
 				$pathJSON = "/launcher/files/eventSounds";
+				$musFilesNum = countFilesNum($soundsPath.'/mus');
 				$eventName;
 					//Date explosion
 					$dateExploded = explode ('.',$dateToday);
@@ -655,6 +685,7 @@
 					$yearToday = $dateToday[2];
 					
 				//Checking each of 12 monthes
+				$musRange ="1/11"; //Standart music range
 				switch($monthToday){
 					case 1:
 						switch($dayToday){
@@ -706,6 +737,7 @@
 							
 							case 31:
 								$eventName = "newYear";
+								$musRange ="1/8";
 							break;
 							
 							default:
@@ -714,23 +746,66 @@
 					break;
 				}
 				
-				$musFilesNum = countFilesNum($soundsPath.'/mus');
-				$RandMusic = rand(1,$musFilesNum);
+				//Generating a Mus File
+					$easterMusFile = easterEgg(1);
+					if(isset($musRange)){
+						$musRange = explode('/',$musRange);
+						$minRange = $musRange[0];
+						$maxRange = $musRange[1];
+					}
+
+				if(isset($minRange) && isset($maxRange)) {
+					$RandMusic = rand($minRange,$maxRange);
+				} else {
+					$RandMusic = rand(1,$musFilesNum);
+				}
+				$selectedSound;
+				if($easterMusFile == "YES"){
+					$RandMusic = rand($maxRange + 1,$musFilesNum);
+				}
 				$selectedMusic = "mus".$RandMusic.".mp3";
+
+				$musMd5 = md5_file($soundsPath.'/mus/'.$selectedMusic);
+				//************************
+				
 				if(isset($eventName)){
 					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName);	
 					$selectedSound = rand(1,$eventSoundsNum);
-					$eventSound = $eventName.$selectedSound.'.mp3';
-					$outputArray = array("Status" => "Event", "filesDir" => $pathJSON.'/',"eventName" => $eventName,"selectedSound" => $eventSound,"selectedMusic" => $selectedMusic);
-
+					$selectedSound = $eventName.$selectedSound.'.mp3';
+					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
+					$outputArray = array("Status" => "Event",
+									     "filesDir" => $pathJSON.'/',"eventName" => $eventName,
+										 "soundMd5" => $thisSoundMd5,
+										 "selectedSound" => $selectedSound,
+										 "MusicMd5" => $musMd5,
+										 "selectedMusic" => $selectedMusic);
 				} else {
-					$commonFilesNum = countFilesNum($soundsPath.'/common');
+					$eventName = 'common';
+					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName);
 					$selectedSound = rand(1,$commonFilesNum);
 					$selectedSound = "voice".$selectedSound.".mp3";
-					$outputArray = array("Status" => "noEvent", "filesDir" => $pathJSON.'/', "selectedSound" => $selectedSound,"selectedMusic" => $selectedMusic, "eventName" => "common");
+					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
+					$outputArray = array("Status" => "noEvent",
+										 "filesDir" => $pathJSON.'/',
+										 "soundMd5" => $thisSoundMd5,
+										 "selectedSound" => $selectedSound,
+										 "MusicMd5" => $musMd5,
+										 "selectedMusic" => $selectedMusic,
+										 "eventName" => $eventName);
 				}
 				$outputJSON = json_encode($outputArray);
 				return $outputJSON;
+			}
+			
+			function easterEgg($chance){
+				$minRange = 1;
+				$maxRange = 1000;
+				if (mt_rand($minRange, $maxRange) <= $chance){
+					$returnText = 'YES';
+				} else {
+					$returnText= 'NO';
+				}
+				return $returnText;
 			}
 			
 			function display_error($error ='No errors', $error_num = 100, $query) {

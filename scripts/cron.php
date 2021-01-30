@@ -17,16 +17,25 @@
 =====================================================
 */
 define('INCLUDE_CHECK',true);
-define('DEBUG_LOGS',true);
+define('DEBUG_LOGS',true);	
 require ('../database.php');
 //===================================================
-	$key = trim(str_replace($not_allowed_symbol,'',strip_tags(stripslashes($_GET['key']))));
-	if(isset($key) && $key == $config['cronPass']){
+
+	$key = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['key']))));
+	if($key == $config['cronPass']){
+		$dateHIS = date("H:i:s");
+		$file = SCRIPTS_DIR.'cronLogs.log';
+		writeLogFile($file,'[CRON] Started CRON worklist at '.$dateToday.' ['.$dateHIS.']');
 	//===========Running CronTab Jobs================
-		clearMD5Cache();
+			
+			clearMD5Cache($file);
+
 	
 	//===============================================
+		$messageExecuted = "[CRON] Done cron job at ".$dateToday." in [".$dateHIS."]";
+		writeLogFile($file,$messageExecuted);
 	} else {
 		require ('../../index.php');
+		exit();
 	}
 
