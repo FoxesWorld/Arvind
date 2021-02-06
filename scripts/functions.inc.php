@@ -188,25 +188,6 @@
 				}
 				return $serversList;
 			}
-			
-			//Displays All avialable servers (NO JSON!!)
-			function serversParser($selector) {
-				$counter = 0;
-				$srvCount = 0;
-				$serversList = serversListArray($selector);
-				$srvCount = count($serversList);
-				while($counter < $srvCount) {
-					if($serversList[$counter]['status'] == 1) {
-							echo $serversList[$counter]['serverName'] . "& "; 
-							echo $serversList[$counter]['adress'] . "& "; 
-							echo $serversList[$counter]['port'] . "& "; 
-							echo $serversList[$counter]['version']  . "& ";  
-							echo $serversList[$counter]['serverImage']  . "& ";  
-							echo $serversList[$counter]['story'] . "<::>"; 		
-					}
-					$counter++;
-				}
-			}
 
 			//Full JSON (Need migration)
 			function availableServers($login){
@@ -248,7 +229,11 @@
 			
 			function serversParserJSON($login){
 				$JSONServers = array();
-				$selector = availableServers($login);
+				if($login != 'test') { 
+					$selector = availableServers($login);
+				} else {
+					$selector = "SELECT * FROM servers";
+				}
 				$serversList = serversListArray($selector);
 				$srvCount = count($serversList);
 				$counter = 0;

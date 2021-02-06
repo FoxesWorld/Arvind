@@ -45,7 +45,7 @@ $config = array(
 	
 	/* Clients Settings */
 	'clientsDir' 		=> 'files/clients/',
-	'temp' 				=> false, //Use temporary files
+	'temp' 				=> true, //Use temporary files
 	'useban' 			=> false, //Doesn't work
 	'useantibrut' 		=>  true,
 	
