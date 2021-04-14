@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.1.14 Alpha
+ Версия: 0.1.15 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -30,7 +30,11 @@
 	if(isset($_GET['adress']) && isset($_GET['port'])){
 			$host = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['adress']))));
 			$port = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['port']))));
-			die(Security::encrypt(parse_online($host, $port), $config['key1']));
+			if($config['parseOnline'] === true) {
+				die(Security::encrypt(parse_onlineJSON($host, $port), $config['key1']));
+			} else {
+				die(Security::encrypt(parse_online($host, $port), $config['key1']));
+			}
 			
 	} elseif(isset($_GET['radio'])){
 			$radio = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['radio']))));
@@ -85,9 +89,13 @@
 	elseif(isset($_GET['rootJSON'])) {
 		die(checkfilesRootJSON($_GET['rootJSON']));
 		
-	} elseif(isset($_GET['serversJSON'])){
-		$ServersJSONlogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversJSON'])))) ?? null;
-		die(serversParserJSON($ServersJSONlogin));
+	} elseif(isset($_GET['serversList'])){
+		$ServersLogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversList'])))) ?? null;
+		if($config['serversOut'] === true) {
+			die(serversParserJSON($ServersLogin));
+		} else {
+			die(serversParser($ServersLogin));
+		}
 	
 	} elseif(isset($_GET['JREnames'])){
 		$bitDepth = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;

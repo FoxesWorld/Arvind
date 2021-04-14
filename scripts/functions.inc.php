@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.21.10 Release Candidate
+ Версия: 0.0.21.11 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -227,6 +227,24 @@
 				return $query;
 			}
 			
+			function serversParser($selector) {
+				$counter = 0;
+				$srvCount = 0;
+				$serversList = serversListArray(availableServers($selector));
+				$srvCount = count($serversList);
+				while($counter < $srvCount) {
+					if($serversList[$counter]['status'] == 1) {
+							echo $serversList[$counter]['serverName'] . "& "; 
+							echo $serversList[$counter]['adress'] . "& "; 
+							echo $serversList[$counter]['port'] . "& "; 
+							echo $serversList[$counter]['version']  . "& ";  
+							echo $serversList[$counter]['serverImage']  . "& ";  
+							echo $serversList[$counter]['story'] . "<::>"; 		
+					}
+					$counter++;
+				}
+			}
+			
 			function serversParserJSON($login){
 				$JSONServers = array();
 				if($login != 'test') { 
@@ -250,8 +268,8 @@
 							$counter++;
 						}
 				}
-				$JSONServers = json_encode($JSONServers);
-				return $JSONServers;
+				//$JSONServers = json_encode($JSONServers);
+				return json_encode($JSONServers);
 			}
 			//No JSON (Will be removed)
 			function checkfiles($path) {
@@ -542,7 +560,7 @@
 				}
 				return $outputJRE;
 			}
-			//Full JSON (Need migration)
+
 			function parse_online($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
@@ -568,16 +586,50 @@
 					if(!$info[1] || !$info[2]){
 						return 'offline';
 					}
-						$answer = array('host' => $host,'port' => $port,'status' => 'online','currentOnline' => $playersOnline,'maxOnline' => $playersMax);
-						$answer = json_encode($answer);
-						$answerOld = "$playersOnline&$playersMax";
-						return ($answerOld);
-						}} else {
-							$answer = array('host' => $host,'port' => $port,'status' => 'offline');
-							$answer = json_encode($answer);
-							$answerOld = 'offline';
-							return $answer;
+
+						$answer = "$playersOnline&$playersMax";
+						return ($answer);
 						}
+					} else {
+						$answer = 'offline';
+						return $answer;
+					}
+			}
+			
+			function parse_onlineJSON($host, $port){
+				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
+
+					if ($socket !== false) {
+					@fwrite($socket, "\xFE");
+					$data = "";
+					$data = @fread($socket, 256);
+					@fclose($socket);
+			 
+				if ($data == false || substr($data, 0, 1) != "\xFF") return;{
+				  $info= substr($data, 3);
+				  $info = iconv('UTF-16BE', 'UTF-8', $info);
+
+					 if($info[1] === "\xA7" && $info[2] === "\x31" ) {
+					 $info = explode( "\x00", $info);
+					 $playersOnline=IntVal($info[4]);
+					 $playersMax = IntVal($info[5]);
+						} else {
+					 $info = Explode("\xA7", $info);
+					 $playersOnline=IntVal($info[1]);
+					 $playersMax = IntVal($info[2]);
+						}
+					if(!$info[1] || !$info[2]){
+						return 'offline';
+					}
+						$answer = array('host' => $host,'port' => $port,'status' => 'online','currentOnline' => "$playersOnline",'maxOnline' => "$playersMax");
+						$answer = json_encode($answer);
+						return ($answer);
+						}
+					} else {
+						$answer = array('host' => $host,'port' => $port,'status' => 'offline');
+						$answer = json_encode($answer);
+						return $answer;
+					}
 			}
 			
 			function clearMD5Cache($logFile){

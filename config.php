@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: servers.php
 -----------------------------------------------------
- Версия: 0.1.3 Alpha
+ Версия: 0.1.4 Alpha
 -----------------------------------------------------
  Назначение: Настройки веб сервиса
 =====================================================
@@ -45,9 +45,13 @@ $config = array(
 	
 	/* Clients Settings */
 	'clientsDir' 		=> 'files/clients/',
-	'temp' 				=> true, //Use temporary files
+	'temp' 				=> false, //Use temporary files
 	'useban' 			=> false, //Doesn't work
 	'useantibrut' 		=>  true,
+	
+	/* JSON Output */
+	'parseOnline' => false,	//Servers Pinging
+	'serversOut' => false,	//Servers List to print
 	
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
@@ -77,5 +81,3 @@ $config = array(
 	'SMTPsecProtocol'	=> 'SSL');
     $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Ссылка на скины 
     $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Ссылка на плащи
-	
-	//echo $config['launcherMD5'].' '.$config['md5launcherjar'];
