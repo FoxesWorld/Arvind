@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.18.3 Stable Alpha
+ Версия: 0.0.18.4 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
@@ -19,15 +19,15 @@
 header('Content-Type: text/html; charset=utf-8');
 define('INCLUDE_CHECK',true); //Security Define
 define('DEBUG_LOGS',true);
-include ("scripts/functions.inc.php");  //All Functions
-include_once ("scripts/actionScript.php");  //Action requests
+//include ("scripts/functions.inc.php");  //All Functions
+include ("scripts/actionScript.php");  //Action requests
 //===================================================
 	if(!$_REQUEST){
 		require ('../index.php');
 	}
 
 	if(isset($_POST['action'])) {
-		include("database.php");
+		//include("database.php");
 		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 		$x  = $_POST['action'];
 		$x = str_replace(" ", "+", $x);
@@ -56,6 +56,7 @@ include_once ("scripts/actionScript.php");  //Action requests
 		die ("Путь к плащам не является папкой!");
 	}
 	
+	//If auth token was not set - authorisation
     if($ctoken == "null") {
 			if($config['crypt'] === 'hash_md5' || $config['crypt'] === 'hash_foxy') {
 				$stmt = $db->prepare("SELECT ".$config['db_columnUser'].",".$config['db_columnPass']." FROM ".$config['db_table']." WHERE BINARY ".$config['db_columnUser']." = :login");
@@ -97,9 +98,9 @@ include_once ("scripts/actionScript.php");  //Action requests
 					die(Security::encrypt('errorLogin<$>', $config['key1']));
 				}
             }
-	$acesstoken = token();
+		$acesstoken = token();
     } else {
-    $acesstoken = $postPass;
+		$acesstoken = $postPass;
     }
 	
     $sessid = token();
@@ -112,80 +113,35 @@ include_once ("scripts/actionScript.php");  //Action requests
     }
 
     if($ctoken != "null") {
-	if($rU['token'] != $acesstoken || $login != $realUser) {
-           	exit(Security::encrypt("errorLogin<$>", $config['key1']));
-	}
+		if($rU['token'] != $acesstoken || $login != $realUser) {
+				exit(Security::encrypt("errorLogin<$>", $config['key1']));
+		}
     }
 		
     if($login == $rU['user']) {
-        if($ctoken == "null") {
-            $stmt = $db->prepare("UPDATE usersession SET session = '$sessid', token = :token WHERE user= :login");
-            $stmt->bindValue(':token', $acesstoken);
-        } else {
-            $stmt = $db->prepare("UPDATE usersession SET session = '$sessid' WHERE user= :login");
-        }
-	$stmt->bindValue(':login', $login);
-	$stmt->execute();
-    } else if($ctoken == "null" || $login != $rU['user']) {
-    $stmt = $db->prepare("INSERT INTO usersession (user, session, md5, token) VALUES (:login, '$sessid', :md5, '$acesstoken')");
-	$stmt->bindValue(':login', $realUser);
-	$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($realUser)));
-	$stmt->execute();
-    }
+			if($ctoken == "null") {
+				$stmt = $db->prepare("UPDATE usersession SET session = '$sessid', token = :token WHERE user= :login");
+				$stmt->bindValue(':token', $acesstoken);
+			} else {
+				$stmt = $db->prepare("UPDATE usersession SET session = '$sessid' WHERE user = :login");
+			}
+
+		$stmt->bindValue(':login', $login);
+		$stmt->execute();
+		} else if($ctoken == "null" || $login != $rU['user']) {
+		$stmt = $db->prepare("INSERT INTO usersession (user, session, md5, token) VALUES (:login, '$sessid', :md5, '$acesstoken')");
+		$stmt->bindValue(':login', $realUser);
+		$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($realUser)));
+		$stmt->execute();
+		}
     
-    $ip=$_SERVER['REMOTE_ADDR'];
-    $hash = generateLoginHash();
+    $ip =$_SERVER['REMOTE_ADDR'];
+    //$hash = generateLoginHash();
     $db->query("UPDATE LOW_PRIORITY dle_users SET lastdate='{$_TIME}', logged_ip='$ip' WHERE name='$login'"); //,hash='$hash'
     if($action == 'auth') {
-	require ('scripts/geoIP.class.php');
-	$geoplugin = new geoPlugin();
-
-/* Проверка структуры клиента и отдача файлов + Хеш */
-				$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
-				$version = $serverInfo[0]['version'];
-		/* Basic client structure (Alpha) */
-			if(!file_exists($config['clientsDir']."assets")||
-			!file_exists($config['clientsDir']."versions/".$version)||
-			!file_exists($config['clientsDir']."versions/".$version."/libraries")||
-			//!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar")||
-			!file_exists($config['clientsDir']."versions/".$version."/natives/")||
-			!file_exists($config['clientsDir']."clients/".$client."/mods/")||
-			!file_exists($config['clientsDir']."clients/".$client."/servers.dat")) {
-				die(Security::encrypt("client<$> $client", $config['key1']));
-			}
-		/* If a file or folder is abscent dies with an error */
-	
-		/* Argument for coremods (Old) */
-			if(file_exists($config['clientsDir'].$client."/coremods/")) {
-				$arg = checkfiles($config['clientsDir'].$client."/coremods/");
-			}
-	
-        $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $config['protectionKey']));
-        $md5ServersDat	  = @md5_file($config['clientsDir'].$client."/servers.dat");
-        $sizeServersDat  = @filesize($config['clientsDir'].$client."/servers.dat");
-        $sizeass  = @filesize($config['clientsDir']."assets.zip");
-		$usrsessions = $config['md5launcherjar']."<:>".$md5user."<:>".$md5ServersDat."<>".$sizeServersDat."<:><br>".$realUser.'<:>'.strtoint(xorencode($sessid, $config['protectionKey'])).'<br>'.$acesstoken.'<br>';
-
-        if($config['temp'] === true) {
-        $filecache = $config['clientsDir']."clients/".$client.'/'.$client;
-                if (file_exists($filecache)) {
-                     $fp = fopen($filecache, "r");
-                     $hash_md5 = fgets($fp);
-                     fclose($fp);
-                } else {
-                    $hash_md5 = hashcVersion($client);
-					try {
-						$fp = fopen($filecache, "w");
-						fwrite($fp, $hash_md5);
-						fclose($fp);
-					} catch(Exception $e){
-						die($e);
-					}
-				}
-	} else {
-            $hash_md5 = hashcVersion($client);
-	}
-            echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
+		require_once ('scripts/geoIP.class.php');
+		$geoplugin = new geoPlugin();	//GeoPosition
+		require_once ("scripts/loadFiles.php"); //LoadFileList
     }
 	
 } catch(PDOException $pe) {

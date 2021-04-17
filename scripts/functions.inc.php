@@ -5,13 +5,13 @@
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2020  FoxesWorld
+ Copyright (c) 2016-2021  FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.21.11 Release Candidate
+ Версия: 0.0.22.11 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -130,6 +130,20 @@
 					die(display_error($pe->getMessage(), $error_num = 200, $query));
 				}
 			}
+			
+			function checkWriteRights(){
+				$selector = "SELECT * FROM servers";
+				$counter = 0;
+				$srvList = serversListArray($selector);
+				    foreach ($srvList as $key){
+					$clientPath = FILES_DIR.'clients/clients/';
+					$clientPath .= $srvList[$counter]['serverName'];
+						if($rights = substr(decoct(fileperms($clientPath)), -4) != 777) {
+							echo "<b>".$srvList[$counter]['serverName']."</b> can't create a config file the rights are - <b>".$rights."</b><br>";
+						}
+					$counter++;
+				}
+			}
 
 			function hash_name($ncrypt, $realPass, $postPass, $salt) {
 					$cryptPass = false;
@@ -189,7 +203,7 @@
 				return $serversList;
 			}
 
-			//Full JSON (Need migration)
+			//Full JSON
 			function availableServers($login){
 				if(!$login){
 					$userGroup = 4;
@@ -268,7 +282,7 @@
 							$counter++;
 						}
 				}
-				//$JSONServers = json_encode($JSONServers);
+
 				return json_encode($JSONServers);
 			}
 			//No JSON (Will be removed)
@@ -285,6 +299,30 @@
 						}
 						return $massive;
 			}
+
+			//No JSON (Will be removed)
+			function checkfilesRoot($client) {
+					$path = 'files/clients/'.$client;
+					if(!is_dir($path)) {
+						die("ERROR! \nDirectory - $path doesn't exist!");
+					}
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					$massive = "";
+					$arrayOut = array();
+						foreach($objects as $name => $object) {
+							$basename = basename($name);
+							$isdir = is_dir($name);
+							if ($basename!="." and $basename!=".." and !is_dir($name)){
+								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
+								$arrayOut[] = array('fileName' => $str.$basename,
+													'fileMd5' => md5_file($name),
+													'fileSize' => filesize($name));
+							}
+						}
+						return $massive;
+			}
+
 			//Full JSON (Need migration)
 			function checkfilesJSON($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -294,7 +332,6 @@
 							$isdir = is_dir($name);
 							if ($basename!="." and $basename!=".." and !is_dir($name)){
 								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								//$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 								$fileOBJ[] = array (
 									'filename' => $str.$basename,
 								  'fileInfo' => 
@@ -308,30 +345,13 @@
 				$fileOBJ = json_encode($fileOBJ);
 				return $fileOBJ;
 			}
-			//No JSON (Will be removed)
-			function checkfilesRoot($client) {
-					$path = 'files/clients/'.$client;
-					if(!is_dir($path)) {
-						die("ERROR! \nDirectory - $path doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$massive = "";
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
-							}
-						}
-						return $massive;
-			}
+			
 			//Full JSON
 			function checkfilesRootJSON($client) {
-				$path = 'files/clients/'.$client;
+				$path = 'files/clients/clients/'.$client;
 				$files = array();
 				if(!is_dir($path)) {
-					//die("ERROR! \nDirectory - $path doesn't exist!");
+					die("ERROR! \nDirectory - $path doesn't exist!");
 					exit();
 				}
 				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -665,6 +685,27 @@
 					$counter++;
 				}
 			}
+			
+			function writeLogFile($file,$text){					
+				$fp = fopen($file, "a+");
+					if($fp) {
+						fwrite($fp,$text."\n");
+					} else {
+						echo "Error writing file ".$file;
+					}
+				fclose($fp);
+			}
+			
+			function clearLogFile($file) {
+				$fp = fopen($file,"a+");
+					if($fp) {
+						ftruncate($fp,0);
+					} else {
+						$this->error = "Error truncating file ".$file;
+					}
+				fclose($fp);
+			}
+			
 			//Full JSON
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
@@ -687,26 +728,6 @@
 				   exit();
 				}
 				return true;
-			}
-			
-			function writeLogFile($file,$text){					
-				$fp = fopen($file, "a+");
-					if($fp) {
-						fwrite($fp,$text."\n");
-					} else {
-						echo "Error writing file ".$file;
-					}
-				fclose($fp);
-			}
-			
-			function clearLogFile($file) {
-				$fp = fopen($file,"a+");
-					if($fp) {
-						ftruncate($fp,0);
-					} else {
-						$this->error = "Error truncating file ".$file;
-					}
-				fclose($fp);
 			}
 			
 			function eventNow(){
