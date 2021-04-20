@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.22.11 Release Candidate
+ Версия: 0.0.23.13 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -24,6 +24,10 @@
 	if(defined('DEBUG_LOGS')){
 		Error_Reporting(E_ALL);
 		Ini_Set('display_errors', true);
+	}
+	
+	if(defined('NO_DEBUG')){
+		error_reporting(0);
 	}
 
 //================================================================
@@ -79,6 +83,7 @@
 					}
 					return $status === 0;
 			}
+
 			//Full JSON (Answers in JSON (2 rows))
 			function JSONanswer($typeName, $typeValue, $messageName, $messageValue){
 				$array = array($typeName => $typeValue,$messageName => $messageValue);
@@ -130,7 +135,8 @@
 					die(display_error($pe->getMessage(), $error_num = 200, $query));
 				}
 			}
-			
+
+			//Checking ability to write cacheFiles
 			function checkWriteRights(){
 				$selector = "SELECT * FROM servers";
 				$counter = 0;
@@ -180,7 +186,8 @@
 				
 				return $hash;
 			}
-			//Parses All servers for any needs
+
+			//Parses servers for any needs
 			function serversListArray($selector){
 				global $config;
 				$serversList = array();
@@ -285,6 +292,7 @@
 
 				return json_encode($JSONServers);
 			}
+
 			//No JSON (Will be removed)
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -297,7 +305,7 @@
 								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 							}
 						}
-						return $massive;
+				return $massive;
 			}
 
 			//No JSON (Will be removed)
@@ -345,7 +353,7 @@
 				$fileOBJ = json_encode($fileOBJ);
 				return $fileOBJ;
 			}
-			
+
 			//Full JSON
 			function checkfilesRootJSON($client) {
 				$path = 'files/clients/clients/'.$client;
@@ -427,7 +435,7 @@
 				
 				return $hash_md5;
 			}
-			
+
 			//Full JSON
 			function getyText(){
 					global $config;
@@ -452,6 +460,7 @@
 					
 					return $textGet;
 			}
+
 			//Full JSON
 			function getUserData($login,$data){
 				global $config;
@@ -522,7 +531,8 @@
 				$usersImages = $data['Images'];
 				return $usersImages;
 			}
-			//Full JSON (Need writing Java code)
+
+			//Full JSON
 			function usersBackgrounds($login){
 				global $config;
 				$counter = 0;
@@ -559,6 +569,7 @@
 				$usersSelectedBG = getUserData($login,'profilePhoto');
 				die($usersSelectedBG);
 			}
+
 			//Gets the version of Java
 			function scanRuntimeDir($bitDepth){
 				if($bitDepth) {
@@ -615,7 +626,7 @@
 						return $answer;
 					}
 			}
-			
+
 			function parse_onlineJSON($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
@@ -651,7 +662,7 @@
 						return $answer;
 					}
 			}
-			
+
 			function clearMD5Cache($logFile){
 				$selector = "SELECT * FROM servers";
 				$srvList = serversListArray($selector);
@@ -685,7 +696,7 @@
 					$counter++;
 				}
 			}
-			
+
 			function writeLogFile($file,$text){					
 				$fp = fopen($file, "a+");
 					if($fp) {
@@ -695,7 +706,7 @@
 					}
 				fclose($fp);
 			}
-			
+
 			function clearLogFile($file) {
 				$fp = fopen($file,"a+");
 					if($fp) {
@@ -705,7 +716,7 @@
 					}
 				fclose($fp);
 			}
-			
+
 			//Full JSON
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
@@ -718,7 +729,7 @@
 				}
 				return $answer;
 			}
-			
+
 			function verifySSL(){
 				if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||  isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'))
 				{
@@ -729,13 +740,16 @@
 				}
 				return true;
 			}
-			
+
 			function eventNow(){
-				global $dateToday;
-				$soundsPath = FILES_DIR."eventSounds";
-				$pathJSON = "/launcher/files/eventSounds";
-				$musFilesNum = countFilesNum($soundsPath.'/mus');
-				$eventName;
+				global $dateToday, $config;
+					//Vars definition
+					$soundsPath = FILES_DIR."eventSounds";
+					$pathJSON = "/launcher/files/eventSounds";
+					$musFilesNum = countFilesNum($soundsPath.'/mus');					//Count of ordinary Music
+					$easterMusFilesNum = countFilesNum($soundsPath.'/mus/easterMusic'); //Count of Easter Music
+					$eventName;
+					
 					//Date explosion
 					$dateExploded = explode ('.',$dateToday);
 					$dayToday = $dateExploded[0];
@@ -743,7 +757,7 @@
 					$yearToday = $dateToday[2];
 					
 				//Checking each of 12 monthes
-				$musRange ="1/11"; //Standart music range
+				$musRange ="1/11"; //Standart music range (Non Legendary)
 				switch($monthToday){
 					case 1:
 						switch($dayToday){
@@ -803,9 +817,9 @@
 						}
 					break;
 				}
-				
+
 				//Generating a Mus File
-					$easterMusFile = easterEgg(1);
+					$easterMusFile = easterEgg($config['easterMusRarity']); //Rarity of music '1' by default
 					if(isset($musRange)){
 						$musRange = explode('/',$musRange);
 						$minRange = $musRange[0];
@@ -817,15 +831,17 @@
 				} else {
 					$RandMusic = rand(1,$musFilesNum);
 				}
+				$selectedMusic = "mus".$RandMusic.".mp3";
 				$selectedSound;
 				if($easterMusFile == "YES"){
-					$RandMusic = rand($maxRange + 1,$musFilesNum);
+					$RandMusic = rand(1, $easterMusFilesNum);
+					$selectedMusic = "easterMusic/mus".$RandMusic.".mp3";
 				}
-				$selectedMusic = "mus".$RandMusic.".mp3";
+				
 
 				$musMd5 = md5_file($soundsPath.'/mus/'.$selectedMusic);
 				//************************
-				
+
 				if(isset($eventName)){
 					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName);	
 					$selectedSound = rand(1,$eventSoundsNum);
@@ -865,7 +881,7 @@
 				}
 				return $returnText;
 			}
-			
+
 			function display_error($error ='No errors', $error_num = 100, $query) {
 					$error = htmlspecialchars($error, ENT_QUOTES, 'ISO-8859-1');
 					$trace = debug_backtrace();

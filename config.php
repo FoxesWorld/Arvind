@@ -25,6 +25,7 @@ if(!defined('CONFIG')) {
 	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
 	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
 	define('SITE_ROOT', ROOT_DIR.'/launcher');
+	$ip  = getenv('REMOTE_ADDR');
 	
 $config = array(
 	/* Database Settings*/
@@ -56,6 +57,9 @@ $config = array(
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
 	'uploaddirp'  		=> 'MinecraftCloaks',
+	
+	/* startUpSound */
+	'easterMusRarity' => 1, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
