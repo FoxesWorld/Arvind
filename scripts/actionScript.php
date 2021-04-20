@@ -104,6 +104,6 @@
 	} elseif(isset($_GET['events'])) {
 		die(eventNow());
 	} elseif(isset($_GET['tes'])) {
-		die(checkWriteRights($_SERVER['DOCUMENT_ROOT']));
+		die(REMOTE_IP);
 	}
 	

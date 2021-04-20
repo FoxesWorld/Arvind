@@ -25,6 +25,9 @@ if(!defined('CONFIG')) {
 	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
 	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
 	define('SITE_ROOT', ROOT_DIR.'/launcher');
+	define('REMOTE_IP', getenv('REMOTE_ADDR'));
+	define('CURRENT_TIME', time());
+	define('CURRENT_DATE', date("d.m.Y"));
 	$ip  = getenv('REMOTE_ADDR');
 	
 $config = array(

@@ -744,7 +744,7 @@
 			}
 
 			function eventNow(){
-				global $dateToday, $config;
+				global $config;
 					//Vars definition
 					$soundsPath = FILES_DIR."eventSounds";
 					$pathJSON = "/launcher/files/eventSounds";
@@ -753,13 +753,12 @@
 					$eventName;
 					
 					//Date explosion
-					$dateExploded = explode ('.',$dateToday);
+					$dateExploded = explode ('.',CURRENT_DATE);
 					$dayToday = $dateExploded[0];
 					$monthToday = $dateExploded[1];
 					$yearToday = $dateToday[2];
 					
 				//Checking each of 12 monthes
-				$musRange ="1/11"; //Standart music range (Non Legendary)
 				switch($monthToday){
 					case 1:
 						switch($dayToday){
@@ -776,6 +775,7 @@
 					break;
 					
 					case 4:
+						//$musRange ="1/1";
 					break;
 					
 					case 5:
@@ -821,25 +821,24 @@
 				}
 
 				//Generating a Mus File
-					$easterMusFile = easterEgg($config['easterMusRarity']); //Rarity of music '1' by default
+					$easterMusFile = easterEgg($config['easterMusRarity']);
 					if(isset($musRange)){
 						$musRange = explode('/',$musRange);
 						$minRange = $musRange[0];
 						$maxRange = $musRange[1];
 					}
 
-				if(isset($minRange) && isset($maxRange)) {
-					$RandMusic = rand($minRange,$maxRange);
-				} else {
-					$RandMusic = rand(1,$musFilesNum);
-				}
-				$selectedMusic = "mus".$RandMusic.".mp3";
-				$selectedSound;
-				if($easterMusFile == "YES"){
-					$RandMusic = rand(1, $easterMusFilesNum);
-					$selectedMusic = "easterMusic/mus".$RandMusic.".mp3";
-				}
-				
+					if(isset($minRange) && isset($maxRange)) {
+						$RandMusic = rand($minRange,$maxRange);
+					} else {
+						$RandMusic = rand(1,$musFilesNum);
+					}
+					$selectedMusic = "mus".$RandMusic.".mp3";
+					$selectedSound;
+					if($easterMusFile == "YES"){
+						$RandMusic = rand(1, $easterMusFilesNum);
+						$selectedMusic = "easterMusic/mus".$RandMusic.".mp3";
+					}
 
 				$musMd5 = md5_file($soundsPath.'/mus/'.$selectedMusic);
 				//************************
@@ -869,8 +868,8 @@
 										 "selectedMusic" => $selectedMusic,
 										 "eventName" => $eventName);
 				}
-				$outputJSON = json_encode($outputArray);
-				return $outputJSON;
+
+				return json_encode($outputArray);
 			}
 			
 			function easterEgg($chance){

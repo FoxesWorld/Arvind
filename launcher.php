@@ -11,13 +11,13 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.19.4 Stable Alpha
+ Версия: 0.0.19.5 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
 */
 header('Content-Type: text/html; charset=utf-8');
-define('INCLUDE_CHECK',true); //Security Define
+define('INCLUDE_CHECK',true);
 define('NO_DEBUG',true);
 include ("scripts/actionScript.php");  //Action requests
 //===================================================
@@ -46,13 +46,13 @@ include ("scripts/actionScript.php");  //Action requests
 		exit(Security::encrypt("errorLogin<$>", $config['key1']));
     }
 	
-	if(!file_exists($config['uploaddirs'])) {
-		die ("Путь к скинам не является папкой!");
-	}
+			if(!file_exists($config['uploaddirs'])) {
+				die ("Skins path is not a folder!");
+			}
 
-	if(!file_exists($config['uploaddirp'])) {
-		die ("Путь к плащам не является папкой!");
-	}
+			if(!file_exists($config['uploaddirp'])) {
+				die ("Cloak path is not a folder!");
+			}
 
 	//If auth token was not set - authorisation
     if($ctoken == "null") {
@@ -65,27 +65,27 @@ include ("scripts/actionScript.php");  //Action requests
 				$stmt->fetch();
 			}
 			$checkPass = hash_name($config['crypt'], $realPass, $postPass, @$salt);
+
 					//If usung Antibrut
-					if($config['useantibrut'] === true) {	
-						$time = time();
-						$bantime = $time+(10);
-						$stmt = $db->prepare("SELECT sip,time From sip WHERE sip='$ip' And time>'$time'");
+					if($config['useantibrut'] === true) {
+						$bantime = CURRENT_TIME + (100);
+						$stmt = $db->prepare("SELECT sip,time FROM sip WHERE sip='".REMOTE_IP."' And time>'".CURRENT_TIME."'");
 						$stmt->execute();
 						$row = $stmt->fetch(PDO::FETCH_ASSOC);
 						$real = $row['sip'];
-							if($ip == $real) {
-								$stmt = $db->prepare("DELETE FROM sip WHERE time < '$time';");
+							if(REMOTE_IP == $real) {
+								$stmt = $db->prepare("DELETE FROM sip WHERE time < '".CURRENT_TIME."';");
 								$stmt->execute();
 								exit(Security::encrypt("temp<$>", $config['key1']));
 							}
 						
 							if ($login != $realUser) {
-								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('$ip', '$bantime')");
+								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '$bantime')");
 								$stmt->execute();
 								exit(Security::encrypt("errorLogin<$>", $config['key1']));
 							}
 							if(!strcmp($realPass,$checkPass) == 0 || !$realPass) {
-								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('$ip', '$bantime')");
+								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '$bantime')");
 								$stmt->execute();
 								exit(Security::encrypt("errorLogin<$>", $config['key1']));
 							}
@@ -95,6 +95,7 @@ include ("scripts/actionScript.php");  //Action requests
 							die(Security::encrypt('errorLogin<$>', $config['key1']));
 						}
 					}
+					//*********************
 			
 		$acesstoken = token();
     } else {
