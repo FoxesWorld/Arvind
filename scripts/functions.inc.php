@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.23.13 Release Candidate
+ Версия: 0.0.23.14 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -477,14 +477,16 @@
 				return $answer;
 			}
 			
-			function countFilesNum($dirPath){
+			function countFilesNum($dirPath, $fileMask){
 				$count = 0;
 				$dir = opendir($dirPath);
 				while($file = readdir($dir)){
 					if($file == '.' || $file == '..' || is_dir($dir.'/' . $file)){
 						continue;
+					} elseif(strpos($file, $fileMask)){
+						$count++;
 					}
-					$count++;
+					
 				}
 				return $count;
 			}
@@ -746,8 +748,8 @@
 					//Vars definition
 					$soundsPath = FILES_DIR."eventSounds";
 					$pathJSON = "/launcher/files/eventSounds";
-					$musFilesNum = countFilesNum($soundsPath.'/mus');					//Count of ordinary Music
-					$easterMusFilesNum = countFilesNum($soundsPath.'/mus/easterMusic'); //Count of Easter Music
+					$musFilesNum = countFilesNum($soundsPath.'/mus', '.mp3');					//Count of ordinary Music
+					$easterMusFilesNum = countFilesNum($soundsPath.'/mus/easterMusic', '.mp3'); //Count of Easter Music
 					$eventName;
 					
 					//Date explosion
@@ -843,7 +845,7 @@
 				//************************
 
 				if(isset($eventName)){
-					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName);	
+					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');	
 					$selectedSound = rand(1,$eventSoundsNum);
 					$selectedSound = $eventName.$selectedSound.'.mp3';
 					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
@@ -855,7 +857,7 @@
 										 "selectedMusic" => $selectedMusic);
 				} else {
 					$eventName = 'common';
-					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName);
+					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');
 					$selectedSound = rand(1,$commonFilesNum);
 					$selectedSound = "voice".$selectedSound.".mp3";
 					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
