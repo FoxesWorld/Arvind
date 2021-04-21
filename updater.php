@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.17 Alpha
+ Версия: 0.1.18 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера и апдейтера
 =====================================================
@@ -69,7 +69,7 @@ include_once ("scripts/functions.inc.php");
 			$file = "files//updater//updater.jar";
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.jar"));
+			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.".$download));
 			header('Content-Transfer-Encoding: binary');
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');
@@ -81,7 +81,7 @@ include_once ("scripts/functions.inc.php");
 			$file = "files//updater//updater.exe";
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.exe"));
+			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.".$download));
 			header('Content-Transfer-Encoding: binary');
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');

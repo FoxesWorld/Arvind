@@ -5,17 +5,21 @@
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2020  FoxesWorld
+ Copyright (c) 2016-2021  FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.21.11 Release Candidate
+ Версия: 0.0.24.15 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
+/* TODO 
+ *	Define Global Variables
+ *	Finish checkFilesJSON
+ */
 	verifySSL();
 	if(!defined('INCLUDE_CHECK')) {
 		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
@@ -25,38 +29,42 @@
 		Error_Reporting(E_ALL);
 		Ini_Set('display_errors', true);
 	}
+	
+	if(defined('NO_DEBUG')){
+		error_reporting(0);
+	}
 
 //================================================================
 			header('Content-Type: text/html; charset=utf-8');
-			$_TIME = time();
-			$dateToday = date("d.m.Y");
+			//$_TIME = time();
+			//$dateToday = date("d.m.Y");
 
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
 						$key .= $key;
 					}
-					return $str ^ $key;
+				return $str ^ $key;
 			}
 
 			function strtoint($text) {
 					$res = "";
 					for ($i = 0; $i < strlen($text); $i++) $res .= ord($text{$i}) . "-";
 					$res = substr($res, 0, -1);
-					return $res;
+				return $res;
 			}
 
 			function strlen_8bit($binary_string) {
 					if (function_exists('mb_strlen')) {
 						return mb_strlen($binary_string, '8bit');
 					}
-					return strlen($binary_string);
+				return strlen($binary_string);
 			}
 	
 			function substr_8bit($binary_string, $start, $length) {
 					if (function_exists('mb_substr')) {
 						return mb_substr($binary_string, $start, $length, '8bit');
 					}
-					return substr($binary_string, $start, $length);
+				return substr($binary_string, $start, $length);
 			}
 
 			function pass_get_info($hash) {
@@ -64,7 +72,7 @@
 					if (substr_8bit($hash, 0, 4) == '$2y$' && strlen_8bit($hash) == 60) {
 						$return = false;
 					}
-					return $return;
+				return $return;
 			}
 	
 			function pass_verify($password, $hash) {
@@ -77,13 +85,13 @@
 					for ($i = 0; $i < strlen_8bit($ret); $i++) {
 						$status |= (ord($ret[$i]) ^ ord($hash[$i]));
 					}
-					return $status === 0;
+				return $status === 0;
 			}
+
 			//Full JSON (Answers in JSON (2 rows))
 			function JSONanswer($typeName, $typeValue, $messageName, $messageValue){
 				$array = array($typeName => $typeValue,$messageName => $messageValue);
-				$array = json_encode($array);
-				return $array;
+				return json_encode($array);
 			}
 
 			function dbPrepare(){
@@ -131,6 +139,21 @@
 				}
 			}
 
+			//Checking ability to write cacheFiles
+			function checkWriteRights(){
+				$selector = "SELECT * FROM servers";
+				$counter = 0;
+				$srvList = serversListArray($selector);
+				    foreach ($srvList as $key){
+					$clientPath = FILES_DIR.'clients/clients/';
+					$clientPath .= $srvList[$counter]['serverName'];
+						if($rights = substr(decoct(fileperms($clientPath)), -4) != 777) {
+							echo "<b>".$srvList[$counter]['serverName']."</b> can't create a config file the rights are - <b>".$rights."</b><br>";
+						}
+					$counter++;
+				}
+			}
+
 			function hash_name($ncrypt, $realPass, $postPass, $salt) {
 					$cryptPass = false;
 
@@ -149,7 +172,7 @@
 							}
 						}
 					}
-					return $cryptPass;
+				return $cryptPass;
 			}
 		
 			function generateLoginHash(){
@@ -166,7 +189,8 @@
 				
 				return $hash;
 			}
-			//Parses All servers for any needs
+
+			//Parses servers for any needs
 			function serversListArray($selector){
 				global $config;
 				$serversList = array();
@@ -189,7 +213,7 @@
 				return $serversList;
 			}
 
-			//Full JSON (Need migration)
+			//Full JSON
 			function availableServers($login){
 				if(!$login){
 					$userGroup = 4;
@@ -268,9 +292,10 @@
 							$counter++;
 						}
 				}
-				//$JSONServers = json_encode($JSONServers);
+
 				return json_encode($JSONServers);
 			}
+
 			//No JSON (Will be removed)
 			function checkfiles($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -283,8 +308,32 @@
 								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 							}
 						}
-						return $massive;
+				return $massive;
 			}
+
+			//No JSON (Will be removed)
+			function checkfilesClient($client) {
+					$path = 'files/clients/'.$client;
+					if(!is_dir($path)) {
+						die("ERROR! \nDirectory - $path doesn't exist!");
+					}
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+					$massive = "";
+					$arrayOut = array();
+						foreach($objects as $name => $object) {
+							$basename = basename($name);
+							$isdir = is_dir($name);
+							if ($basename!="." and $basename!=".." and !is_dir($name)){
+								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
+								$arrayOut[] = array('fileName' => $str.$basename,
+													'fileMd5' => md5_file($name),
+													'fileSize' => filesize($name));
+							}
+						}
+				return $massive;
+			}
+
 			//Full JSON (Need migration)
 			function checkfilesJSON($path) {
 					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -294,7 +343,6 @@
 							$isdir = is_dir($name);
 							if ($basename!="." and $basename!=".." and !is_dir($name)){
 								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								//$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 								$fileOBJ[] = array (
 									'filename' => $str.$basename,
 								  'fileInfo' => 
@@ -305,33 +353,15 @@
 								); 
 							}
 						}
-				$fileOBJ = json_encode($fileOBJ);
-				return $fileOBJ;
+				return json_encode($fileOBJ);
 			}
-			//No JSON (Will be removed)
-			function checkfilesRoot($client) {
-					$path = 'files/clients/'.$client;
-					if(!is_dir($path)) {
-						die("ERROR! \nDirectory - $path doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$massive = "";
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
-							}
-						}
-						return $massive;
-			}
+
 			//Full JSON
-			function checkfilesRootJSON($client) {
-				$path = 'files/clients/'.$client;
+			function checkfilesClientJSON($client) {
+				$path = 'files/clients/clients/'.$client;
 				$files = array();
 				if(!is_dir($path)) {
-					//die("ERROR! \nDirectory - $path doesn't exist!");
+					die("ERROR! \nDirectory - $path doesn't exist!");
 					exit();
 				}
 				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
@@ -350,8 +380,7 @@
 							);		
 						}
 					}
-					$files = json_encode($files);
-					return $files;
+					return json_encode($files);
 			}
 			
 			function uuidFromString($string) {
@@ -396,18 +425,37 @@
 					return $password;
 			}
 
-			//New function for clients (Gets the client version and loads the proper version of the game) P.S WIP	
+			//New function for clients
 			function hashcVersion($client) {
 				global $config;
 					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 					$version = $serverInfo[0]['version'];
 					$versionPath = 'files/clients/versions/'.$version;
-					$clientPath = 'files/clients/clients/'.$client;
-					$hash_md5    = str_replace("\\", "/",checkfiles($versionPath).checkfilesRoot('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>assets/indexes<:b:>assets/objects<:b:>versions/'.$version.'<:b:>clients/'.$client.'/mods<:b:>clients/'.$client.'/config<:b:>clients/'.$client.'/resourcepacks<:b:>clients/'.$client.'/shaderpacks';
-				
+					//$clientPath = 'files/clients/clients/'.$client;
+
+						if($config['filesOutJSON'] === true) { //WIP
+							$hash_md5 = str_replace("\\", "/",checkfilesJSON($versionPath).checkfilesClientJSON($client).checkfilesJSON($config['clientsDir'].'assets')).'<::>'.
+							dirsToCheckJSON();
+						} else {
+							$hash_md5 = str_replace("\\", "/",checkfiles($versionPath).checkfilesClient('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>'.
+							dirsToCheck("assets/indexes,assets/objects,versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks",$version, $client);
+						}
+
 				return $hash_md5;
 			}
 			
+			/* function dirsToCheckJSON(){ WIP
+				
+			} */
+
+			function dirsToCheck($dirs, $version, $client){
+				$dirs = str_replace(',', '<:b:>', $dirs);
+				$dirs = str_replace('{thisVersion}', $version, $dirs);
+				$dirs = str_replace('{thisClient}', $version, $dirs);
+				
+				return $dirs;
+			}
+
 			//Full JSON
 			function getyText(){
 					global $config;
@@ -432,6 +480,7 @@
 					
 					return $textGet;
 			}
+
 			//Full JSON
 			function getUserData($login,$data){
 				global $config;
@@ -448,14 +497,16 @@
 				return $answer;
 			}
 			
-			function countFilesNum($dirPath){
+			function countFilesNum($dirPath, $fileMask){
 				$count = 0;
 				$dir = opendir($dirPath);
 				while($file = readdir($dir)){
 					if($file == '.' || $file == '..' || is_dir($dir.'/' . $file)){
 						continue;
+					} elseif(strpos($file, $fileMask)){
+						$count++;
 					}
-					$count++;
+					
 				}
 				return $count;
 			}
@@ -502,7 +553,8 @@
 				$usersImages = $data['Images'];
 				return $usersImages;
 			}
-			//Full JSON (Need writing Java code)
+
+			//Full JSON
 			function usersBackgrounds($login){
 				global $config;
 				$counter = 0;
@@ -539,6 +591,7 @@
 				$usersSelectedBG = getUserData($login,'profilePhoto');
 				die($usersSelectedBG);
 			}
+
 			//Gets the version of Java
 			function scanRuntimeDir($bitDepth){
 				if($bitDepth) {
@@ -595,7 +648,7 @@
 						return $answer;
 					}
 			}
-			
+
 			function parse_onlineJSON($host, $port){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
@@ -631,7 +684,7 @@
 						return $answer;
 					}
 			}
-			
+
 			function clearMD5Cache($logFile){
 				$selector = "SELECT * FROM servers";
 				$srvList = serversListArray($selector);
@@ -665,6 +718,27 @@
 					$counter++;
 				}
 			}
+
+			function writeLogFile($file,$text){					
+				$fp = fopen($file, "a+");
+					if($fp) {
+						fwrite($fp,$text."\n");
+					} else {
+						echo "Error writing file ".$file;
+					}
+				fclose($fp);
+			}
+
+			function clearLogFile($file) {
+				$fp = fopen($file,"a+");
+					if($fp) {
+						ftruncate($fp,0);
+					} else {
+						$this->error = "Error truncating file ".$file;
+					}
+				fclose($fp);
+			}
+
 			//Full JSON
 			function ImgHash($img) {
 					$file_link = $_SERVER['DOCUMENT_ROOT']."/launcher/files/img/$img.png";
@@ -677,7 +751,7 @@
 				}
 				return $answer;
 			}
-			
+
 			function verifySSL(){
 				if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||  isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'))
 				{
@@ -688,41 +762,23 @@
 				}
 				return true;
 			}
-			
-			function writeLogFile($file,$text){					
-				$fp = fopen($file, "a+");
-					if($fp) {
-						fwrite($fp,$text."\n");
-					} else {
-						echo "Error writing file ".$file;
-					}
-				fclose($fp);
-			}
-			
-			function clearLogFile($file) {
-				$fp = fopen($file,"a+");
-					if($fp) {
-						ftruncate($fp,0);
-					} else {
-						$this->error = "Error truncating file ".$file;
-					}
-				fclose($fp);
-			}
-			
+
 			function eventNow(){
-				global $dateToday;
-				$soundsPath = FILES_DIR."eventSounds";
-				$pathJSON = "/launcher/files/eventSounds";
-				$musFilesNum = countFilesNum($soundsPath.'/mus');
-				$eventName;
+				global $config;
+					//Vars definition
+					$soundsPath = FILES_DIR."eventSounds";
+					$pathJSON = "/launcher/files/eventSounds";
+					$musFilesNum = countFilesNum($soundsPath.'/mus', '.mp3');					//Count of ordinary Music
+					$easterMusFilesNum = countFilesNum($soundsPath.'/mus/easterMusic', '.mp3'); //Count of Easter Music
+					$eventName;
+					
 					//Date explosion
-					$dateExploded = explode ('.',$dateToday);
+					$dateExploded = explode ('.',CURRENT_DATE);
 					$dayToday = $dateExploded[0];
 					$monthToday = $dateExploded[1];
-					$yearToday = $dateToday[2];
+					$yearToday = $dateExploded[2];
 					
 				//Checking each of 12 monthes
-				$musRange ="1/11"; //Standart music range
 				switch($monthToday){
 					case 1:
 						switch($dayToday){
@@ -739,6 +795,7 @@
 					break;
 					
 					case 4:
+						//$musRange ="1/1";
 					break;
 					
 					case 5:
@@ -782,31 +839,32 @@
 						}
 					break;
 				}
-				
+
 				//Generating a Mus File
-					$easterMusFile = easterEgg(1);
+					$easterMusFile = easterEgg($config['easterMusRarity']);
 					if(isset($musRange)){
 						$musRange = explode('/',$musRange);
 						$minRange = $musRange[0];
 						$maxRange = $musRange[1];
 					}
 
-				if(isset($minRange) && isset($maxRange)) {
-					$RandMusic = rand($minRange,$maxRange);
-				} else {
-					$RandMusic = rand(1,$musFilesNum);
-				}
-				$selectedSound;
-				if($easterMusFile == "YES"){
-					$RandMusic = rand($maxRange + 1,$musFilesNum);
-				}
-				$selectedMusic = "mus".$RandMusic.".mp3";
+					if(isset($minRange) && isset($maxRange)) {
+						$RandMusic = rand($minRange,$maxRange);
+					} else {
+						$RandMusic = rand(1,$musFilesNum);
+					}
+					$selectedMusic = "mus".$RandMusic.".mp3";
+					$selectedSound;
+					if($easterMusFile == "YES"){
+						$RandMusic = rand(1, $easterMusFilesNum);
+						$selectedMusic = "easterMusic/mus".$RandMusic.".mp3";
+					}
 
 				$musMd5 = md5_file($soundsPath.'/mus/'.$selectedMusic);
 				//************************
-				
+
 				if(isset($eventName)){
-					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName);	
+					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');	
 					$selectedSound = rand(1,$eventSoundsNum);
 					$selectedSound = $eventName.$selectedSound.'.mp3';
 					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
@@ -818,7 +876,7 @@
 										 "selectedMusic" => $selectedMusic);
 				} else {
 					$eventName = 'common';
-					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName);
+					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');
 					$selectedSound = rand(1,$commonFilesNum);
 					$selectedSound = "voice".$selectedSound.".mp3";
 					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
@@ -830,8 +888,8 @@
 										 "selectedMusic" => $selectedMusic,
 										 "eventName" => $eventName);
 				}
-				$outputJSON = json_encode($outputArray);
-				return $outputJSON;
+
+				return json_encode($outputArray);
 			}
 			
 			function easterEgg($chance){
@@ -844,7 +902,7 @@
 				}
 				return $returnText;
 			}
-			
+
 			function display_error($error ='No errors', $error_num = 100, $query) {
 					$error = htmlspecialchars($error, ENT_QUOTES, 'ISO-8859-1');
 					$trace = debug_backtrace();

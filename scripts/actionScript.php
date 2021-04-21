@@ -5,13 +5,13 @@
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2020 FoxesWorld
+ Copyright (c) 2016-2021 FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.1.15 Alpha
+ Версия: 0.1.16 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
@@ -22,9 +22,10 @@
 		exit();
   } else {
 		require_once ('functions.inc.php');
-		if(!isset($_POST['action'])){
-			require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
-		}
+		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+		/*if(!isset($_POST['action'])){
+				require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+		} */
   }
 		
 	if(isset($_GET['adress']) && isset($_GET['port'])){
@@ -102,5 +103,7 @@
 		die(scanRuntimeDir($bitDepth));
 	} elseif(isset($_GET['events'])) {
 		die(eventNow());
+	} elseif(isset($_GET['tes'])) {
+		die(dirsToCheck("versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks", "1.16.4", "Foxesworld"));
 	}
 	

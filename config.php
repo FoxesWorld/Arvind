@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: servers.php
 -----------------------------------------------------
- Версия: 0.1.4 Alpha
+ Версия: 0.1.5 Alpha
 -----------------------------------------------------
  Назначение: Настройки веб сервиса
 =====================================================
@@ -25,6 +25,10 @@ if(!defined('CONFIG')) {
 	define('SCRIPTS_DIR', ROOT_DIR.'/launcher/scripts/');
 	define('FILES_DIR', ROOT_DIR.'/launcher/files/');
 	define('SITE_ROOT', ROOT_DIR.'/launcher');
+	define('REMOTE_IP', getenv('REMOTE_ADDR'));
+	define('CURRENT_TIME', time());
+	define('CURRENT_DATE', date("d.m.Y"));
+	//$ip  = getenv('REMOTE_ADDR');
 	
 $config = array(
 	/* Database Settings*/
@@ -47,15 +51,20 @@ $config = array(
 	'clientsDir' 		=> 'files/clients/',
 	'temp' 				=> false, //Use temporary files
 	'useban' 			=> false, //Doesn't work
-	'useantibrut' 		=>  true,
+	'useantibrut' 		=> true,
+	'bantime'			=> CURRENT_TIME + (100),
 	
 	/* JSON Output */
-	'parseOnline' => false,	//Servers Pinging
-	'serversOut' => false,	//Servers List to print
+	'parseOnline' => false,	//Servers Pinging using JSON
+	'serversOut' => false,	//Servers output printing using JSON
+	'filesOutJSON' => false,  //WIP
 	
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
 	'uploaddirp'  		=> 'MinecraftCloaks',
+	
+	/* startUpSound */
+	'easterMusRarity' => 1, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
