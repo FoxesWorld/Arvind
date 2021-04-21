@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- HasJoined| AuthLib
+ HasJoined | AuthLib
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: h.php
 -----------------------------------------------------
- Версия: 0.0.4 Alpha
+ Версия: 0.0.6 Alpha
 -----------------------------------------------------
  Назначение: Присоединение игрока на сервер
 =====================================================
@@ -36,7 +36,7 @@
 		$md5 = $row['md5'];
 		if($user == $realUser)
 		{
-			$time = time();
+
 			$file = $capeurl.$realUser.'.png';
 			$exists = file_exists($config['uploaddirp'].'/'.$realUser.'.png');
 			if ($exists) {
@@ -51,7 +51,7 @@
 			}
 			$base64 ='
 			{
-				"timestamp":"'.$time.'","profileId":"'.$md5.'","profileName":"'.$realUser.'","textures":
+				"timestamp":"'.CURRENT_TIME.'","profileId":"'.$md5.'","profileName":"'.$realUser.'","textures":
 				{
 					"SKIN":
 					{
@@ -63,14 +63,14 @@
 			{
 				"id":"'.$md5.'","name":"'.$realUser.'","properties":
 				[
-				{
-					"name":"textures","value":"'.base64_encode($base64).'","signature":"Cg=="
-				}
+					{
+						"name":"textures","value":"'.base64_encode($base64).'","signature":"'.$config['letterHeadLine'].'"
+					}
 				]
 			}';
             
 		}
 		else exit(json_encode($bad));
 	} catch(PDOException $pe) {
-			die("Ошибка".$pe);  //вывод ошибок MySQL в m.log
+			die("Ошибка".$pe);
 	}

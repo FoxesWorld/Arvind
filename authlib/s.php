@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- Skins - you look nice today!| AuthLib
+ Skins - you look nice today !| AuthLib
 -----------------------------------------------------
  https://arcjetsystems.ru/
 -----------------------------------------------------
@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: skins.php
 -----------------------------------------------------
- Версия: 0.0.4 Stable Alpha
+ Версия: 0.0.5 Stable Alpha
 -----------------------------------------------------
  Назначение: Парсит скины и плащи
 =====================================================
@@ -35,8 +35,7 @@ $exists1;
 	if($realUser==null) {
 		exit;
 	}
-		
-		$time = time();
+
 		$file1 = $capeurl.$realUser.'.png';
 		$exists1 = file_exists('../'.$config['uploaddirp'].'/'.$realUser.'.png');
 		$file2 = $skinurl.$realUser.'.png';
@@ -61,8 +60,8 @@ $exists1;
 			$spl = '';
 		}
 
-		$base64 ='{"timestamp":"'.$time.'","profileId":"'.$md5.'","profileName":"'.$realUser.'","textures":{'.$skin.$spl.$cape.'}}';
-		echo '{"id":"'.$md5.'","name":"'.$realUser.'","properties":[{"name":"textures","value":"'.base64_encode($base64).'","signature":"Foxesworld"}]}';
+		$base64 ='{"timestamp":"'.CURRENT_TIME.'","profileId":"'.$md5.'","profileName":"'.$realUser.'","textures":{'.$skin.$spl.$cape.'}}';
+		echo '{"id":"'.$md5.'","name":"'.$realUser.'","properties":[{"name":"textures","value":"'.base64_encode($base64).'","signature":"'.$config['letterHeadLine'].'"}]}';
 	} catch(PDOException $pe) {
 			die($pe);
 	}
