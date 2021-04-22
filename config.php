@@ -5,7 +5,7 @@
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2020  FoxesWorld
+ Copyright (c) 2016-2021  FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
@@ -28,7 +28,6 @@ if(!defined('CONFIG')) {
 	define('REMOTE_IP', getenv('REMOTE_ADDR'));
 	define('CURRENT_TIME', time());
 	define('CURRENT_DATE', date("d.m.Y"));
-	//$ip  = getenv('REMOTE_ADDR');
 	
 $config = array(
 	/* Database Settings*/
@@ -55,9 +54,9 @@ $config = array(
 	'bantime'			=> CURRENT_TIME + (100),
 	
 	/* JSON Output */
-	'parseOnline' => false,	//Servers Pinging using JSON
-	'serversOut' => false,	//Servers output printing using JSON
-	'filesOutJSON' => false,  //WIP
+	'parseOnline' => false,	  //Servers Pinging using JSON
+	'serversOut' => false,	  //Servers output printing using JSON
+	'filesOutJSON' => false,  //Files output using JSON WIP
 	
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
@@ -72,13 +71,13 @@ $config = array(
 	'key2'              => "oPCwB9S6z{*rEh%V", //Encryption Key 2
 	'md5launcherjar'    => @md5_file("files/launcher/launcher.jar"),
 	'not_allowed_symbol'=> array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" ),
-	'cronPass' 			=> 'Tess2556308',//CronTab secure key
+	'cronPass' 			=> 'Tess2556308',//CronTab secure key WIP
 	'crypt' 			=> 'hash_foxy',
 	
 	/* Updater */
 	'launcherRepositoryPath' => "files/launcher/launcher.jar",
 	'updaterRepositoryPath' => "files/updater/updater.",
-	
+
 	/* E-mail */
 	'adminEmail'		=> 'lisssicin@ya.ru',
 	'letterHeadLine' 	=> 'FoxesWorld | Arvind',
@@ -87,6 +86,7 @@ $config = array(
 	'SMTPport'			=> 465,
 	'SMTPMail'			=> 'no-reply@foxesworld.ru',
 	'SMTPpass'			=> 'dvhbdxutiscpbmof',
-	'SMTPsecProtocol'	=> 'SSL');
-    $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Ссылка на скины 
-    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Ссылка на плащи
+	'SMTPsecProtocol'	=> 'SSL');	
+
+    $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Skins Link
+    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Cloaks Link

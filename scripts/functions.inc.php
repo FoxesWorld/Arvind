@@ -11,14 +11,14 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.24.15 Release Candidate
+ Версия: 0.0.24.16 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
 */
+
 /* TODO 
  *	Define Global Variables
- *	Finish checkFilesJSON
  */
 	verifySSL();
 	if(!defined('INCLUDE_CHECK')) {
@@ -147,9 +147,13 @@
 				    foreach ($srvList as $key){
 					$clientPath = FILES_DIR.'clients/clients/';
 					$clientPath .= $srvList[$counter]['serverName'];
+					if(is_dir($clientPath)) {
 						if($rights = substr(decoct(fileperms($clientPath)), -4) != 777) {
 							echo "<b>".$srvList[$counter]['serverName']."</b> can't create a config file the rights are - <b>".$rights."</b><br>";
 						}
+					} else {
+						echo "<b>".$clientPath."</b> doesn't exist! <br>";
+					}
 					$counter++;
 				}
 			}
@@ -426,16 +430,15 @@
 			}
 
 			//New function for clients
-			function hashcVersion($client) {
+			function hashcVersion($client, $forceJSON = false) {
 				global $config;
 					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 					$version = $serverInfo[0]['version'];
 					$versionPath = 'files/clients/versions/'.$version;
-					//$clientPath = 'files/clients/clients/'.$client;
 
-						if($config['filesOutJSON'] === true) { //WIP
-							$hash_md5 = str_replace("\\", "/",checkfilesJSON($versionPath).checkfilesClientJSON($client).checkfilesJSON($config['clientsDir'].'assets')).'<::>'.
-							dirsToCheckJSON();
+						if($config['filesOutJSON'] === true || $forceJSON === true) {
+							$hash_md5 = checkfilesJSON($versionPath).checkfilesClientJSON($client).checkfilesJSON($config['clientsDir'].'assets').'<::>'.
+							dirsToCheckJSON("assets/indexes,assets/objects,versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks",$version, $client);
 						} else {
 							$hash_md5 = str_replace("\\", "/",checkfiles($versionPath).checkfilesClient('clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>'.
 							dirsToCheck("assets/indexes,assets/objects,versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks",$version, $client);
@@ -444,14 +447,23 @@
 				return $hash_md5;
 			}
 			
-			/* function dirsToCheckJSON(){ WIP
-				
-			} */
+			function dirsToCheckJSON($dirs, $version, $client){
+				$dirsArray = array();
+				$counter = 0;
+				$dirsExplode = explode(',', $dirs);
+				while($counter < count($dirsExplode)){
+					$dirsExplode[$counter] = str_replace('{thisVersion}', $version, $dirsExplode[$counter]);
+					$dirsExplode[$counter] = str_replace('{thisClient}', $client, $dirsExplode[$counter]);
+					$dirsArray[] = array("dir-".$counter => $dirsExplode[$counter]);
+					$counter++;
+				}
+				return json_encode($dirsArray);
+			}
 
 			function dirsToCheck($dirs, $version, $client){
 				$dirs = str_replace(',', '<:b:>', $dirs);
 				$dirs = str_replace('{thisVersion}', $version, $dirs);
-				$dirs = str_replace('{thisClient}', $version, $dirs);
+				$dirs = str_replace('{thisClient}', $client, $dirs);
 				
 				return $dirs;
 			}
@@ -518,12 +530,10 @@
 							   'Таинственный незнакомец',
 							   'Тот чьё имя нельзя называть',
 							   'Скрытный незнакомец',
-							   'Шпиён');
-				$arraySize = count($array)-1;
-				$randWord = rand(0, $arraySize);
-				$word = $array[$randWord];
-				
-				return $word;
+							   'Шпиён!!1');
+				$randWord = rand(0, count($array)-1);
+
+				return $array[$randWord];
 			}
 		
 			function getRealName($login){
@@ -550,8 +560,7 @@
 				$query = "SELECT Images FROM `userBgImg` WHERE  userlogin = '$login'";
 				$db = new db($config['db_user'],$config['db_pass'],$config['db_name_userdata']);
 				$data = $db->getRow($query);
-				$usersImages = $data['Images'];
-				return $usersImages;
+				return $data['Images'];
 			}
 
 			//Full JSON
@@ -606,15 +615,14 @@
 						  }
 						}
 					}
-					$outputJSON = array('type' => 'success','JREname' => $outputJRE);
-					$outputJRE = json_encode($outputJSON);
+					$outputJRE = json_encode(array('type' => 'success','JREname' => $outputJRE));
 				} else {
 					$outputJRE = JSONanswer('type', 'error', 'message', 'Not specifyed JRE bit depth!');
 				}
 				return $outputJRE;
 			}
 
-			function parse_online($host, $port){
+			function parse_online($host = 'localhost', $port = 25565){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
 					if ($socket !== false) {
@@ -649,7 +657,7 @@
 					}
 			}
 
-			function parse_onlineJSON($host, $port){
+			function parse_onlineJSON($host = 'localhost', $port = 25565){
 				$socket = @fsockopen($host, $port, $tes, $offline, 0.1);
 
 					if ($socket !== false) {
@@ -674,14 +682,10 @@
 					if(!$info[1] || !$info[2]){
 						return 'offline';
 					}
-						$answer = array('host' => $host,'port' => $port,'status' => 'online','currentOnline' => "$playersOnline",'maxOnline' => "$playersMax");
-						$answer = json_encode($answer);
-						return ($answer);
+						return json_encode(array('host' => $host,'port' => $port,'status' => 'online','currentOnline' => "$playersOnline",'maxOnline' => "$playersMax"));
 						}
 					} else {
-						$answer = array('host' => $host,'port' => $port,'status' => 'offline');
-						$answer = json_encode($answer);
-						return $answer;
+						return json_encode(array('host' => $host,'port' => $port,'status' => 'offline'));
 					}
 			}
 
@@ -778,7 +782,7 @@
 					$monthToday = $dateExploded[1];
 					$yearToday = $dateExploded[2];
 					
-				//Checking each of 12 monthes
+				//Checking each of 12 months
 				switch($monthToday){
 					case 1:
 						switch($dayToday){
@@ -795,7 +799,7 @@
 					break;
 					
 					case 4:
-						//$musRange ="1/1";
+						$musRange ="4/4";
 					break;
 					
 					case 5:
@@ -904,6 +908,7 @@
 			}
 
 			function display_error($error ='No errors', $error_num = 100, $query) {
+				global $config;
 					$error = htmlspecialchars($error, ENT_QUOTES, 'ISO-8859-1');
 					$trace = debug_backtrace();
 
@@ -916,7 +921,7 @@
 							<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 							<html xmlns="http://www.w3.org/1999/xhtml">
 							<head>
-							<title>MySQL Fatal Error | Arvind</title>
+							<title>MySQL Fatal Error '.$config['letterHeadLine'].'</title>
 							<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 							<style type="text/css">
 							<!--
@@ -949,14 +954,13 @@
 								padding: 4px;
 								background-color: #EFEDED;
 								border: 1px solid #DEDCDC;
-
 							}
 							-->
 							</style>
 							</head>
 							<body>
 								<div style="width: 700px;margin: 20px; border: 1px solid #D9D9D9; background-color: #F1EFEF; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3); box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);" >
-									<div class="top" >MySQ: Error! | Arvind</div>
+									<div class="top" >MySQ: Error! '.$config['letterHeadLine'].'</div>
 									<div class="box" ><b>MySQL error</b> in file: <b>'.$trace[$level]['file'],'</b> at line <b>'.$trace[$level]['line'].'</b></div>
 									<div class="box" >Error Number: <b>'.$error_num.'</b></div>
 									<div class="box" >The Error returned was: <b>'.$error.'</b></div>

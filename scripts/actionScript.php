@@ -23,11 +23,8 @@
   } else {
 		require_once ('functions.inc.php');
 		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
-		/*if(!isset($_POST['action'])){
-				require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
-		} */
   }
-		
+
 	if(isset($_GET['adress']) && isset($_GET['port'])){
 			$host = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['adress']))));
 			$port = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['port']))));
@@ -89,7 +86,7 @@
 	
 	elseif(isset($_GET['rootJSON'])) {
 		die(checkfilesRootJSON($_GET['rootJSON']));
-		
+
 	} elseif(isset($_GET['serversList'])){
 		$ServersLogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversList'])))) ?? null;
 		if($config['serversOut'] === true) {
@@ -103,7 +100,6 @@
 		die(scanRuntimeDir($bitDepth));
 	} elseif(isset($_GET['events'])) {
 		die(eventNow());
-	} elseif(isset($_GET['tes'])) {
-		die(dirsToCheck("versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks", "1.16.4", "Foxesworld"));
+	} elseif(isset($_GET['debug'])) {
+		die(checkWriteRights());
 	}
-	

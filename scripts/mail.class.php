@@ -14,14 +14,18 @@
  Назначение: Класс для отправки писем с сайта
 =====================================================
 */
-
-if (! defined ( 'DATALIFEENGINE' )) {
-	die ( "Hacking attempt!" );
+/*
+ * Using
+ * $mail = new foxMail($config,1);
+ * $mail->send(self::$email, "FoxEngine", self::$template);
+*/
+if (!defined('INCLUDE_CHECK')) {
+	die ("Hacking attempt!");
 }
 
-require_once ROOT_DIR . '/engine/classes/mail/class.phpmailer.php';
+require_once ('class.mailer.php');
 
-class dle_mail {
+class ArvindMail {
 
 	public $mail = false;
 	public $send_error = false;
@@ -37,34 +41,34 @@ class dle_mail {
 		$this->mail->CharSet = $config['charset'];
 		$this->mail->Encoding = "base64";
 
-		$config['mail_title'] = str_replace( '&amp;', '&', $config['mail_title'] );
+		$config['letterHeadLine'] = str_replace( '&amp;', '&', $config['letterHeadLine'] );
 
-		if( $config['mail_title'] ) {
-			$this->mail->setFrom($config['admin_mail'], $config['mail_title']);
+		if( $config['letterHeadLine'] ) {
+			$this->mail->setFrom($config['adminEmail'], $config['letterHeadLine']);
 		} else {
-			$this->mail->setFrom( $config['admin_mail'] );			
+			$this->mail->setFrom( $config['adminEmail'] );			
 		}
 		
-		if($config['mail_metod'] == "smtp") {
+		if($config['sendMethod'] == "smtp") {
 			$this->mail->isSMTP();
 			$this->mail->Timeout = 10;
-			$this->mail->Host = $config['smtp_host'];
-			$this->mail->Port = intval( $config['smtp_port'] );
-			$this->mail->SMTPSecure = $config['smtp_secure'];
+			$this->mail->Host = $config['sendHost'];
+			$this->mail->Port = intval( $config['SMTPport'] );
+			$this->mail->SMTPSecure = $config['SMTPsecProtocol'];
 			
 			if( $config['smtp_user'] ) {
 				$this->mail->SMTPAuth = true;
 				$this->mail->Username = $config['smtp_user'];
-				$this->mail->Password = $config['smtp_pass'];
+				$this->mail->Password = $config['SMTPpass'];
 			}
 			
-			if( $config['smtp_mail'] ) {
-				$this->mail->From = $config['smtp_mail'];
-				$this->mail->Sender = $config['smtp_mail'];
+			if( $config['SMTPMail'] ) {
+				$this->mail->From = $config['SMTPMail'];
+				$this->mail->Sender = $config['SMTPMail'];
 			}
 		}
 		
-		$this->mail->XMailer = "DLE CMS";
+		$this->mail->XMailer = "FoxesWorld | Arvind";
 		
 		if ( $is_html ) {
 			$this->mail->isHTML();
