@@ -7,11 +7,11 @@
 -----------------------------------------------------
  Copyright (c) 2016-2021  FoxesWorld
 -----------------------------------------------------
- Данный код защищен авторскими правами
+ Данный код защищен авторскими правами и является приватным софтом
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.26.0 Release Candidate
+ Версия: 0.0.27.0 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -300,12 +300,17 @@
 			}
 
 			//No JSON
-			function checkfiles($path) {
-					if(!is_dir($path)) {
-						die("<b>ERROR!</b> \nDirectory - ".$path." doesn't exist!");
+			function checkfiles($client, $version) {
+				global $config;
+				$i = 0;
+				$massive = "";
+				$arrayToLoad = array($config['clientsDir'].'versions/'.$version, $config['clientsDir'].'clients/'.$client, $config['clientsDir'].'assets');
+				while($i < count($arrayToLoad)) {
+					if(!is_dir($arrayToLoad[$i])) {
+						die("<b>ERROR!</b> \nDirectory - ".$arrayToLoad[$i]." doesn't exist!");
 					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$massive = "";
+					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($arrayToLoad[$i]), RecursiveIteratorIterator::SELF_FIRST);
+					
 						foreach($objects as $name => $object) {
 							$basename = basename($name);
 							$isdir = is_dir($name);
@@ -314,10 +319,12 @@
 								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
 							}
 						}
+						$i++;
+				}
 				return $massive;
 			}
-			
-			function checkfilesJSONnew($client, $version) {
+
+			function checkfilesJSON($client, $version) {
 				global $config;
 				$i = 0;
 				$fileNum = 0;
@@ -392,52 +399,61 @@
 					return $password;
 			}
 
-			//New function for clients
+			/*	Function for loading clients
+			 *	JSON | NOJSON
+			 */
 			function hashcVersion($client, $forceJSON = false) {
 				global $config;
 					$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 					$version = $serverInfo[0]['version'];
-					$versionPath = $config['clientsDir'].'versions/'.$version;
 
 						if($config['filesOutJSON'] === true || $forceJSON === true) {
 							$hash_md5 =
-							'[
-								{
-									"filesToLoad":
-										'.checkfilesJSONnew($client, $version).
-								'},'.
-								'{
-									"dirsToCheck": 
-										'.dirsToCheckJSON("assets/indexes,assets/objects,versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks",$version, $client).'
-								 }
-							]'; 
-
+							'[{"filesToLoad":'.checkfilesJSON($client, $version).'},'.
+							'{"dirsToCheck":'.dirsToCheckJSON($client, $version).'}]';
 						} else {
-							$hash_md5 = str_replace("\\", "/",checkfiles($versionPath).checkfiles($config['clientsDir'].'clients/'.$client).checkfiles($config['clientsDir'].'assets')).'<::>'.
-							dirsToCheck("assets/indexes,assets/objects,versions/{thisVersion},clients/{thisClient}/mods,clients/{thisClient}/config,clients/{thisClient}/resourcepacks,clients/{thisClient}/shaderpacks",$version, $client);
+							$hash_md5 = checkfiles($client, $version).'<::>'.
+							dirsToCheck($client, $version);
 						}
 				return $hash_md5;
 			}
 			
-			function dirsToCheckJSON($dirs, $version, $client){
-				$dirsArray;
-				$counter = 0;
-				$dirsExplode = explode(',', $dirs);
-				while($counter < count($dirsExplode)){
-					$dirsExplode[$counter] = str_replace('{thisVersion}', $version, $dirsExplode[$counter]);
-					$dirsExplode[$counter] = str_replace('{thisClient}', $client, $dirsExplode[$counter]);
-				$dirsArray[] = '{'.$dirsExplode[$counter].'}';
-					$counter++;
-				}
-				return json_encode($dirsArray);
-			}
-
-			function dirsToCheck($dirs, $version, $client){
-				$dirs = str_replace(',', '<:b:>', $dirs);
-				$dirs = str_replace('{thisVersion}', $version, $dirs);
-				$dirs = str_replace('{thisClient}', $client, $dirs);
+			function dirsToCheckJSON($client, $version){
+				$i = 0;
+				$outputArray = array();
+				$dirsArray = array(
+				$config['clientsDir']."assets/indexes",
+				$config['clientsDir']."assets/objects",
+				$config['clientsDir']."versions/".$version,
+				$config['clientsDir']."clients/".$client."/mods",
+				$config['clientsDir']."clients/".$client."/config",
+				$config['clientsDir']."clients/".$client."/resourcepacks",
+				$config['clientsDir']."clients/".$client."/shaderpacks");
 				
-				return $dirs;
+				while($i < count($dirsArray)){
+					$outputArray[] = '{'.$dirsArray[$i].'}';
+					$i++;
+				}
+				return json_encode($outputArray);
+			}
+			
+			function dirsToCheck($client, $version){
+				$i = 0;
+				$outputArray = array();
+				$dirsArray = array(
+				$config['clientsDir']."assets/indexes",
+				$config['clientsDir']."assets/objects",
+				$config['clientsDir']."versions/".$version,
+				$config['clientsDir']."clients/".$client."/mods",
+				$config['clientsDir']."clients/".$client."/config",
+				$config['clientsDir']."clients/".$client."/resourcepacks",
+				$config['clientsDir']."clients/".$client."/shaderpacks");
+
+					while($i < count($dirsArray)) {
+						$outputArray[] = $dirsArray[$i];
+						$i++;
+					}
+				return implode('<:b:>', $outputArray);
 			}
 
 			//Full JSON
