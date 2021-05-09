@@ -44,7 +44,7 @@
 	
 	} elseif(isset($_GET['Image'])){
 			$Image = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['Image']))));
-			die(Security::encrypt(ImgHash($Image), $config['key1']));
+			die(ImgHash($Image));//Security::encrypt( , $config['key1'])
 			
 	} elseif(isset($_GET['getRealname'])){
 			$login = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
@@ -101,5 +101,7 @@
 	} elseif(isset($_GET['events'])) {
 		die(eventNow());
 	} elseif(isset($_GET['debug'])) {
-		die(checkWriteRights());
+		die(var_dump(dirsToCheckFullClient('Foxesworld')));
+	} elseif(isset($_GET['debug2'])) {
+		die(dirsToCheck('Foxesworld', '1.12.2', false));
 	}

@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.27.0 Release Candidate
+ Версия: 0.0.29.1 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -33,6 +33,9 @@
 	if(defined('NO_DEBUG')){
 		error_reporting(0);
 	}
+	
+		require ('startUpSound.php');
+	
 	
 	/* Global Vars */
 	//'SELECT * FROM servers' = 'SELECT * FROM servers';
@@ -88,12 +91,25 @@
 				return $status === 0;
 			}
 
-			//Full JSON (Answers in JSON (2 rows))
+			/**
+			 * Answer using JSON
+			 * 
+			 * @param in - Two String values & Two String Titles
+			 * @throws IOException
+			 */
 			function JSONanswer($typeName, $typeValue, $messageName, $messageValue){
+				if(!$typeName || !$typeValue || !$messageName || !$messageValue){
+					throw new Exception('Sent not all the data');
+				}
 				$array = array($typeName => $typeValue,$messageName => $messageValue);
 				return json_encode($array);
 			}
-
+			
+			/**
+			 * Alters tables in the database
+			 * 
+			 * @param in - null
+			 */
 			function dbPrepare(){
 				global $config;
 				$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
@@ -298,64 +314,6 @@
 
 				return json_encode($JSONServers);
 			}
-
-			//No JSON
-			function checkfiles($client, $version) {
-				global $config;
-				$i = 0;
-				$massive = "";
-				$arrayToLoad = array($config['clientsDir'].'versions/'.$version, $config['clientsDir'].'clients/'.$client, $config['clientsDir'].'assets');
-				while($i < count($arrayToLoad)) {
-					if(!is_dir($arrayToLoad[$i])) {
-						die("<b>ERROR!</b> \nDirectory - ".$arrayToLoad[$i]." doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($arrayToLoad[$i]), RecursiveIteratorIterator::SELF_FIRST);
-					
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
-							}
-						}
-						$i++;
-				}
-				return $massive;
-			}
-
-			function checkfilesJSON($client, $version) {
-				global $config;
-				$i = 0;
-				$fileNum = 0;
-				$fileOBJ = array();
-				$dirsCheckArr = array($config['clientsDir'].'clients/'.$client, $config['clientsDir'].'assets', $config['clientsDir'].'versions/'.$version);
-			while(count($dirsCheckArr) > $i) {
-
-					if(!is_dir($dirsCheckArr[$i])) {
-								die("<b>ERROR!</b> \nDirectory - ".$dirsCheckArr[$i]." doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirsCheckArr[$i]), RecursiveIteratorIterator::SELF_FIRST);
-					
-					
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$fileOBJ[] = 
-								[
-									'filename' => $str.$basename,
-									'hash'     => md5($name),
-									'size'     => filesize($name)
-								];
-							}
-							$fileNum++;
-						}
-				$i++;
-			}
-				return json_encode($fileOBJ, JSON_UNESCAPED_SLASHES);
-			}
 			
 			function uuidFromString($string) {
 				$val = md5($string, true);
@@ -409,51 +367,98 @@
 
 						if($config['filesOutJSON'] === true || $forceJSON === true) {
 							$hash_md5 =
-							'[{"filesToLoad":'.checkfilesJSON($client, $version).'},'.
-							'{"dirsToCheck":'.dirsToCheckJSON($client, $version).'}]';
+							'[{"filesToLoad":'.checkfiles($client, $version, true).'},'.
+							'{"dirsToCheck":'.dirsToCheck($client, $version).'}]';
 						} else {
 							$hash_md5 = checkfiles($client, $version).'<::>'.
-							dirsToCheck($client, $version);
+							dirsToCheck($client, $version, false);
 						}
 				return $hash_md5;
 			}
 			
-			function dirsToCheckJSON($client, $version){
+			function dirsToCheck($client, $version, $JSON = false){
 				$i = 0;
 				$outputArray = array();
 				$dirsArray = array(
-				$config['clientsDir']."assets/indexes",
-				$config['clientsDir']."assets/objects",
-				$config['clientsDir']."versions/".$version,
-				$config['clientsDir']."clients/".$client."/mods",
-				$config['clientsDir']."clients/".$client."/config",
-				$config['clientsDir']."clients/".$client."/resourcepacks",
-				$config['clientsDir']."clients/".$client."/shaderpacks");
-				
-				while($i < count($dirsArray)){
-					$outputArray[] = '{'.$dirsArray[$i].'}';
-					$i++;
-				}
-				return json_encode($outputArray);
-			}
-			
-			function dirsToCheck($client, $version){
-				$i = 0;
-				$outputArray = array();
-				$dirsArray = array(
-				$config['clientsDir']."assets/indexes",
-				$config['clientsDir']."assets/objects",
-				$config['clientsDir']."versions/".$version,
-				$config['clientsDir']."clients/".$client."/mods",
-				$config['clientsDir']."clients/".$client."/config",
-				$config['clientsDir']."clients/".$client."/resourcepacks",
-				$config['clientsDir']."clients/".$client."/shaderpacks");
+				"assets/indexes",
+				"assets/objects",
+				"versions/".$version);
+				$fullArray = array_merge($dirsArray,dirsToCheckFullClient($client)); 
 
-					while($i < count($dirsArray)) {
-						$outputArray[] = $dirsArray[$i];
+					while($i < count($fullArray)) {
+						if($JSON === true){
+							//$outputArray[] = '{'.$dirsArray[$i].'}';
+							$outputArray[] = array('dir'.$i =>$fullArray[$i]);
+						} else {
+							$outputArray[] = $fullArray[$i];
+						}
 						$i++;
 					}
-				return implode('<:b:>', $outputArray);
+				if($JSON === true){
+					return json_encode($outputArray, JSON_UNESCAPED_SLASHES);
+				} else {
+					return implode('<:b:>', $outputArray);
+				}
+			}
+			
+			function dirsToCheckFullClient($client){
+				global $config;
+				$dirsWeHave = array();
+				$path = $config['clientsDir']."clients/".$client;
+				if(!is_dir($path)) {
+					return "Not a directory!";
+				}
+				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+								
+							foreach($objects as $name => $object) {
+								$basename = basename($name);
+								if ($basename != "." and $basename != ".." && is_dir($name)){
+									$name = str_replace('files/clients/', "", $name);
+										$dirsWeHave[] = $name; 
+								}
+							}
+				return $dirsWeHave;
+			}
+
+			function checkfiles($client, $version, $JSON = false) {
+				global $config;
+				$i = 0;
+				$fileNum = 0;
+				$fileOBJ = array();
+				$massive = "";
+				$dirsCheckArr = array($config['clientsDir'].'clients/'.$client, $config['clientsDir'].'assets', $config['clientsDir'].'versions/'.$version);
+				while($i < count($dirsCheckArr)) {
+						if(!is_dir($dirsCheckArr[$i])) {
+									die("<b>ERROR!</b> \nDirectory - ".$dirsCheckArr[$i]." doesn't exist!");
+						}
+						$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirsCheckArr[$i]), RecursiveIteratorIterator::SELF_FIRST);
+						
+						
+							foreach($objects as $name => $object) {
+								$basename = basename($name);
+								$isdir = is_dir($name);
+								if ($basename!="." and $basename!=".." and !is_dir($name)){
+									$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
+									if($JSON === true) {
+										$fileOBJ[] = 
+										[
+											'filename' => $str.$basename,
+											'hash'     => md5($name),
+											'size'     => strval(filesize($name))
+										];
+									} else {
+										$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
+									}
+								}
+								$fileNum++;
+							}
+					$i++;
+				}	
+				if($JSON === true) {
+					return json_encode($fileOBJ, JSON_UNESCAPED_SLASHES);
+				} else {
+					return $massive;
+				}
 			}
 
 			//Full JSON
@@ -476,9 +481,8 @@
 					'type' => 'getText',
 					'rarity' => $TextRarity,
 					'Message' => $text);
-					$textGet = json_encode($textGet);	
-					
-					return $textGet;
+
+					return json_encode($textGet);
 			}
 
 			//Full JSON
@@ -754,146 +758,6 @@
 				return true;
 			}
 
-			function eventNow(){
-				global $config;
-					//Vars definition
-					$soundsPath = FILES_DIR."eventSounds";
-					$pathJSON = "/launcher/files/eventSounds";
-					$musFilesNum = countFilesNum($soundsPath.'/mus', '.mp3');					//Count of ordinary Music
-					$easterMusFilesNum = countFilesNum($soundsPath.'/mus/easterMusic', '.mp3'); //Count of Easter Music
-					$eventName;
-					
-					//Date explosion
-					$dateExploded = explode ('.',CURRENT_DATE);
-					$dayToday = $dateExploded[0];
-					$monthToday = $dateExploded[1];
-					$yearToday = $dateExploded[2];
-					
-				//Checking each of 12 months
-				switch($monthToday){
-					case 1:
-						switch($dayToday){
-							case($dayToday < 12):
-								$eventName = "winterHolidays";
-							break;
-						}
-					break;
-					
-					case 2:
-					break;
-					
-					case 3:
-					break;
-					
-					case 4:
-
-					break;
-					
-					case 5:
-					break;
-					
-					case 6:
-					break;
-					
-					case 7:
-					break;
-					
-					case 8:
-					break;
-					
-					case 9:
-					break;
-					
-					case 10:
-					break;
-					
-					case 11:
-					break;
-					
-					case 12:
-						switch($dayToday){
-							case($dayToday < 31 && $dayToday != 20 && $dayToday != 31):
-								$eventName = "winterHolidays";
-							break;
-							
-							case 20:
-								$eventName = "twistOfTheSun";
-							break;
-							
-							case 31:
-								$eventName = "newYear";
-								$musRange ="1/8";
-							break;
-							
-							default:
-							
-						}
-					break;
-				}
-
-				//Generating a Mus File
-					$easterMusFile = easterEgg($config['easterMusRarity']);
-					if(isset($musRange)){
-						$musRange = explode('/',$musRange);
-						$minRange = $musRange[0];
-						$maxRange = $musRange[1];
-					}
-
-					if(isset($minRange) && isset($maxRange)) {
-						$RandMusic = rand($minRange,$maxRange);
-					} else {
-						$RandMusic = rand(1,$musFilesNum);
-					}
-					$selectedMusic = "mus".$RandMusic.".mp3";
-					$selectedSound;
-					if($easterMusFile == "YES"){
-						$RandMusic = rand(1, $easterMusFilesNum);
-						$selectedMusic = "easterMusic/mus".$RandMusic.".mp3";
-					}
-
-				$musMd5 = md5_file($soundsPath.'/mus/'.$selectedMusic);
-				//************************
-
-				if(isset($eventName)){
-					$eventSoundsNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');	
-					$selectedSound = rand(1,$eventSoundsNum);
-					$selectedSound = $eventName.$selectedSound.'.mp3';
-					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
-					$outputArray = array("Status" => "Event",
-									     "filesDir" => $pathJSON.'/',"eventName" => $eventName,
-										 "soundMd5" => $thisSoundMd5,
-										 "selectedSound" => $selectedSound,
-										 "MusicMd5" => $musMd5,
-										 "selectedMusic" => $selectedMusic);
-				} else {
-					$eventName = 'common';
-					$commonFilesNum = countFilesNum($soundsPath.'/'.$eventName, '.mp3');
-					$selectedSound = rand(1,$commonFilesNum);
-					$selectedSound = "voice".$selectedSound.".mp3";
-					$thisSoundMd5 = md5_file($soundsPath.'/'.$eventName.'/'.$selectedSound);
-					$outputArray = array("Status" => "noEvent",
-										 "filesDir" => $pathJSON.'/',
-										 "soundMd5" => $thisSoundMd5,
-										 "selectedSound" => $selectedSound,
-										 "MusicMd5" => $musMd5,
-										 "selectedMusic" => $selectedMusic,
-										 "eventName" => $eventName);
-				}
-
-				return json_encode($outputArray);
-			}
-			
-			function easterEgg($chance){
-				$minRange = 1;
-				$maxRange = 1000;
-				if (mt_rand($minRange, $maxRange) <= $chance){
-					$returnText = 'YES';
-				} else {
-					$returnText= 'NO';
-				}
-				return $returnText;
-			}
-
 			function display_error($error ='No errors', $error_num = 100, $query) {
 				global $config;
 					$error = htmlspecialchars($error, ENT_QUOTES, 'ISO-8859-1');
@@ -958,84 +822,3 @@
 					';
 				exit();
 			}
-
-
-			//Full JSON (Need migration)
-			/* function checkfilesJSON($path) {
-					if(!is_dir($path)) {
-						die("<b>ERROR!</b> \nDirectory - $path doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$fileOBJ = array();
-					$fileNum = 0;
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$fileOBJ[] = 
-								[
-									'filename' => $str.$basename,
-									'hash'     => md5($name),
-									'size'     => filesize($name)
-								];
-							}
-							$fileNum++;
-						}
-				return json_encode($fileOBJ, JSON_UNESCAPED_SLASHES);
-			} */
-			
-			//Full JSON
-			/* function checkfilesClientJSON($client) {
-				$path = 'files/clients/clients/'.$client;
-				$files = array();
-				if(!is_dir($path)) {
-					die("<b>ERROR!</b> \nDirectory - $path doesn't exist!");
-					exit();
-				}
-				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					foreach($objects as $name => $object) {
-						$basename = basename($name);
-						$fileNum = 0;
-						$isdir = is_dir($name);
-						if ($basename!="." and $basename!=".." and !is_dir($name)){
-							$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-							$files[] = array (
-								
-							  'file-' => 
-							  array (
-							    'filename'  => $str.$basename,
-								'hash' 		=> md5($name),
-								'size' 		=> filesize($name),
-							  )
-							);		
-						}
-						$fileNum++;
-					}
-					return json_encode($files);
-			} 
-			
-			//No JSON
-			function checkfilesClient($client) {
-					$path = 'files/clients/'.$client;
-					if(!is_dir($path)) {
-						die("<b>ERROR!</b> \nDirectory - $path doesn't exist!");
-					}
-					$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-					$massive = "";
-					$arrayOut = array();
-						foreach($objects as $name => $object) {
-							$basename = basename($name);
-							$isdir = is_dir($name);
-							if ($basename!="." and $basename!=".." and !is_dir($name)){
-								$str = str_replace('files/clients/', "", str_replace($basename, "", $name));
-								$massive = $massive.$str.$basename.':>'.md5_file($name).':>'.filesize($name)."<:>";
-								$arrayOut[] = array('fileName' => $str.$basename,
-													'fileMd5' => md5_file($name),
-													'fileSize' => filesize($name));
-							}
-						}
-				return $massive;
-			}
-			
-			*/
