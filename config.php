@@ -28,7 +28,7 @@ if(!defined('CONFIG')) {
 	define('REMOTE_IP', getenv('REMOTE_ADDR'));
 	define('CURRENT_TIME', time());
 	define('CURRENT_DATE', date("d.m.Y"));
-	
+
 $config = array(
 	/* Database Settings*/
 	'db_host' 			=> 'localhost',
@@ -54,16 +54,18 @@ $config = array(
 	'bantime'			=> CURRENT_TIME + (100),
 	
 	/* JSON Output */
-	'parseOnline' => false,	  //Servers Pinging using JSON
-	'serversOut' => false,	  //Servers output printing using JSON
-	'filesOutJSON' => false,  //Files output using JSON WIP
+	'parseOnline'       => false, //Servers Pinging using JSON
+	'serversOut'        => false, //Servers output printing using JSON
+	'filesOutJSON'      => false, //Files output using JSON WIP
 	
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
 	'uploaddirp'  		=> 'MinecraftCloaks',
 	
 	/* startUpSound */
-	'easterMusRarity' => 1, //1 by default
+	'enableVoice' 		=> true,
+	'enableMusic' 		=> true,
+	'easterMusRarity'   => 1, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
@@ -76,7 +78,7 @@ $config = array(
 	
 	/* Updater */
 	'launcherRepositoryPath' => "files/launcher/launcher.jar",
-	'updaterRepositoryPath' => "files/updater/updater.",
+	'updaterRepositoryPath'  => "files/updater/updater.",
 
 	/* E-mail */
 	'adminEmail'		=> 'lisssicin@ya.ru',

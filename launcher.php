@@ -11,15 +11,15 @@
 -----------------------------------------------------
  Файл: launcher.php
 -----------------------------------------------------
- Версия: 0.0.19.6 Stable Alpha
+ Версия: 0.0.19.7 Stable Alpha
 -----------------------------------------------------
  Назначение: Ядро вебчасти, сочетающее в себе всю её функциональность
 =====================================================
 */
-header('Content-Type: text/html; charset=utf-8');
-define('INCLUDE_CHECK',true);
-define('NO_DEBUG',true);
-include ("scripts/actionScript.php");  //Action requests
+	header('Content-Type: text/html; charset=utf-8');
+	define('INCLUDE_CHECK',true);
+	define('NO_DEBUG',true);
+	include ("scripts/actionScript.php");  //Action requests
 //===================================================
 	if(!$_REQUEST){
 		require ('../index.php');
@@ -45,7 +45,7 @@ include ("scripts/actionScript.php");  //Action requests
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $login) || !preg_match("/^[a-zA-Z0-9_-]+$/", $postPass) || !preg_match("/^[a-zA-Z0-9_-]+$/", $action)) {
 		exit(Security::encrypt("errorLogin<$>", $config['key1']));
     }
-	
+
 			if(!file_exists($config['uploaddirs'])) {
 				die ("Skins path is not a folder!");
 			}
@@ -68,25 +68,20 @@ include ("scripts/actionScript.php");  //Action requests
 
 					//If usung Antibrut
 					if($config['useantibrut'] === true) {
-						$stmt = $db->prepare("SELECT sip,time FROM sip WHERE sip='".REMOTE_IP."' And time >'".CURRENT_TIME."'");
-						$stmt->execute();
-						$row = $stmt->fetch(PDO::FETCH_ASSOC);
-						$bannedIP = $row['sip'];
+						$stmt = $db->getRow("SELECT sip,time FROM sip WHERE sip='".REMOTE_IP."' And time >'".CURRENT_TIME."'");
+						$bannedIP = $stmt['sip'];
 							if(REMOTE_IP == $bannedIP) {
-								$stmt = $db->prepare("DELETE FROM sip WHERE time < '".CURRENT_TIME."';");
-								$stmt->execute();
+								$stmt = $db->run("DELETE FROM sip WHERE time < '".CURRENT_TIME."';");
 								exit(Security::encrypt("temp<$>", $config['key1']));
 							}
 						
 							if ($login != $realUser) {
-								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-								$stmt->execute();
+								$stmt = $db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
 								exit(Security::encrypt("errorLogin<$>", $config['key1']));
 							}
 							
 							if(!strcmp($realPass,$checkPass) == 0 || !$realPass) {
-								$stmt = $db->prepare("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-								$stmt->execute();
+								$stmt = $db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
 								exit(Security::encrypt("errorLogin<$>", $config['key1']));
 							}
 
@@ -137,7 +132,7 @@ include ("scripts/actionScript.php");  //Action requests
 		}
 
     //$hash = generateLoginHash();
-    $db->query("UPDATE LOW_PRIORITY dle_users SET lastdate='".CURRENT_TIME."', logged_ip='".REMOTE_IP."' WHERE name='$login'"); //,hash='$hash'
+    $db->run("UPDATE LOW_PRIORITY dle_users SET lastdate='".CURRENT_TIME."', logged_ip='".REMOTE_IP."' WHERE name='$login'"); //,hash='$hash'
     if($action == 'auth') {
 		require_once ('scripts/geoIP.class.php');
 		$geoplugin = new geoPlugin();	//GeoPosition
