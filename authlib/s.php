@@ -19,8 +19,8 @@
 define('INCLUDE_CHECK',true);
 @$md5 = $_GET['user'];
 $exists1;
+	
 	try {
-		
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $md5)){
 		exit;
 	}
@@ -37,9 +37,9 @@ $exists1;
 	}
 
 		$file1 = $capeurl.$realUser.'.png';
-		$exists1 = file_exists('../'.$config['uploaddirp'].'/'.$realUser.'.png');
+		$exists1 = file_exists(SITE_ROOT.$config['uploaddirp'].'/'.$realUser.'.png');
 		$file2 = $skinurl.$realUser.'.png';
-		$exists2 = file_exists('../'.$config['uploaddirs'].'/'.$realUser.'.png');
+		$exists2 = file_exists(SITE_ROOT.$config['uploaddirs'].'/'.$realUser.'.png');
 		
 		//If cape exists
 		if ($exists1) {
@@ -51,7 +51,7 @@ $exists1;
 		if ($exists2) {
 		    $skin ='"SKIN":{"url":"'.$skinurl.$realUser.'.png"}';
 		} else {
-			$skin = '';
+			$skin ='"SKIN":{"url":"'.$skinurl.'default.png"}';
 		}
 		//If both of them are found
 		if ($exists1 && $exists2) {
