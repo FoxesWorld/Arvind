@@ -1,0 +1,45 @@
+pc{
+	gui{
+		miner{
+			cargo="Cargo"
+			crashed="crashed"
+			launchProgram="Launch"
+			noError="no error"
+			opt{
+				airFill="Air filling - tunnel mode"
+				bridge="Bridge building"
+				compress="Compress items"
+				keepFuel="Keep all fuel"
+				lavaFill="Lava filling"
+				makeCobble="Make cobble (water & lava)"
+				mining="Mining enabled"
+				torchPlacing="Place torches"
+				torchesOnlyOnFloor="Torches only on floor"
+				waterFill="Water filling"
+			}
+			program="Program"
+			restartProgram="Restart"
+			running="running"
+			settings="Settings"
+			stopProgram="Stop"
+			stoped="stoped"
+			terminal="Terminal"
+			title="Miner"
+		}
+	}
+	miner{
+		bridgeOff="Bridge building disabled."
+		bridgeOn="Bridge building enabled."
+		build{
+			errInvalidStructure="Not a valid Miner's structure!"
+			errMissingCrystals="Put some Power Crystals into the chest!"
+		}
+		chestName="Miner Cargo Storage"
+		connected="Miner %s connected to keyboard."
+		disconnected="Miner %s disconnected from keyboard."
+		launchedAll="Miners launched and disconnected."
+		miningOff="Mining disabled."
+		miningOn="Mining enabled."
+		operationsCancelled="All operations cancelled."
+	}
+}

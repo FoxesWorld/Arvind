@@ -1,0 +1,31 @@
+pc{
+	gui{
+		teleportTo{
+			title="Teleport To"
+		}
+		teleporter{
+			animals="animals"
+			east="east"
+			items="items"
+			lasers="lasers"
+			monsters="monsters"
+			name="Name:"
+			north="north"
+			nothing="<Nothing>"
+			page1="Teleporter"
+			page2="Property"
+			playerChoose="playerChoose"
+			players="players"
+			sneakTrigger="sneakTrigger"
+			soundEnabled="soundEnabled"
+			south="south"
+			target="Target:"
+			west="west"
+		}
+	}
+}
+tile{
+	PCtp_BlockTeleporter{
+		name="Teleporter"
+	}
+}

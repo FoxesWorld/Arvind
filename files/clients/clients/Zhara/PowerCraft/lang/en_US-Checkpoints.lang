@@ -1,0 +1,16 @@
+pc{
+	checkpoint{
+		setSpawn="Set spawnpoint to %s"
+	}
+	gui{
+		checkpoint{
+			title="Checkpoint"
+			walkingtiggerd="Walkingtiggerd"
+		}
+	}
+}
+tile{
+	PCcp_BlockCheckpoint{
+		name="Checkpoint"
+	}
+}

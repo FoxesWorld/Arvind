@@ -1,0 +1,58 @@
+pc{
+	gui{
+		automaticWorkbench{
+			redstoneActivated="Redstone triggered"
+		}
+		blockReplacer{
+			err3zeros="Expects at least 1 value unequal 0."
+			errWrongValue="Expects a value between -16 and 16."
+			particleFrame="Particles"
+			title="Block Replacer"
+		}
+		transmutabox{
+			timeCritical="Time critical?"
+		}
+		xpbank{
+			all="all"
+			currentPlayerLevel="Your level:"
+			deposit="Deposit:"
+			oneLevel="1 level"
+			storagePoints="Stored XP:"
+			withdraw="Withdraw:"
+			xpLevels="levels"
+			xpUnit="points"
+		}
+	}
+	roaster{
+		insertFuel="fuel"
+	}
+}
+tile{
+	PCma_BlockAutomaticWorkbench{
+		name="Automatic Workbench"
+	}
+	PCma_BlockBlockBuilder{
+		name="Block Builder"
+	}
+	PCma_BlockChunkLoader{
+		name="Chunk Loader"
+	}
+	PCma_BlockFishingMachine{
+		name="Fishing Machine"
+	}
+	PCma_BlockHarvester{
+		name="Harvester"
+	}
+	PCma_BlockReplacer{
+		name="Replacer"
+	}
+	PCma_BlockRoaster{
+		name="Roaster"
+	}
+	PCma_BlockTransmutabox{
+		name="Transmutabox"
+	}
+	PCma_BlockXPBank{
+		name="XP Bank"
+	}
+}

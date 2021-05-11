@@ -1,0 +1,54 @@
+item{
+	PCnt_ItemRadioRemote{
+		name="Radio Remote"
+	}
+}
+pc{
+	gui{
+		radio{
+			channel="Channel:"
+			errChannel="Invalid channel name."
+			renderSmall="Tiny"
+			showLabel="Show label"
+		}
+		sensor{
+			range="Detection distance:"
+		}
+	}
+	radio{
+		activatorGetChannel="Channel "%s" assigned to activation crystal."
+		activatorSetChannel="Radio connected to channel "%s"."
+	}
+	radioRemote{
+		connected="Portable transmitter connected to channel "%s"."
+		desc="Channel: %s"
+	}
+	sensor{
+		range{
+			1="Range: %s block"
+			2-4="Range: %s block"
+			5+="Range: %s block"
+		}
+	}
+}
+tile{
+	PCnt_BlockRadio{
+		rx{
+			name="Redstone Radio Receiver"
+		}
+		tx{
+			name="Redstone Radio Transmitter"
+		}
+	}
+	PCnt_BlockSensor{
+		item{
+			name="Item Proximity Detector"
+		}
+		living{
+			name="Mob Proximity Detector"
+		}
+		player{
+			name="Player Proximity Detector"
+		}
+	}
+}
