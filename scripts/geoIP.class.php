@@ -119,6 +119,7 @@ class geoPlugin {
         return unserialize( $this->fetch($host) );
     }
 	
+	/* DBadding */
 	private static function getIP($ip,$ipLocation,$ipRegion,$log=false){
 		global $config;
 		if($ip){

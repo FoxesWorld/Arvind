@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- load your data!
+ Let's load your data! | loadFiles
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
@@ -11,23 +11,28 @@
 -----------------------------------------------------
  Файл: loadFiles.php
 -----------------------------------------------------
- Версия: 0.0.1.0 Alpha
+ Версия: 0.0.1.2 Alpha
 -----------------------------------------------------
  Назначение: Отдача файлов + Хеш + Размер
 =====================================================
 */
+	if(!defined('INCLUDE_CHECK')) {
+		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
+	}
 
 	$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 	$version = $serverInfo[0]['version'];
 
 		/* Basic client structure (Alpha) */
-			if(!file_exists($config['clientsDir']."assets") ||
+			if(
+			!file_exists($config['clientsDir']."assets") ||
 			!file_exists($config['clientsDir']."versions/".$version) ||
 			!file_exists($config['clientsDir']."versions/".$version."/libraries") ||
 			!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar") ||
-			!file_exists($config['clientsDir']."versions/".$version."/natives/") ||
-			!file_exists($config['clientsDir']."clients/".$client."/mods/") ||
-			!file_exists($config['clientsDir']."clients/".$client."/servers.dat")) {
+			!file_exists($config['clientsDir']."versions/".$version."/natives/")
+			//!file_exists($config['clientsDir']."clients/".$client."/mods/") ||
+			//!file_exists($config['clientsDir']."clients/".$client."/servers.dat")
+			) {
 				die(Security::encrypt("client<$> $client", $config['key1']));
 			}
 
@@ -57,11 +62,3 @@
             $hash_md5 = hashcVersion($client);
 	}
             echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
-
-
-
-/* Argument for coremods (Old) 
-if(file_exists($config['clientsDir'].$client."/coremods/")) {
-	$arg = checkfiles($config['clientsDir'].$client."/coremods/");
-}
-*/
