@@ -11,46 +11,75 @@
 -----------------------------------------------------
  Файл: actionScript.php
 -----------------------------------------------------
- Версия: 0.1.16 Alpha
+ Версия: 0.2.17 Alpha
 -----------------------------------------------------
  Назначение: Действия при определенных запросах
 =====================================================
 */
 
+/* TODO Rewrite switch case!!!*/
+
   if(!defined('INCLUDE_CHECK')) {
 		require ('../../index.php');
 		exit();
   } else {
-		require_once ('functions.inc.php');
 		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
   }
-
-	if(isset($_GET['adress']) && isset($_GET['port'])){
-			$host = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['adress']))));
-			$port = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['port']))));
-			if($config['parseOnline'] === true) {
-				die(Security::encrypt(parse_onlineJSON($host, $port), $config['key1']));
-			} else {
-				die(Security::encrypt(parse_online($host, $port), $config['key1']));
-			}
-			
-	} elseif(isset($_GET['radio'])){
-			$radio = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['radio']))));
-			die(JSONanswer('type', 'error', 'message', 'Not supported yet: '.$radio));
-			
-	} elseif(isset($_GET['getText'])){
+  foreach ($_GET as $key => $value) {
+	   switch ($key) {
+		   case 'radio' :
+			die("А не послушаешь ты его...");
+		   break;
+		   
+		   case 'getText' :
 			$getText = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getText']))));
 			die(getyText());
-	
-	} elseif(isset($_GET['Image'])){
+		   break;
+		   
+		   case 'Image' :
 			$Image = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['Image']))));
 			die(ImgHash($Image));//Security::encrypt( , $config['key1'])
-			
-	} elseif(isset($_GET['getRealname'])){
+		   break;
+		   
+		   case 'getRealname' :
 			$login = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getRealname'])))) ?? null;
 			die(getRealName($login));
-		
-	} elseif(isset($_GET['show'])) {
+		   break;
+		   
+		   case 'getProfileBG' :
+			$getProfileBG = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
+			if($getProfileBG !== null) {
+			die(usersBackgrounds($getProfileBG));
+			} else {
+				die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $config['key1']));
+			}
+		   break;
+		   
+		   case 'userSelected' :
+			$userSelected = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['userSelected'])))) ?? null;
+			die(selectedUserBg($userSelected));
+		   break;
+		   
+		   case 'serversList' :
+			$ServersLogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversList'])))) ?? null;
+			if($config['serversOut'] === true) {
+				die(serversParserJSON($ServersLogin));
+			} else {
+				die(serversParser($ServersLogin));
+			}
+		   break;
+		   
+		   case 'JREnames' :
+			$bitDepth = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
+			die(scanRuntimeDir($bitDepth));
+		   break;
+		   
+		   case 'startUpSound' :
+			$startSound = new startUpSound(false);
+			die($startSound->generateAudio());
+		   break;
+		   
+		   case 'show' :
 			require 'SkinViewer2D.class.php';
 			header("Content-type: image/png");
 			$skin_dir = $_SERVER['DOCUMENT_ROOT'] . '/launcher/MinecraftSkins/';
@@ -70,38 +99,16 @@
 				$img = skinViewer2D::createHead($skin, 64);
 			}
 			imagepng($img);
-			
-	} elseif (isset($_GET['getProfileBG'])){
-		$getProfileBG = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['getProfileBG'])))) ?? null;
-		if($getProfileBG !== null) {
-		die(usersBackgrounds($getProfileBG));
-		} else {
-			die(Security::encrypt(JSONanswer('type', 'error', 'message', 'No login to search!'), $config['key1']));
-		}
-		
-	} elseif (isset($_GET['userSelected'])) {
-		$userSelected = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['userSelected'])))) ?? null;
-		die(selectedUserBg($userSelected));
-	}
-	
-	elseif(isset($_GET['rootJSON'])) {
-		die(checkfilesRootJSON($_GET['rootJSON']));
-
-	} elseif(isset($_GET['serversList'])){
-		$ServersLogin = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['serversList'])))) ?? null;
-		if($config['serversOut'] === true) {
-			die(serversParserJSON($ServersLogin));
-		} else {
-			die(serversParser($ServersLogin));
-		}
-	
-	} elseif(isset($_GET['JREnames'])){
-		$bitDepth = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['JREnames'])))) ?? null;
-		die(scanRuntimeDir($bitDepth));
-	} elseif(isset($_GET['events'])) {
-		die(eventNow());
-	} elseif(isset($_GET['debug'])) {
-		die(var_dump(dirsToCheckFullClient('Foxesworld')));
-	} elseif(isset($_GET['debug2'])) {
-		die(dirsToCheck('Foxesworld', '1.12.2', false));
-	}
+		   break;
+		   
+		   case 'adress':
+			$host = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['adress']))));
+			$port = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($_GET['port']))));
+			if($config['parseOnline'] === true) {
+				die(Security::encrypt(parse_onlineJSON($host, $port), $config['key1']));
+			} else {
+				die(Security::encrypt(parse_online($host, $port), $config['key1']));
+			}
+		   break;
+	   }
+  }
