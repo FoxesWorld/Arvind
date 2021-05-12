@@ -1,0 +1,207 @@
+pc{
+	delayer{
+		buffer{
+			desc="slows down signal"
+		}
+		slowRepeater{
+			desc="makes pulses longer"
+		}
+	}
+	flipflop{
+		D{
+			desc="latch memory"
+		}
+		RS{
+			desc="set/reset memory"
+		}
+		T{
+			desc="divides signal by 2"
+		}
+		random{
+			desc="changes state randomly on pulse"
+		}
+	}
+	gate{
+		and{
+			desc="all inputs on"
+		}
+		nand{
+			desc="some inputs off"
+		}
+		nor{
+			desc="all inputs off"
+		}
+		not{
+			desc="negates input"
+		}
+		or{
+			desc="at least one input on"
+		}
+		xnor{
+			desc="inputs equal"
+		}
+		xor{
+			desc="inputs different"
+		}
+	}
+	gui{
+		delayer{
+			delay="Delay (sec)"
+			errnoinput="No Input!"
+		}
+		pulsar{
+			delay="Delay (sec)"
+			errDelay="Bad delay time!"
+			errHold="Bad hold time!"
+			errintputzero="Bad delay time!"
+			hold="Hold time (sec)"
+			paused="Pause"
+			silent="Silent"
+			ticks="ticks"
+		}
+		special{
+			chestEmpty{
+				inv="No item of kind"
+				name="Empty Chest"
+			}
+			chestFull{
+				inv="Space for"
+				name="Full Chest"
+			}
+		}
+	}
+	pulsar{
+		clickMsg="Period %s ticks (%s s)"
+		clickMsgTime="Period %s ticks (%s s), remains %s"
+	}
+	repeater{
+		crossing{
+			desc="lets two wires intersect"
+		}
+		repeaterCorner{
+			desc="simple 1-tick corner repeater"
+		}
+		repeaterCornerInstant{
+			desc="instant corner repeater"
+		}
+		repeaterStraight{
+			desc="simple 1-tick repeater"
+		}
+		repeaterStraightInstant{
+			desc="instant repeater"
+		}
+		splitter{
+			desc="splits signal"
+		}
+	}
+	special{
+		chestEmpty{
+			desc="on if nearby container is empty"
+		}
+		chestFull{
+			desc="on if nearby container is full"
+		}
+		day{
+			desc="on during day"
+		}
+		night{
+			desc="on during night"
+		}
+		rain{
+			desc="on during rain"
+		}
+		special{
+			desc="spawner & pulsar control"
+		}
+	}
+}
+tile{
+	PClo_BlockDelayer{
+		delayer0{
+			name="buffered delayer"
+		}
+		delayer1{
+			name="delayed repeater"
+		}
+	}
+	PClo_BlockFlipFlop{
+		flipflop0{
+			name="D flipflop"
+		}
+		flipflop1{
+			name="RS flipflop"
+		}
+		flipflop2{
+			name="T flipflop"
+		}
+		flipflop3{
+			name="random flipflop"
+		}
+	}
+	PClo_BlockGate{
+		gate0{
+			name="gate not"
+		}
+		gate1{
+			name="gate and"
+		}
+		gate2{
+			name="gate nand"
+		}
+		gate3{
+			name="gate or"
+		}
+		gate4{
+			name="gate nor"
+		}
+		gate5{
+			name="gate xor"
+		}
+		gate6{
+			name="gate xnor"
+		}
+	}
+	PClo_BlockPulsar{
+		name="Redstone Pulsar"
+	}
+	PClo_BlockRepeater{
+		repeater0{
+			name="crossing repeater"
+		}
+		repeater1{
+			name="splitter repeater"
+		}
+		repeater2{
+			name="repeaterStraight repeater"
+		}
+		repeater3{
+			name="repeaterCorner repeater"
+		}
+		repeater4{
+			name="repeaterStraightInstant repeater"
+		}
+		repeater5{
+			name="repeaterCornerInstant repeater"
+		}
+	}
+	PClo_BlockSpecial{
+		special0{
+			name="sensor day"
+		}
+		special1{
+			name="sensor night"
+		}
+		special2{
+			name="sensor rain"
+		}
+		special3{
+			name="sensor chestEmpty"
+		}
+		special4{
+			name="sensor chestFull"
+		}
+		special5{
+			name="special controller"
+		}
+	}
+}

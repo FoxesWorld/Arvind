@@ -1,0 +1,19 @@
+item{
+	PChg_ItemArmorHologramGlasses{
+		name="Hologram Glasses"
+	}
+}
+tile{
+	PChg_BlockHologramBlock{
+		desc{
+			name="Contains: %s"
+		}
+		name="Hologramblock"
+	}
+	PChg_BlockHologramBlockEmpty{
+		name="Hologramblock"
+	}
+	PChg_BlockHologramField{
+		name="Hologram Field"
+	}
+}

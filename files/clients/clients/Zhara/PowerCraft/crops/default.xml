@@ -1,0 +1,23 @@
+<?xml version='1.1' encoding='UTF-8' ?>
+<!-- 
+  BLOCK HARVESTER CONFIG FILE
+  You can add your own crops into this file.
+  Any other xml files in this folder will be parsed too.
+
+  If you make a setup file for some mod, please post it on forums.
+
+  Special values:
+    metaMature  = -1  ...  any metadata
+    metaReplant = -1  ...  do not replant
+
+    Item meta   <  0  ...  get item with meta = blockMeta & abs(THIS_NUMBER) - useful for leaves
+
+  Item meta can be ranged - use 4-7 for random meta in range 4 to 7 (inclusive).
+  You can also use range for item count (eg. 0-5). 
+
+  Higher rarity number means more rare. Use 1 for regular drops. 
+-->
+
+<crops>
+
+</crops>

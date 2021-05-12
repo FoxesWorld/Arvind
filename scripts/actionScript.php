@@ -74,8 +74,8 @@
 			die(scanRuntimeDir($bitDepth));
 		   break;
 		   
-		   case 'startUpSound' :
-			$startSound = new startUpSound(false);
+		   case 'events' :
+			$startSound = new startUpSound();
 			die($startSound->generateAudio());
 		   break;
 		   

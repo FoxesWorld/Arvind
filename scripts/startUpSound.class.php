@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: startUpSound.class.php
 -----------------------------------------------------
- Версия: 0.1.4 Alpha
+ Версия: 0.1.2 Alpha
 -----------------------------------------------------
  Назначение: Генерация звука запуска
 =====================================================
@@ -29,7 +29,6 @@ require ('mp3File.class.php');
 		private static $musFilesNum = 0;
 		private static $soundFilesNum = 0;
 		private static $easter = "";
-		private static $debug = false;
 		
 		/* Mus */
 		private static $selectedMusic; 		//Selected mus File
@@ -48,17 +47,14 @@ require ('mp3File.class.php');
 
 		function __construct($debug = false) {
 			global $config;
-			startUpSound::$debug = $debug;
 			$this->eventNow();
-			$this->generateMusic(static::$debug);
-			$this->generateSound(static::$debug);
-			$this->maxDuration(static::$debug);
+			$this->generateMusic($debug);
+			$this->generateSound($debug);
+			$this->maxDuration($debug);
 		}
 		
 		function generateAudio() {
-			if(static::$debug === false) {
-				echo $this->outputJson();
-			}
+			echo $this->outputJson();
 		}
 		
 		public function eventNow($debug = false) {
@@ -88,10 +84,6 @@ require ('mp3File.class.php');
 					break;
 					
 					case 5:
-						switch($dayToday){ //День победы
-							case 9:
-							break;
-						}
 					break;
 					
 					case 6:
@@ -118,7 +110,7 @@ require ('mp3File.class.php');
 								$eventName = "winterHolidays";
 							break;
 							
-							case 22:
+							case 20:
 								$eventName = "twistOfTheSun";
 							break;
 							
@@ -126,6 +118,8 @@ require ('mp3File.class.php');
 								$eventName = "newYear";
 								$musRange ="1/8";
 							break;
+							
+							default:
 							
 						}
 					break;
@@ -145,13 +139,13 @@ require ('mp3File.class.php');
 		
 		private function generateMusic($debug = false) {
 			global $config;
-			
 			$this->easter($config['easterMusRarity']);
+
 			if($config['enableMusic'] === true) {
-				$currentMusFolder = static::$AbsolutesoundPath.'/'.static::$musMountPoint.static::$easter;  							//Folder of music
+				$currentMusFolder = static::$AbsolutesoundPath.'/'.static::$musMountPoint.static::$easter;  							//Folder of music /Avalon/sites/foxLogin/www/launcher/files/eventSounds/mus/easter
 				startUpSound::$musFilesNum = countFilesNum($currentMusFolder, '.mp3');													//Count of music
 				$RandMusFile = 'mus'.rand(1,static::$musFilesNum).'.mp3';																//Getting random File
-
+				
 				//***********************************************								
 				startUpSound::$selectedMusic = str_replace(static::$AbsolutesoundPath.'/mus',"",$currentMusFolder).'/'.$RandMusFile; 	//Local musPath
 				startUpSound::$musFileAbsolute = $currentMusFolder.'/'.$RandMusFile;													//Absolute musFilePath
@@ -169,30 +163,27 @@ require ('mp3File.class.php');
 				static::$selectedMusic = "musicOff";
 			}
 				if($debug === true) {
-						$output =
-						'<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15px;">'.
-						'<h1 style="font-size: large;margin: 0;">Mus Gen</h1>'.
-							"<b>selectedFile:</b>".			static::$selectedMusic.'<br>'.
-							"<b>musFileAbsolutePath:</b>".	static::$musFileAbsolute.'<br>'.
-							"<b>musFileDuration:</b>".		static::$durationMus.'<br>'.
-							"<b>filesInDir:</b>".			static::$musFilesNum.'<br>'.
-							"<b>selectedMusFileHash:</b>".	static::$musMd5.'<br>'.
-							"<b>eventName:</b>".			static::$eventNow.
-						'</div>';
+						$outputArray = array(
+							"selectedFile" 			=> static::$selectedMusic,
+							"musFileAbsolutePath" 	=> static::$musFileAbsolute,
+							"musFileDuration" 		=> static::$durationMus,
+							"filesInDir"			=> static::$musFilesNum,
+							"selectedMusFileHash" 	=> static::$musMd5,
+							"eventName" 			=> static::$eventNow);
 						
-						echo $output;
+						echo var_dump($outputArray);
 				}
 		}
 		
 		private function generateSound($debug = false) {
 			global $config;
-
 			$this->easter($config['easterMusRarity']);
+
 			if($config['enableVoice'] === true) {
-				$currentSoundFolder = static::$AbsolutesoundPath.'/'.static::$eventNow.static::$easter;			//Folder of Sounds
+				$currentSoundFolder = static::$AbsolutesoundPath.'/'.static::$eventNow.static::$easter;			//Folder of Sounds	/Avalon/sites/foxLogin/www/launcher/files/eventSounds/common/easter
 				startUpSound::$soundFilesNum = countFilesNum($currentSoundFolder, '.mp3');						//Count of Sounds
 				$RandSoundFile = 'voice'.rand(1,static::$soundFilesNum).'.mp3';
-
+				
 				//***********************************************
 				startUpSound::$selectedSound = str_replace(static::$AbsolutesoundPath,"",$currentSoundFolder).'/'.$RandSoundFile;
 				startUpSound::$soundFileAbsolute = static::$AbsolutesoundPath.static::$selectedSound;
@@ -210,17 +201,15 @@ require ('mp3File.class.php');
 				static::$selectedSound = 'soundOff';
 			}
 				if($debug == true) {
-					$output =
-						'<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15px;">'.
-						'<h1 style="font-size: large;margin: 0;">Sound Gen</h1>'.
-						"<b>selectedFile:</b>".static::$selectedSound.'<br>'.
-						"<b>soundFileAbsolutePath:</b>".static::$soundFileAbsolute.'<br>'.
-						"<b>soundFileDuration:</b>".static::$durationSound.'<br>'.
-						"<b>soundsInDir:</b>".static::$soundFilesNum.'<br>'.
-						"<b>selectedSoundFileHash:</b>".static::$soundMd5.'<br>'.
-						"<b>eventName:</b>".static::$eventNow.'</div>';
+					$outputArray = array(
+						"selectedFile" 				=> static::$selectedSound,
+						"soundFileAbsolutePath" 	=> static::$soundFileAbsolute,
+						"soundFileDuration" 		=> static::$durationSound,
+						"soundsInDir"				=> static::$soundFilesNum,
+						"selectedSoundFileHash" 	=> static::$soundMd5,
+						"eventName" 				=> static::$eventNow);
 		
-						echo $output;
+						echo var_dump($outputArray);
 					}
 		}
 		
@@ -244,13 +233,7 @@ require ('mp3File.class.php');
 				startUpSound::$maxDuration = $duration;
 			
 			if($debug === true) {
-				echo '
-				<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15px;">
-				<h1 style="font-size: large; margin: 0;">Music duration</h1>
-							<b>Sound duration:</b>'.static::$durationSound.'
-							<br><b>Mus duration:</b> '.static::$durationMus.'
-							<br> <b>Max duration:</b>'.static::$maxDuration.'
-				</div>';
+				echo static::$durationSound.' '.static::$durationMus.' '.static::$maxDuration;
 			}
 		}
 		
@@ -264,6 +247,6 @@ require ('mp3File.class.php');
 					"MusicMd5" 			=> static::$musMd5,
 					"eventName" 		=> static::$eventNow);
 
-			return json_encode($outputArray, JSON_UNESCAPED_SLASHES);
+			return json_encode($outputArray);
 		}	
 	}

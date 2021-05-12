@@ -1,0 +1,59 @@
+item{
+	PCtr_ItemArmorStickyBoots{
+		name="Sticky Iron Boots"
+	}
+}
+pc{
+	gui{
+		ejector{
+			modeAll="All contents at once"
+			modeEjectTitle="Ejection mode:"
+			modeItems="Single items"
+			modeSelectFirst="First slot"
+			modeSelectLast="Last slot"
+			modeSelectRandom="Random slot"
+			modeSelectTitle="Method of selection:"
+			modeStacks="Whole stacks"
+		}
+		separationBelt{
+			group="Ignore subtypes of"
+			groupAll="All"
+			groupLogs="Logs"
+			groupPlanks="Planks"
+		}
+	}
+}
+tile{
+	PCtr_BlockBeltBreak{
+		name="break belt"
+	}
+	PCtr_BlockBeltDetector{
+		name="belt detector"
+	}
+	PCtr_BlockBeltEjector{
+		name="ejection belt"
+	}
+	PCtr_BlockBeltNormal{
+		name="normal belt"
+	}
+	PCtr_BlockBeltRedirector{
+		name="redirector belt"
+	}
+	PCtr_BlockBeltSeparator{
+		name="separation belt"
+	}
+	PCtr_BlockBeltSpeedy{
+		name="speedy belt"
+	}
+	PCtr_BlockElevator{
+		down{
+			name="elevator down"
+		}
+		up{
+			name="elevator up"
+		}
+	}
+	PCtr_BlockSplitter{
+		name="Splitter"
+	}
+}

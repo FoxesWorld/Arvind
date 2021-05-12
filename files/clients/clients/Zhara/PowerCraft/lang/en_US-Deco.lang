@@ -1,0 +1,64 @@
+tile{
+	PCde_BlockChimney{
+		type0{
+			name="Cobblestone Chimney"
+		}
+		type1{
+			name="Brick Chimney"
+		}
+		type10{
+			name="ChiseledQuartzBlock Chimney"
+		}
+		type11{
+			name="PillarQuartzBlock Chimney"
+		}
+		type12{
+			name="MossStone Chimney"
+		}
+		type13{
+			name="MossyStoneBrick Chimney"
+		}
+		type14{
+			name="Clay Chimney"
+		}
+		type15{
+			name="IronBlock Chimney"
+		}
+		type2{
+			name="StoneBrick Chimney"
+		}
+		type3{
+			name="CrackedStoneBrick Chimney"
+		}
+		type4{
+			name="ChiseledStoneBrick Chimney"
+		}
+		type5{
+			name="Sandstone Chimney"
+		}
+		type6{
+			name="ChiseledSandstone Chimney"
+		}
+		type7{
+			name="SmothSandstone Chimney"
+		}
+		type8{
+			name="NetherBrick Chimney"
+		}
+		type9{
+			name="QuartzBlock Chimney"
+		}
+	}
+	PCde_BlockIronFrame{
+		name="Iron Frame"
+	}
+	PCde_BlockPlatform{
+		name="Platform"
+	}
+	PCde_BlockRedstoneStorage{
+		name="Redstone Storage"
+	}
+	PCde_BlockStairs{
+		name="Stairs"
+	}
+}

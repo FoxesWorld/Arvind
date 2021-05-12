@@ -1,0 +1,30 @@
+item{
+	PCis_ItemCompressor{
+		big{
+			name="big compressor"
+		}
+		enderaccess{
+			name="ender compressor"
+		}
+		height{
+			name="high stack compressor"
+		}
+		normal{
+			name="compressor"
+		}
+	}
+}
+pc{
+	gui{
+		compressor{
+			name="name:"
+			putStacks="Fill Inv Stacks"
+			takeStacks="Fill Stacks"
+		}
+	}
+}
+tile{
+	PCis_BlockBigChest{
+		name="Big Chest"
+	}
+}

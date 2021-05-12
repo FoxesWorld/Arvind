@@ -16,6 +16,9 @@
  Назначение: Отдача файлов + Хеш + Размер
 =====================================================
 */
+	if(!defined('INCLUDE_CHECK')) {
+		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
+	}
 
 	$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 	$version = $serverInfo[0]['version'];

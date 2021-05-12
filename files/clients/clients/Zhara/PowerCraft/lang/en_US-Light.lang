@@ -1,0 +1,45 @@
+item{
+	PCli_ItemLaserComposition{
+		distance{
+			name="Distance Level %s"
+		}
+		kill{
+			name="Kill Level %s"
+		}
+		name="Laser Composition"
+		sensor{
+			name="Sensor Level %s"
+		}
+	}
+}
+pc{
+	damage{
+		laser="%s wanted to know his reflexivity"
+	}
+	gui{
+		light{
+			isHuge="is Huge"
+			isStable="is Stable"
+		}
+	}
+}
+tile{
+	PCli_BlockLaser{
+		name="Laser"
+	}
+	PCli_BlockLaserSensor{
+		name="Laser Sensor"
+	}
+	PCli_BlockLight{
+		name="Light"
+	}
+	PCli_BlockLightningConductor{
+		name="Lightning Conductor"
+	}
+	PCli_BlockMirror{
+		name="Mirror"
+	}
+	PCli_BlockPrism{
+		name="Prism"
+	}
+}

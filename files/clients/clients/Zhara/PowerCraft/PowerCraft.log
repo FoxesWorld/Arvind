@@ -1,0 +1,77 @@
+INFO: PowerCraft logger initialized.
+INFO: 2013/06/10 20:00:19
+INFO: Enter Section: Loading
+
+
+Update information received from server.
+INFO: Exit Section: Loading
+INFO: Enter Section: PreInit
+INFO: Enter Section: Register Hacks
+INFO: Exit Section: Register Hacks
+INFO: Enter Section: Module PreInit
+INFO: Exit Section: Module PreInit
+INFO: Enter Section: Module Property Init
+INFO: Exit Section: Module Property Init
+INFO: Enter Section: Module Language Init
+INFO: Exit Section: Module Language Init
+INFO: Enter Section: Module Texture Init
+INFO: Exit Section: Module Texture Init
+INFO: Exit Section: PreInit
+		Sent event FMLPreInitializationEvent to mod PowerCraft
+
+
+Lang information received from server.
+		Sending event FMLInitializationEvent to mod PowerCraft
+INFO: Enter Section: Init
+	Loading XML configuration for crops.
+		* loading file default.xml...
+	Crops configuration loaded.
+	Loading XML configuration for trees.
+		* loading file default.xml...
+		   - Tree "Oak" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@47ba2cb4
+		   - Tree "Pine" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@fcd0236
+		   - Tree "Birch" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@5c4c2f54
+		   - Tree "Jungle" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@db76323
+		   - Tree "Huge Brown Mushroom" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@2cd95de
+		   - Tree "Huge Red Mushroom" loaded. -> powercraft.api.building.PC_TreeHarvesting$Tree@72a2342
+	Trees configuration loaded.
+INFO: Enter Section: Module Init
+INFO: Exit Section: Module Init
+INFO: Enter Section: Module Field Init
+INFO: Exit Section: Module Field Init
+INFO: Enter Section: Module Entity Init
+INFO: Exit Section: Module Entity Init
+INFO: Enter Section: Module Container Init
+INFO: Exit Section: Module Container Init
+INFO: Enter Section: Register EntityRender
+INFO: Exit Section: Register EntityRender
+INFO: Enter Section: Module Gui Init
+INFO: Exit Section: Module Gui Init
+INFO: Enter Section: Module Splashes Init
+INFO: Exit Section: Module Splashes Init
+INFO: Exit Section: Init
+		Sent event FMLInitializationEvent to mod PowerCraft
+		Sending event IMCEvent to mod PowerCraft
+		Sent event IMCEvent to mod PowerCraft
+		Sending event FMLPostInitializationEvent to mod PowerCraft
+INFO: Enter Section: PostInit
+INFO: Enter Section: Module Recipes Init
+INFO: Exit Section: Module Recipes Init
+INFO: Enter Section: Module Data Handlers Init
+INFO: Exit Section: Module Data Handlers Init
+INFO: Enter Section: Module Packet Handlers Init
+INFO: Exit Section: Module Packet Handlers Init
+INFO: Enter Section: Module PostInit
+INFO: Exit Section: Module PostInit
+INFO: Enter Section: Module Language Saving
+INFO: Exit Section: Module Language Saving
+INFO: Enter Section: Module Config Saving
+INFO: Exit Section: Module Config Saving
+INFO: Exit Section: PostInit
+		Sent event FMLPostInitializationEvent to mod PowerCraft
+		Sending event FMLLoadCompleteEvent to mod PowerCraft
+		Sent event FMLLoadCompleteEvent to mod PowerCraft
+		Hacking main menu splashes
+INFO: Enter Section: Loading NEI configuration
+INFO: Exit Section: Loading NEI configuration
+		Hacking main menu splashes

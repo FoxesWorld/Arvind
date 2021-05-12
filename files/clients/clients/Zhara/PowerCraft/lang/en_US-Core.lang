@@ -1,0 +1,70 @@
+item{
+	PCco_ItemActivator{
+		name="Activation Crystal"
+	}
+	PCco_ItemCraftingTool{
+		name="Crafting Tool"
+	}
+	PCco_ItemOreSniffer{
+		name="Ore Sniffer"
+	}
+	PCco_ItemPowerDust{
+		name="Power dust"
+	}
+}
+pc{
+	gui{
+		back="Back"
+		cancel="Cancel"
+		close="Close"
+		craftingTool{
+			search="Search"
+			sort="Sort"
+			title="Crafting Tool"
+			trashAll="Trash All"
+		}
+		ok="OK"
+		update{
+			doNotShowAgain="Don't show again"
+			newVersionAvailable="Update available!"
+			readMore="Read more..."
+			title="Mod Update Notification"
+			version="Using %1$s (%2$s), Available %3$s (%4$s)"
+		}
+	}
+	sniffer{
+		desc="Portable radar device"
+		distance="Sniffing depth (blocks):"
+	}
+}
+tile{
+	PCco_BlockBlockSaver{
+		name="Block Saver"
+	}
+	PCco_BlockPowerCrystal{
+		color0{
+			name="Orange Power Crystal"
+		}
+		color1{
+			name="Red Power Crystal"
+		}
+		color2{
+			name="Green Power Crystal"
+		}
+		color3{
+			name="Darkblue Power Crystal"
+		}
+		color4{
+			name="Lightblue Power Crystal"
+		}
+		color5{
+			name="Purple Power Crystal"
+		}
+		color6{
+			name="Cyan Power Crystal"
+		}
+		color7{
+			name="Yellow Power Crystal"
+		}
+	}
+}

@@ -1,0 +1,117 @@
+item{
+	PCws_ItemSilicon{
+		name="Ingot Silicon"
+	}
+	PCws_ItemTransistor{
+		name="Transistor"
+	}
+}
+pc{
+	gui{
+		weasel{
+			core{
+				crashed="crashed"
+				launchProgram="Launch"
+				memoryLabel="Memory size:"
+				noError="no error"
+				peripheralsLabel="Peripherals:"
+				program="Program"
+				programLength="Program length:"
+				restartProgram="Restart"
+				running="running"
+				runningStateLabel="Program state:"
+				stackLabel="Stack size:"
+				status="Status"
+				statusLabel="Status:"
+				stopProgram="Stop"
+				stoped="stoped"
+				unitInstructions="instructions"
+				unitObjects="values"
+			}
+			device{
+				name="device name:"
+				rename="rename device"
+			}
+			diskDrive{
+				tab="Disk Drive"
+			}
+			diskManager{
+				clickCompile="Click "Compile" to make the library executable."
+				color="Color:"
+				compiled="Library was successfully compiled."
+				disk="Disk"
+				edit="Edit"
+				format="Format:"
+				formatImage="Image"
+				formatIntegerList="Numbers"
+				formatLibrary="Library"
+				formatStringList="Strings"
+				formatText="Text"
+				formatVariableMap="Data"
+				img{
+					clear="Clear"
+					fill="Fill"
+				}
+				label="Disk label:"
+				resize="Resize"
+				separator="Entry separator:"
+				set="Set"
+				title="Digital Workbench"
+			}
+			network{
+				join="join network"
+				name="network name:"
+				new="new network"
+				rename="rename network"
+				tab="Network"
+			}
+			terminal{
+				terminal="Terminal"
+			}
+		}
+	}
+	weasel{
+		activatorGetNetwork="Network "%s" assigned to activation crystal."
+		activatorSetNetwork="Device connected to network "%s"."
+		disk{
+			empty="Blank Weasel Disk"
+			image="Weasel Image Disk"
+			numberList="Weasel Numbers Disk"
+			programLibrary="Weasel Library Disk"
+			stringList="Weasel Strings Disk"
+			text="Weasel Text Disk"
+			variableMap="Weasel Data Disk"
+		}
+	}
+}
+tile{
+	PCws_BlockSilicon{
+		name="Silicon"
+	}
+	PCws_BlockWeasel{
+		PCws_WeaselPluginCore{
+			name="Weasel Core"
+		}
+		PCws_WeaselPluginDiskDrive{
+			name="Weasel Disk Drive"
+		}
+		PCws_WeaselPluginDisplay{
+			name="Weasel Display"
+		}
+		PCws_WeaselPluginPort{
+			name="Weasel Port"
+		}
+		PCws_WeaselPluginSpeaker{
+			name="Weasel Speaker"
+		}
+		PCws_WeaselPluginTerminal{
+			name="Weasel Terminal"
+		}
+		PCws_WeaselPluginTouchscreen{
+			name="Weasel Touchscreen"
+		}
+	}
+	PCws_BlockWeaselDiskManager{
+		name="Digital Workbench"
+	}
+}

@@ -34,7 +34,7 @@
 		error_reporting(0);
 	}
 	
-		require ('startUpSound.php');
+		require ('startUpSound.class.php');
 	
 	
 	/* Global Vars */
