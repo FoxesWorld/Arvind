@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- LauncherNlibHash
+ Launcher-N-Hash Class
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.1.18 Alpha
+ Версия: 0.2.3 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера и апдейтера
 =====================================================
@@ -20,77 +20,94 @@ header("Content-Type: text/plain; charset=UTF-8");
 define('INCLUDE_CHECK',true);
 define('CONFIG', true);
 include_once ("config.php");
-include_once ("scripts/functions.inc.php");
-	$get_request =  $_SERVER['QUERY_STRING'];
-	if($get_request === ''){
+
+	if($_SERVER['QUERY_STRING'] === ''){
 		die("Hacking Attempt!");
+	} else {
+		$updater = new updater();
 	}
+	
+class updater {
 
-	$updater_type = $_GET['updater_type'] ?? null;
-	$updater_hash = $_GET['hash'] ?? null;
-	$launcher_hash = $_GET['ver'] ?? null;
-	$download = $_GET['download'] ?? null;
+	private static $updater_type;
+	private static $updater_hash;
+	private static $launcher_hash;
+	private static $download;
 
+	public function __construct($debug = false) {
+		updater::$updater_type = $_GET['updater_type'] ?? null;
+		updater::$updater_hash = $_GET['hash'] ?? null;
+		updater::$launcher_hash = $_GET['ver'] ?? null;
+		updater::$download = $_GET['download'] ?? null;
+		$this->updaterCheck($debug);
+		$this->launcherHash();
+		$this->downloadUpdater();
+	}
+	
 	//Хеш-код апдейтера, если обновление есть скрипт отвечает YES, иначе NO
-	if(isset($updater_type)){
-		$file = "updater";
-		if($updater_type === 'jar'){
-			$fileName = $file.'.'.$updater_type;
-			$updaterHashLocal = md5_file($config['updaterRepositoryPath'].$updater_type);
-			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
-			
-		} elseif($updater_type === 'exe'){
-			$fileName = $file.'.'.$updater_type;
-			$updaterHashLocal = md5_file($config['updaterRepositoryPath'].$updater_type);
-			$updateState = $updater_hash == $updaterHashLocal ? "NO" : "YES";
-			
-		} elseif ($updater_type != 'exe' || $updater_type != 'jar') {
-			$updateState = "Unknown updater type!";
-		}
+	private function updaterCheck($debug) {
+		global $config;
+		
+		if(isset(static::$updater_type)){
+			$file = "updater";
+			switch(static::$updater_type){
+				case 'jar' || 'exe':
+					$fileName = $file.'.'.static::$updater_type;
+					$updaterHashLocal = md5_file($config['updaterRepositoryPath'].static::$updater_type);
+					$updateState = static::$updater_hash == $updaterHashLocal ? "NO" : "YES";
+				break;
 
-		$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
-		$answer = json_encode($answer);
-		die($answer);
+				default:
+					$updateState = "Unknown updater type!";
+				break;
+			}
+
+			$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
+			$answer = json_encode($answer);
+			die($answer);
+		}
+		if($debug === true) {
+			echo 'updaterRepositoryPath: '.$config['updaterRepositoryPath'].'extension';
+		}
 	}
 	
 	//Хеш-код лаунчера, если обновление есть скрипт отвечает YES, иначе NO
-	if(isset($launcher_hash)){
-		$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
-		$launcherState = $launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
-		$fileName = explode('/',$config['launcherRepositoryPath']); 
-		$answer = array('fileName' =>$fileName[2], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
-		$answer = json_encode($answer);
-		die($answer);
+	private function launcherHash() {
+		global $config;
+		
+		if(isset(static::$launcher_hash)){
+			$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
+			$launcherState = static::$launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
+			$fileName = explode('/',$config['launcherRepositoryPath']); 
+			$answer = array('fileName' =>$fileName[2], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
+			$answer = json_encode($answer);
+			die($answer);
+		}
 	}
 	
 	//Download (Скачивание апдейтера с сайта)
-	if(isset($download)){
-		if ($download == "jar"){
-			$file = "files//updater//updater.jar";
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.".$download));
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Length: ' . filesize($file));
-			readfile($file);
-			exit;
-		} elseif($download == "exe"){
-			$file = "files//updater//updater.exe";
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename=' . basename("Foxesworld.".$download));
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Length: ' . filesize($file));
-			readfile($file);
-			exit;
-		} elseif ($download != "jar" || $download == "exe"){
-			die ("Unknown request!");
+	private function downloadUpdater(){ 
+		switch (static::$download){
+			case 'jar' || 'exe':
+				$file = "files//updater//updater.".static::$download;
+				if(file_exists($file)) {
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename=' . basename("Foxesworld.".static::$download));
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate');
+					header('Pragma: public');
+					header('Content-Length: ' . filesize($file));
+					readfile($file);
+					exit;
+				}
+			break;
+				
+			default:
+				die ("Unknown request!");
+			break;
 		}
 	}
+}
 ?>
