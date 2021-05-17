@@ -17,8 +17,6 @@
 =====================================================
 */
 
-/* TODO Rewrite switch case!!!*/
-
   if(!defined('INCLUDE_CHECK')) {
 		require ('../../index.php');
 		exit();
@@ -74,8 +72,8 @@
 			die(scanRuntimeDir($bitDepth));
 		   break;
 		   
-		   case 'events' :
-			$startSound = new startUpSound();
+		   case 'startUpSound' :
+			$startSound = new startUpSound(false);
 			die($startSound->generateAudio());
 		   break;
 		   

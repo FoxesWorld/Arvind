@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: startUpSound.class.php
 -----------------------------------------------------
- Версия: 0.1.5 Alpha
+ Версия: 0.1.7 Alpha
 -----------------------------------------------------
  Назначение: Генерация звука запуска
 =====================================================
@@ -43,6 +43,7 @@ require ('mp3File.class.php');
 		private static $soundFileAbsolute;	//Absolute soundFilePath
 		private static $durationSound = 0;	//Duration of a soundFile
 		private static $soundMd5;			//soundFile md5
+		private static $soundRange;			//Range of sound files
 		
 		/* Both */
 		private static $maxDuration = 0;
@@ -88,7 +89,8 @@ require ('mp3File.class.php');
 					break;
 					
 					case 5:
-						//$musRange ="1/8";
+						//$eventName = "newYear";
+						//$soundRange = "1/1";
 						switch($dayToday){ //День победы
 							case 9:
 							break;
@@ -96,6 +98,10 @@ require ('mp3File.class.php');
 					break;
 					
 					case 6:
+						switch($dayToday){ //День рождения Нотча
+							case 1:
+							break;
+						}
 					break;
 					
 					case 7:
@@ -115,7 +121,7 @@ require ('mp3File.class.php');
 					
 					case 12:
 						switch($dayToday){
-							case($dayToday < 31 && $dayToday != 20 && $dayToday != 31):
+							case($dayToday < 31 && $dayToday != 22 && $dayToday != 31):
 								$eventName = "winterHolidays";
 							break;
 							
@@ -126,6 +132,7 @@ require ('mp3File.class.php');
 							case 31:
 								$eventName = "newYear";
 								$musRange ="1/8";
+								
 							break;
 							
 						}
@@ -140,6 +147,10 @@ require ('mp3File.class.php');
 				if(isset($musRange)){
 					startUpSound::$musRange = explode('/',$musRange);
 				}
+				
+				if(isset($soundRange)){
+					startUpSound::$soundRange = explode('/',$soundRange);
+				}
 
 				if($debug === true) {
 					echo '<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15px;">'.
@@ -151,7 +162,7 @@ require ('mp3File.class.php');
 		private function generateMusic($debug = false) {
 			global $config;
 			
-			$this->easter($config['easterMusRarity']);
+			$this->easter($config['easterMusRarity'], static::$debug, 'music');
 			if($config['enableMusic'] === true) {
 					if(isset(static::$musRange)){
 						$minRange = static::$musRange[0];
@@ -163,12 +174,13 @@ require ('mp3File.class.php');
 					}
 				$currentMusFolder = static::$AbsolutesoundPath.'/'.static::$musMountPoint.static::$easter;  							//Folder of music
 				startUpSound::$musFilesNum = countFilesNum($currentMusFolder, '.mp3');													//Count of music
+				//Getting random musFile
 				if(isset($minRange) && isset($maxRange)) {
 					$RandMusFile = 'mus'.rand($minRange,$maxRange).'.mp3';
 				} else {
 					$RandMusFile = 'mus'.rand(1,static::$musFilesNum).'.mp3';																
 				}
-				//Getting random File
+
 
 				//MusDirs****************************************								
 				startUpSound::$selectedMusic = str_replace(static::$AbsolutesoundPath.'/mus',"",$currentMusFolder).'/'.$RandMusFile; 	//Local musPath
@@ -204,11 +216,23 @@ require ('mp3File.class.php');
 		private function generateSound($debug = false) {
 			global $config;
 
-			$this->easter($config['easterMusRarity']);
+			$this->easter($config['easterMusRarity'], static::$debug, 'sound');
 			if($config['enableVoice'] === true) {
+					if(isset(static::$soundRange)){
+						$minRange = static::$soundRange[0];
+						$maxRange = static::$soundRange[1];
+						$soundRangeOutput = '<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15 0px;">'.
+						'<h1 style="font-size: large;margin: 0;">soundRange</h1>'.
+						 "<b>minRange:</b>".$minRange.'<br>'.
+						 "<b>maxRange:</b>".$maxRange.'</div>';
+					}
 				$currentSoundFolder = static::$AbsolutesoundPath.'/'.static::$eventNow.static::$easter;			//Folder of Sounds
 				startUpSound::$soundFilesNum = countFilesNum($currentSoundFolder, '.mp3');						//Count of Sounds
-				$RandSoundFile = 'voice'.rand(1,static::$soundFilesNum).'.mp3';
+				if(isset(static::$soundRange)) {
+					$RandSoundFile = 'voice'.rand($minRange,$maxRange).'.mp3';
+				} else {
+					$RandSoundFile = 'voice'.rand(1,static::$soundFilesNum).'.mp3';
+				}
 
 				//SoundDirs**************************************
 				startUpSound::$selectedSound = str_replace(static::$AbsolutesoundPath,"",$currentSoundFolder).'/'.$RandSoundFile;
@@ -235,21 +259,32 @@ require ('mp3File.class.php');
 						"<b>soundFileDuration:</b>".static::$durationSound.'<br>'.
 						"<b>soundsInDir:</b>".static::$soundFilesNum.'<br>'.
 						"<b>selectedSoundFileHash:</b>".static::$soundMd5.'<br>'.
-						"<b>eventName:</b>".static::$eventNow.'
+						"<b>eventName:</b>".static::$eventNow.$soundRangeOutput.'
 					</div>';
 		
 						echo $output;
 					}
 		}
 		
-		private function easter($chance) {
+		private function easter($chance, $debug = false, $of) {
+			global $config;
 			$minRange = 1;
 			$maxRange = 1000;
-				if (mt_rand($minRange, $maxRange) <= $chance){
+			$easterChance = mt_rand($minRange, $maxRange);
+				if ($easterChance <= $chance){
 					startUpSound::$easter = "/easter";
+					$status = 'true';
 				} else {
 					startUpSound::$easter = "";
+					$status = 'false';
 				}
+			if($debug === true) {
+					echo 	'<div style="border: 1px solid black; padding: 5px; border-radius: 10px; width: fit-content; margin: 15px;">'.
+							'<h1 style="font-size: large;margin: 0;">Easter '.$of.'</h1>
+							<b>This rand: </b>'.$easterChance.' <= '.$config['easterMusRarity'].'<br>'.
+							'<b>Easter status: </b>'.$status.
+							'</div>';
+			}
 		}
 		
 		private function maxDuration($debug = false) {

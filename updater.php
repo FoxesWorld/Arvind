@@ -5,13 +5,13 @@
 -----------------------------------------------------
  https://Foxesworld.ru/
 -----------------------------------------------------
- Copyright (c) 2016-2019 FoxesWorld
+ Copyright (c) 2016-2021 FoxesWorld
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
  Файл: updater.php
 -----------------------------------------------------
- Версия: 0.2.3 Alpha
+ Версия: 0.2.4 Alpha
 -----------------------------------------------------
  Назначение: Проверка хеша лаунчера и апдейтера
 =====================================================
@@ -42,50 +42,83 @@ class updater {
 		$this->updaterCheck($debug);
 		$this->launcherHash();
 		$this->downloadUpdater();
+		
+		if($debug === true) {
+			error_reporting(E_ALL);
+		}
 	}
 	
-	//Хеш-код апдейтера, если обновление есть скрипт отвечает YES, иначе NO
+	/**
+	* @param boolean $debug
+	* @return YES||NO
+	* @throws Exception
+	*/
 	private function updaterCheck($debug) {
 		global $config;
-		
-		if(isset(static::$updater_type)){
-			$file = "updater";
-			switch(static::$updater_type){
-				case 'jar' || 'exe':
-					$fileName = $file.'.'.static::$updater_type;
-					$updaterHashLocal = md5_file($config['updaterRepositoryPath'].static::$updater_type);
-					$updateState = static::$updater_hash == $updaterHashLocal ? "NO" : "YES";
-				break;
+		try {
+			if(isset(static::$updater_type)){
+				$file = "updater";
+				switch(static::$updater_type){
+					case 'jar' || 'exe':
+						$fileName = $file.'.'.static::$updater_type;
+						$updaterHashLocal = md5_file($config['updaterRepositoryPath'].static::$updater_type);
+						$updateState = static::$updater_hash == $updaterHashLocal ? "NO" : "YES";
+					break;
 
-				default:
-					$updateState = "Unknown updater type!";
-				break;
+					default:
+						$updateState = "Unknown updater type!";
+					break;
+				}
+
+				$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
+				$answer = json_encode($answer);
+				die($answer);
 			}
-
-			$answer = array('fileName' => $fileName, 'fileHash' => $updaterHashLocal, 'updateState' => $updateState);
-			$answer = json_encode($answer);
-			die($answer);
+		}  catch (Exception $e) {
+			die("File not found! ".$e);
 		}
 		if($debug === true) {
 			echo 'updaterRepositoryPath: '.$config['updaterRepositoryPath'].'extension';
 		}
 	}
 	
-	//Хеш-код лаунчера, если обновление есть скрипт отвечает YES, иначе NO
+	 /**
+	* @param boolean $debug
+	* @return YES||NO
+	* @throws Exception
+	*/
 	private function launcherHash() {
 		global $config;
 		
 		if(isset(static::$launcher_hash)){
-			$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
-			$launcherState = static::$launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
-			$fileName = explode('/',$config['launcherRepositoryPath']); 
-			$answer = array('fileName' =>$fileName[2], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState);
-			$answer = json_encode($answer);
-			die($answer);
+			try {
+				$launcherRepositoryHash = md5_file($config['launcherRepositoryPath']);
+				$launcherState = static::$launcher_hash == $launcherRepositoryHash  ? "NO" : "YES";
+				$fileName = explode('/',$config['launcherRepositoryPath']); 
+				$answer = array('fileName' =>$fileName[2], 'hash' => $launcherRepositoryHash, 'updateState' => $launcherState, 'updateNotes' => $this->readUpdateNotes('files/launcher/notes.txt')[0]);
+				$answer = json_encode($answer);
+				die($answer);
+			}  catch (Exception $e) {
+				die("File not found! ".$e);
+			}
 		}
 	}
 	
-	//Download (Скачивание апдейтера с сайта)
+	private function readUpdateNotes($file){
+		if(file_exists($file)) {
+			$fd = fopen($file, 'r');
+			$fileContents = array();
+			while(!feof($fd))
+			{
+				$str = htmlentities(fgets($fd));
+				$fileContents[] = $str;
+			}
+			return $fileContents;
+		} else {
+			die("File - ".$file." not found!");
+		}
+	}
+
 	private function downloadUpdater(){ 
 		switch (static::$download){
 			case 'jar' || 'exe':

@@ -22,7 +22,7 @@
 	include ("scripts/actionScript.php");  //Action requests
 //===================================================
 	if(!$_REQUEST){
-		require ('../index.php');
+		die("No request!");
 	}
 
 	if(isset($_POST['action'])) {

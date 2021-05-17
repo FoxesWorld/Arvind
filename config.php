@@ -65,7 +65,7 @@ $config = array(
 	/* startUpSound */
 	'enableVoice' 		=> true,
 	'enableMusic' 		=> true,
-	'easterMusRarity'   => 1000, //1 by default
+	'easterMusRarity'   => 10, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
