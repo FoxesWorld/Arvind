@@ -22,6 +22,7 @@
 		exit();
   } else {
 		require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+		//header("Content-Type: text/plain; charset=UTF-8");
   }
   foreach ($_GET as $key => $value) {
 	   switch ($key) {
@@ -73,7 +74,7 @@
 		   break;
 		   
 		   case 'startUpSound' :
-			$startSound = new startUpSound(false);
+			$startSound = new startUpSound($config['debugStartUpSound']);
 			die($startSound->generateAudio());
 		   break;
 		   

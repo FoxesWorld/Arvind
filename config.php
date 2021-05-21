@@ -63,9 +63,10 @@ $config = array(
 	'uploaddirp'  		=> 'MinecraftCloaks',
 	
 	/* startUpSound */
+	'debugStartUpSound' => false,
 	'enableVoice' 		=> true,
 	'enableMusic' 		=> true,
-	'easterMusRarity'   => 10, //1 by default
+	'easterMusRarity'   => 1, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
