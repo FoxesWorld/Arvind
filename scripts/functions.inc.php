@@ -22,7 +22,7 @@
  */
 	verifySSL();
 	if(!defined('INCLUDE_CHECK')) {
-		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
+		die ("Hacking Attempt!");
 	}
 	
 	if(defined('DEBUG_LOGS')){
@@ -34,7 +34,7 @@
 		error_reporting(0);
 	}
 	
-		require ('startUpSound.class.php');
+	require ('startUpSound.class.php');
 	
 	
 	/* Global Vars */
@@ -42,6 +42,7 @@
 //================================================================
 			header('Content-Type: text/html; charset=utf-8');
 
+		/* Authorisation */
 			function xorencode($str, $key) {
 					while(strlen($key) < strlen($str)) {
 						$key .= $key;
@@ -488,7 +489,7 @@
 			//Full JSON
 			function getUserData($login,$data){
 				global $config;
-				$query = "SELECT $data FROM dle_users WHERE name = '$login'";
+				$query = "SELECT $data FROM dle_users WHERE name = '$login'"; //$query = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes("SELECT $data FROM dle_users WHERE name = '$login'"))));
 				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 				$selectedValue = $db->getRow($query);
 					if($selectedValue["$data"]){

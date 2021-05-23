@@ -82,7 +82,7 @@ class updater {
 		}
 	}
 	
-	 /**
+	/**
 	* @param boolean $debug
 	* @return YES||NO
 	* @throws Exception

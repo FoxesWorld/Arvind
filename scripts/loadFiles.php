@@ -11,30 +11,30 @@
 -----------------------------------------------------
  Файл: loadFiles.php
 -----------------------------------------------------
- Версия: 0.0.1.2 Alpha
+ Версия: 0.0.1.3 Alpha
 -----------------------------------------------------
- Назначение: Отдача файлов + Хеш + Размер
+ Назначение: Files out + crypt + size
 =====================================================
 */
 	if(!defined('INCLUDE_CHECK')) {
-		require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
+		die ("Hacking Attempt!");
 	}
 
 	$serverInfo = serversListArray("SELECT * FROM `servers` WHERE Server_name = '$client'");
 	$version = $serverInfo[0]['version'];
 
 		/* Basic client structure (Alpha) */
-			if(
-			!file_exists($config['clientsDir']."assets") ||
-			!file_exists($config['clientsDir']."versions/".$version) ||
-			!file_exists($config['clientsDir']."versions/".$version."/libraries") ||
-			!file_exists($config['clientsDir']."versions/".$version."/".$version.".jar") ||
-			!file_exists($config['clientsDir']."versions/".$version."/natives/")
-			//!file_exists($config['clientsDir']."clients/".$client."/mods/") ||
-			//!file_exists($config['clientsDir']."clients/".$client."/servers.dat")
-			) {
+		$clientStructureCheck = array($config['clientsDir']."assets",
+		$config['clientsDir']."versions/".$version, 
+		$config['clientsDir']."versions/".$version."/libraries",
+		$config['clientsDir']."versions/".$version."/".$version.".jar",
+		$config['clientsDir']."versions/".$version."/natives/");
+		
+		foreach($clientStructureCheck as $key) {
+			if(!file_exists($key)) {
 				die(Security::encrypt("client<$> $client", $config['key1']));
 			}
+		}
 
         $md5user  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $config['protectionKey']));
         $md5ServersDat	  = @md5_file($config['clientsDir']."clients/".$client."/servers.dat");

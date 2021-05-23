@@ -17,8 +17,7 @@
 =====================================================
 */
 if(!defined('CONFIG')) {
-	require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
-	exit();
+	die ("Hacking Attempt!");
 }
 
 	define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT']);
@@ -66,13 +65,13 @@ $config = array(
 	'debugStartUpSound' => false,
 	'enableVoice' 		=> true,
 	'enableMusic' 		=> true,
-	'easterMusRarity'   => 1, //1 by default
+	'easterMusRarity'   => 9, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
 	'key1'              => "R2zwuwmv~YZSIJ21",  //Encryption Key 1
 	'key2'              => "oPCwB9S6z{*rEh%V", //Encryption Key 2
-	'md5launcherjar'    => @md5_file("files/launcher/launcher.jar"),
+	'md5launcherjar'    => @md5_file(FILES_DIR."launcher/launcher.jar"),
 	'not_allowed_symbol'=> array ("\x22", "\x60", "\t", '\n', '\r', "\n", "\r", '\\', ",", "/", "¬", "#", ";", ":", "~", "[", "]", "{", "}", ")", "(", "*", "^", "%", "$", "<", ">", "?", "!", '"', "'", " ", "&" ),
 	'cronPass' 			=> 'Tess2556308',//CronTab secure key WIP
 	'crypt' 			=> 'hash_foxy',

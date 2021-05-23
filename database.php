@@ -17,8 +17,7 @@
 =====================================================
 */
 if(!defined('INCLUDE_CHECK')) {
-	require ($_SERVER['DOCUMENT_ROOT'].'/index.php');
-	exit();
+	die ("Hacking Attempt!");
 }	
 	define('CONFIG', true);
 	require ('config.php');
