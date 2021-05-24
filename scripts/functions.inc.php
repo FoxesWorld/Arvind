@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.29.1 Release Candidate
+ Версия: 0.0.29.2 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -174,7 +174,7 @@
 				}
 			}
 
-			function hash_name($ncrypt, $realPass, $postPass, $salt) {
+			function hash_name($ncrypt, $realPass, $postPass) {
 					$cryptPass = false;
 
 					if ($ncrypt === 'hash_md5' or $ncrypt === 'hash_launcher') {
