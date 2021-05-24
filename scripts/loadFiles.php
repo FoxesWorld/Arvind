@@ -11,15 +11,9 @@
 -----------------------------------------------------
  File: loadFiles.class.php
 -----------------------------------------------------
-<<<<<<< Updated upstream
- Версия: 0.0.1.3 Alpha
------------------------------------------------------
- Назначение: Files out + crypt + size
-=======
  Version: 0.0.2.5 Experimental
 -----------------------------------------------------
  Usage: Files out + crypt + size
->>>>>>> Stashed changes
 =====================================================
 */
 
@@ -39,19 +33,6 @@
 				$this->version = $serverInfo[0]['version'];
 				$this->checkStructure();
 
-<<<<<<< Updated upstream
-		/* Basic client structure (Alpha) */
-		$clientStructureCheck = array($config['clientsDir']."assets",
-		$config['clientsDir']."versions/".$version, 
-		$config['clientsDir']."versions/".$version."/libraries",
-		$config['clientsDir']."versions/".$version."/".$version.".jar",
-		$config['clientsDir']."versions/".$version."/natives/");
-		
-		foreach($clientStructureCheck as $key) {
-			if(!file_exists($key)) {
-				die(Security::encrypt("client<$> $client", $config['key1']));
-			}
-=======
 				$md5user  		  = strtoint(xorencode(str_replace('-', '', uuidConvert($realUser)), $config['protectionKey']));
 				$md5ServersDat	  = @md5_file($config['clientsDir']."clients/".$client."/servers.dat");
 				$sizeServersDat   = @filesize($config['clientsDir']."clients/".$client."/servers.dat");
@@ -64,7 +45,6 @@
 				$hash_md5 = hashcVersion($client);
 			}
 			echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
->>>>>>> Stashed changes
 		}
 
 		private function checkStructure() {

@@ -11,11 +11,7 @@
 -----------------------------------------------------
  File: launcher.php
 -----------------------------------------------------
-<<<<<<< Updated upstream
- Version: 0.0.20.0 Experimental
-=======
  Version: 0.0.22.0 Experimental
->>>>>>> Stashed changes
 -----------------------------------------------------
  Usage: All the functions of Arvind can be obtained in here
 =====================================================
@@ -24,10 +20,7 @@
 	define('INCLUDE_CHECK',true);
 	define('NO_DEBUG',true);
 	include ("scripts/actionScript.php");
-<<<<<<< Updated upstream
-=======
 	require ('scripts/auth.class.php');
->>>>>>> Stashed changes
 //===================================================
 	if(!$_REQUEST){
 		die("No request!");
@@ -49,34 +42,6 @@
 		exit;
 	}
 
-<<<<<<< Updated upstream
-	try {
-			//To merge
-			if(!file_exists($config['uploaddirs'])) {
-				die ("Skins path is not a folder!");
-			}
-
-			if(!file_exists($config['uploaddirp'])) {
-				die ("Cloak path is not a folder!");
-			}
-			//******
-
-			require ('scripts/auth.class.php');
-			$auth = new auth($ctoken, $login, $postPass, $launchermd5, false);
-
-    //$hash = generateLoginHash();
-    $db->run("UPDATE LOW_PRIORITY dle_users SET lastdate='".CURRENT_TIME."', logged_ip='".REMOTE_IP."' WHERE name='$login'"); //,hash='$hash'
-    if($action == 'auth') {
-		require_once ('scripts/geoIP.class.php');
-		$geoplugin = new geoPlugin();
-		require_once ("scripts/loadFiles.php");
-    }
-
-} catch(PDOException $pe) {
-	die(Security::encrypt("errorsql<$>", $config['key1']).$pe);
-}
-=======
 	if($action == 'auth') {
 		$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken);
 	}
->>>>>>> Stashed changes

@@ -11,11 +11,7 @@
 -----------------------------------------------------
  File: startUpSound.class.php
 -----------------------------------------------------
-<<<<<<< Updated upstream
- Version: 0.1.12 Alpha
-=======
  Version: 0.1.13 Final
->>>>>>> Stashed changes
 -----------------------------------------------------
  Usage: Sound generation
 =====================================================
@@ -82,11 +78,8 @@ require ('mp3File.class.php');
 		*/
 		private function eventNow() {
 			$eventName = 'common';
-<<<<<<< Updated upstream
-=======
 			$musRange = 0;
 			$soundRange = 0;
->>>>>>> Stashed changes
 			$eventArray = array();
 			$dateExploded = explode ('.',startUpSound::$currentDate);
 			$dayToday = $dateExploded[0];
@@ -217,11 +210,7 @@ require ('mp3File.class.php');
 					startUpSound::$musFilesNum = countFilesNum($currentMusFolder, '.mp3'); //Count of music
 					$maxRange = startUpSound::$musFilesNum;										
 				
-<<<<<<< Updated upstream
-				if(isset(static::$musRange)) {
-=======
 				if(isset(static::$musRange) && static::$musRange !== 0) {
->>>>>>> Stashed changes
 					$RandMusFile = $this->genRange('mus', static::$musRange);
 				} else {
 					$RandMusFile = 'mus'.rand($minRange,$maxRange).'.mp3'; //Getting random musFile
@@ -271,11 +260,7 @@ require ('mp3File.class.php');
 				$currentSoundFolder = static::$AbsolutesoundPath.'/'.static::$eventNow.static::$easter;			//Folder of Sounds
 				startUpSound::$soundFilesNum = countFilesNum($currentSoundFolder, '.mp3');						//Count of Sounds
 
-<<<<<<< Updated upstream
-				if(isset(static::$soundRange)) {
-=======
 				if(isset(static::$soundRange) && static::$soundRange !== 0) {
->>>>>>> Stashed changes
 					$RandSoundFile = $this->genRange('voice', static::$soundRange);
 				} else {
 					$RandSoundFile = 'voice'.rand($minRange,static::$soundFilesNum).'.mp3'; //Getting random sound file
