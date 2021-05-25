@@ -11,11 +11,12 @@
 -----------------------------------------------------
  Файл: skins.php
 -----------------------------------------------------
- Версия: 0.0.5 Stable Alpha
+ Версия: 0.0.6 Stable Alpha
 -----------------------------------------------------
  Назначение: Парсит скины и плащи
 =====================================================
 */
+header('Content-Type: text/html; charset=utf-8');
 define('INCLUDE_CHECK',true);
 @$md5 = $_GET['user'];
 $exists1;
@@ -24,8 +25,19 @@ $exists1;
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $md5)){
 		exit;
 	}
-			
+
+	define('CONFIG', true);
+	require ('../config.php');
 	include("../database.php");
+			
+			if(!file_exists(SITE_ROOT.'/'.$config['uploaddirs'])) {
+				die ("Skins path is not a folder!");
+			}
+
+			if(!file_exists(SITE_ROOT.'/'.$config['uploaddirp'])) {
+				die ("Cloak path is not a folder!");
+			}
+
 	$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 	$stmt = $db->prepare("SELECT user FROM usersession WHERE md5= :md5");
 	$stmt->bindValue(':md5', $md5);

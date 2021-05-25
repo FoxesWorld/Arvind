@@ -79,6 +79,8 @@
 								$geoplugin = new geoPlugin();
 								$loadFiles = new loadFiles($client, $this->sessID, $this->accessToken, $this->realUser);
 							}
+						} else {
+							die(JSONanswer('type', 'error', 'message', 'Launcher was modifficated!'));
 						}
 			} catch(PDOException $pe) {
 				die(Security::encrypt("errorsql<$>", $config['key1']).$pe);

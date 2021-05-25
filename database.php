@@ -19,9 +19,7 @@
 if(!defined('INCLUDE_CHECK')) {
 	die ("Hacking Attempt!");
 }	
-	define('CONFIG', true);
-	require ('config.php');
-	include_once("scripts/functions.inc.php");		
+		
 	if (extension_loaded('openssl')) {
 		include_once("scripts/security/security_openssl.php");
 	} else if(extension_loaded('mcrypt')){

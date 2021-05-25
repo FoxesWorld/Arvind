@@ -19,8 +19,12 @@
 	header('Content-Type: text/html; charset=utf-8');
 	define('INCLUDE_CHECK',true);
 	define('NO_DEBUG',true);
-	include ("scripts/actionScript.php");
-	require ('scripts/auth.class.php');
+	define('CONFIG', true);
+	require ('config.php');
+	require (SCRIPTS_DIR.'functions.inc.php');
+	require (SITE_ROOT.'/database.php');
+	require (SCRIPTS_DIR.'actionScript.php');
+	require (SCRIPTS_DIR.'auth.class.php');
 //===================================================
 	if(!$_REQUEST){
 		die("No request!");
@@ -28,16 +32,16 @@
 
 	if(isset($_POST['action'])) {
 		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
-		$x  = $_POST['action'];
-		$x = str_replace(" ", "+", $x);
-		$yd = Security::decrypt($x, $config['key2']);
+		$inputValue  = $_POST['action'];
+		$inputValue = str_replace(" ", "+", $inputValue);
+		$inputValueDecrypted = Security::decrypt($inputValue, $config['key2']);
 
-		if($yd == null) {
-			die('Access Error!');
+		if($inputValueDecrypted == null) {
+			die('No info!');
 			exit;
 		}
 
-		list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $yd);
+		list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $inputValueDecrypted);
 	} else {
 		exit;
 	}
