@@ -9,9 +9,9 @@
 -----------------------------------------------------
  Данный код защищен авторскими правами
 -----------------------------------------------------
- Файл: servers.php
+ Файл: config.php
 -----------------------------------------------------
- Версия: 0.1.5 Alpha
+ Версия: 0.1.6 Alpha
 -----------------------------------------------------
  Назначение: Настройки веб сервиса
 =====================================================
@@ -60,6 +60,10 @@ $config = array(
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
 	'uploaddirp'  		=> 'MinecraftCloaks',
+	'skinsAbsolute' 	=> SITE_ROOT.'/'.$config['uploaddirs'],
+	'cloaksAbsolute'	=> SITE_ROOT.'/'.$config['uploaddirp'],
+	'skinUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/',
+	'capeUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/',
 	
 	/* startUpSound */
 	'debugStartUpSound' => false,
@@ -88,7 +92,4 @@ $config = array(
 	'SMTPport'			=> 465,
 	'SMTPMail'			=> 'no-reply@foxesworld.ru',
 	'SMTPpass'			=> 'dvhbdxutiscpbmof',
-	'SMTPsecProtocol'	=> 'SSL');	
-
-    $skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Skins Link
-    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Cloaks Link
+	'SMTPsecProtocol'	=> 'SSL');

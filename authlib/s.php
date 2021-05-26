@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: skins.php
 -----------------------------------------------------
- Версия: 0.0.6 Stable Alpha
+ Версия: 0.0.7 Stable Alpha
 -----------------------------------------------------
  Назначение: Парсит скины и плащи
 =====================================================
@@ -48,22 +48,22 @@ $exists1;
 		exit;
 	}
 
-		$file1 = $capeurl.$realUser.'.png';
+		$file1 = $config['capeUrl'].$realUser.'.png';
 		$exists1 = file_exists(SITE_ROOT.$config['uploaddirp'].'/'.$realUser.'.png');
-		$file2 = $skinurl.$realUser.'.png';
+		$file2 = $config['skinUrl'].$realUser.'.png';
 		$exists2 = file_exists(SITE_ROOT.$config['uploaddirs'].'/'.$realUser.'.png');
 		
 		//If cape exists
 		if ($exists1) {
-		    $cape = '"CAPE":{"url":"'.$capeurl.'?/'.$realUser.'$"}';
+		    $cape = '"CAPE":{"url":"'.$config['capeUrl'].'?/'.$realUser.'$"}';
 		} else {
 			$cape = '';
 		}
 		//If skin exists
 		if ($exists2) {
-		    $skin ='"SKIN":{"url":"'.$skinurl.$realUser.'.png"}';
+		    $skin ='"SKIN":{"url":"'.$config['skinUrl'].$realUser.'.png"}';
 		} else {
-			$skin ='"SKIN":{"url":"'.$skinurl.'default.png"}';
+			$skin ='"SKIN":{"url":"'.$config['skinUrl'].'default.png"}';
 		}
 		//If both of them are found
 		if ($exists1 && $exists2) {

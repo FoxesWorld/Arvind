@@ -23,12 +23,9 @@
 	require ('config.php');
 	require (SCRIPTS_DIR.'functions.inc.php');
 	require (SITE_ROOT.'/database.php');
-	require (SCRIPTS_DIR.'actionScript.php');
+	require (SCRIPTS_DIR.'actionScript.class.php');
 	require (SCRIPTS_DIR.'auth.class.php');
 //===================================================
-	if(!$_REQUEST){
-		die("No request!");
-	}
 
 	if(isset($_POST['action'])) {
 		$launcher = new launcher($_POST['action']);
@@ -55,7 +52,7 @@
 				}
 		}
 		
-		function getJSONinput($JSON){
+		private function getJSONinput($JSON){
 			
 		}
 	}
