@@ -20,7 +20,7 @@
   if(!defined('INCLUDE_CHECK')) {
 		die ("Hacking Attempt!");
   } else {
-		//require ($_SERVER['DOCUMENT_ROOT'].'/launcher/database.php');
+
 		header("Content-Type: text/plain; charset=UTF-8");
 		if(isset($_GET)) {
 			  foreach ($_GET as $key => $value) {
