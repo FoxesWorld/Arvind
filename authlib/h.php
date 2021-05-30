@@ -25,6 +25,8 @@
 		if (!preg_match("/^[a-zA-Z0-9_-]+$/", $user) || !preg_match("/^[a-zA-Z0-9_-]+$/", $serverid)){
 			exit(json_encode($bad));
 		}
+		define('CONFIG', true);
+		require ('../config.php');
 		include ("../database.php");
 		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 		$stmt = $db->prepare("SELECT user,md5 FROM usersession WHERE user = :user and server = :serverid");

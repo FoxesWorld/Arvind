@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- This is my core! | Launcher
+ This is my core! | Launcher class
 -----------------------------------------------------
  https://FoxesWorld.ru/
 -----------------------------------------------------
@@ -11,37 +11,48 @@
 -----------------------------------------------------
  File: launcher.php
 -----------------------------------------------------
- Version: 0.0.22.0 Experimental
+ Version: 0.1.0.0 Experimental
 -----------------------------------------------------
  Usage: All the functions of Arvind can be obtained in here
 =====================================================
 */
 	header('Content-Type: text/html; charset=utf-8');
 	define('INCLUDE_CHECK',true);
-	define('NO_DEBUG',true);
-	include ("scripts/actionScript.php");
-	require ('scripts/auth.class.php');
+	define('DEBUG_LOGS',true);
+	define('CONFIG', true);
+	require ('config.php');
+	require (SCRIPTS_DIR.'functions.inc.php');
+	require (SITE_ROOT.'/database.php');
+	require (SCRIPTS_DIR.'actionScript.class.php');
+	require (SCRIPTS_DIR.'auth.class.php');
 //===================================================
-	if(!$_REQUEST){
-		die("No request!");
-	}
 
 	if(isset($_POST['action'])) {
-		$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
-		$x  = $_POST['action'];
-		$x = str_replace(" ", "+", $x);
-		$yd = Security::decrypt($x, $config['key2']);
-
-		if($yd == null) {
-			die('Access Error!');
-			exit;
-		}
-
-		list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $yd);
+		$launcher = new launcher($_POST['action']);
 	} else {
 		exit;
 	}
+	
+	class launcher {
 
-	if($action == 'auth') {
-		$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken);
+		function __construct($postAction){
+			global $config;
+			$inputValue = Security::decrypt(str_replace(" ", "+", $postAction), $config['key2']);
+
+			if($inputValue == null) {
+				die('No info!');
+			} else {
+				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
+			}
+
+			list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $inputValue);
+			
+				if($action == 'auth') {
+					$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken, $db);
+				}
+		}
+		
+		private function getJSONinput($JSON){
+			
+		}
 	}

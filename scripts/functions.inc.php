@@ -596,6 +596,7 @@
 
 			//Gets the version of Java
 			function scanRuntimeDir($bitDepth){
+				$outputJRE = 'noJRE';
 				if($bitDepth) {
 					$directory = FILES_DIR.'runtime/';
 					$scandir = scandir($directory);

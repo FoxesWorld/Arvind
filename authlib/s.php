@@ -11,11 +11,12 @@
 -----------------------------------------------------
  Файл: skins.php
 -----------------------------------------------------
- Версия: 0.0.5 Stable Alpha
+ Версия: 0.0.7 Stable Alpha
 -----------------------------------------------------
  Назначение: Парсит скины и плащи
 =====================================================
 */
+header('Content-Type: text/html; charset=utf-8');
 define('INCLUDE_CHECK',true);
 @$md5 = $_GET['user'];
 $exists1;
@@ -24,8 +25,19 @@ $exists1;
 	if (!preg_match("/^[a-zA-Z0-9_-]+$/", $md5)){
 		exit;
 	}
-			
+
+	define('CONFIG', true);
+	require ('../config.php');
 	include("../database.php");
+			
+			if(!file_exists(SITE_ROOT.'/'.$config['uploaddirs'])) {
+				die ("Skins path is not a folder!");
+			}
+
+			if(!file_exists(SITE_ROOT.'/'.$config['uploaddirp'])) {
+				die ("Cloak path is not a folder!");
+			}
+
 	$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 	$stmt = $db->prepare("SELECT user FROM usersession WHERE md5= :md5");
 	$stmt->bindValue(':md5', $md5);
@@ -36,22 +48,22 @@ $exists1;
 		exit;
 	}
 
-		$file1 = $capeurl.$realUser.'.png';
+		$file1 = $config['capeUrl'].$realUser.'.png';
 		$exists1 = file_exists(SITE_ROOT.$config['uploaddirp'].'/'.$realUser.'.png');
-		$file2 = $skinurl.$realUser.'.png';
+		$file2 = $config['skinUrl'].$realUser.'.png';
 		$exists2 = file_exists(SITE_ROOT.$config['uploaddirs'].'/'.$realUser.'.png');
 		
 		//If cape exists
 		if ($exists1) {
-		    $cape = '"CAPE":{"url":"'.$capeurl.'?/'.$realUser.'$"}';
+		    $cape = '"CAPE":{"url":"'.$config['capeUrl'].'?/'.$realUser.'$"}';
 		} else {
 			$cape = '';
 		}
 		//If skin exists
 		if ($exists2) {
-		    $skin ='"SKIN":{"url":"'.$skinurl.$realUser.'.png"}';
+		    $skin ='"SKIN":{"url":"'.$config['skinUrl'].$realUser.'.png"}';
 		} else {
-			$skin ='"SKIN":{"url":"'.$skinurl.'default.png"}';
+			$skin ='"SKIN":{"url":"'.$config['skinUrl'].'default.png"}';
 		}
 		//If both of them are found
 		if ($exists1 && $exists2) {
