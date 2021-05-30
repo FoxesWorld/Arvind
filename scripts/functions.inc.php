@@ -121,7 +121,6 @@
 					`session` varchar(255) DEFAULT NULL,
 					`server` varchar(255) DEFAULT NULL,
 					`token` varchar(255) DEFAULT NULL,
-					`realmoney` int(255) DEFAULT '0',
 					`md5` varchar(255) DEFAULT '0',
 					PRIMARY KEY (`user`)
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

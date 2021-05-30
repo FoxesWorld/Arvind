@@ -44,6 +44,7 @@ $config = array(
 	'db_columnIp' 		=> 'logged_ip',
 	'db_columnDatareg' 	=> 'reg_date',
 	'db_columnMail' 	=> 'email',
+	'authJSON'			=> false,
 	
 	/* Clients Settings */
 	'clientsDir' 		=> 'files/clients/',
@@ -60,16 +61,12 @@ $config = array(
 	/* Skins&Cloaks Configuration */
 	'uploaddirs'  		=> 'MinecraftSkins',  
 	'uploaddirp'  		=> 'MinecraftCloaks',
-	'skinsAbsolute' 	=> SITE_ROOT.'/'.$config['uploaddirs'],
-	'cloaksAbsolute'	=> SITE_ROOT.'/'.$config['uploaddirp'],
-	'skinUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/',
-	'capeUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/',
 	
 	/* startUpSound */
 	'debugStartUpSound' => false,
 	'enableVoice' 		=> true,
 	'enableMusic' 		=> true,
-	'easterMusRarity'   => 9, //1 by default
+	'easterMusRarity'   => 10, //1 by default
 	
 	/* Cryptography */
 	'protectionKey'		=> 'VBHJvbgUh*uyy8gJUgkjufgkhjgkj', 
@@ -93,3 +90,13 @@ $config = array(
 	'SMTPMail'			=> 'no-reply@foxesworld.ru',
 	'SMTPpass'			=> 'dvhbdxutiscpbmof',
 	'SMTPsecProtocol'	=> 'SSL');
+	
+	$skinurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/'; //Skins Link
+    $capeurl            = 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/'; //Cloaks Link
+	
+	$skinsArray = array(
+	'skinsAbsolute' 	=> SITE_ROOT.'/'.$config['uploaddirs'],
+	'cloaksAbsolute'	=> SITE_ROOT.'/'.$config['uploaddirp'],
+	'skinUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirs'].'/',
+	'capeUrl'			=> 'https://login.foxesworld.ru/launcher/'.$config['uploaddirp'].'/',
+	);

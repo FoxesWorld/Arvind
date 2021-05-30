@@ -16,6 +16,10 @@
  Usage: All the functions of Arvind can be obtained in here
 =====================================================
 */
+
+	Error_Reporting(E_ALL);
+	Ini_Set('display_errors', true);
+
 	header('Content-Type: text/html; charset=utf-8');
 	define('INCLUDE_CHECK',true);
 	define('DEBUG_LOGS',true);
@@ -42,17 +46,25 @@
 			if($inputValue == null) {
 				die('No info!');
 			} else {
+				$LauncherDB = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
 				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 			}
 
-			list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $inputValue);
+			if($config['authJSON'] === false) {
+				list($action, $client, $login, $postPass, $launchermd5, $ctoken) = explode(':', $inputValue);
+			} else {
+				list($action, $client, $login, $postPass, $launchermd5, $ctoken) = $this->getJSONinput($inputValue);
+			}
 			
 				if($action == 'auth') {
-					$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken, $db);
+					$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken, $db, $LauncherDB);
 				}
 		}
 		
 		private function getJSONinput($JSON){
-			
+			$String = json_decode($JSON);
+
+			$arrayOut = array($String['action'], $String['client'], $String['login'], $String['postPass'], $String['launchermd5'], $String['token']);
+			return $arrayOut;
 		}
 	}

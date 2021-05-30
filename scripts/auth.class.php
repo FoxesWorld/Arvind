@@ -11,7 +11,7 @@
 -----------------------------------------------------
  File: auth.class.php
 -----------------------------------------------------
- Version: 0.0.2.5 Experimental
+ Version: 0.0.2.6 Experimental
 -----------------------------------------------------
  Usage: Auth + SetSession + LoadFiles
 =====================================================
@@ -29,6 +29,7 @@
 		protected $inputPass;
 		protected $ctoken;
 		private $db;
+		private $LauncherDB;
 		
 		/* RealData */
 		protected $realPass;
@@ -42,12 +43,13 @@
 		
 		private $debug = false;
 		
-		function __construct ($action, $client, $login, $postPass, $launchermd5, $ctoken, $db){
+		function __construct ($action, $client, $login, $postPass, $launchermd5, $ctoken, $db, $LauncherDB){
 			require_once (SCRIPTS_DIR.'loadFiles.class.php');
 			require_once (SCRIPTS_DIR.'geoIP.class.php');
 			global $config;
 					try {
 						
+						$this->LauncherDB	= $LauncherDB;
 						$this->db 			= $db;
 						$this->launchermd5  = $this->pregMatch($launchermd5);
 						$this->action 		= $this->pregMatch($action);
@@ -148,7 +150,7 @@
 
 			} else {
 
-				if($this->checkUserSession() !== null || $this->inputUser != $this->realUser) {
+				if($this->checkUserSession() === null || $this->inputUser != $this->realUser) {
 					$stmt = $this->db->prepare("INSERT INTO usersession (user, session, md5, token) VALUES (:login, '".$this->sessID."', :md5, '".$this->accessToken."')");
 					$stmt->bindValue(':login', $this->realUser);
 					$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($this->realUser)));
