@@ -11,7 +11,7 @@
 -----------------------------------------------------
  File: auth.class.php
 -----------------------------------------------------
- Version: 0.0.2.6 Experimental
+ Version: 0.0.2.7 Experimental
 -----------------------------------------------------
  Usage: Auth + SetSession + LoadFiles
 =====================================================
@@ -43,13 +43,13 @@
 		
 		private $debug = false;
 		
-		function __construct ($action, $client, $login, $postPass, $launchermd5, $ctoken, $db, $LauncherDB){
+		function __construct ($action, $client, $login, $postPass, $launchermd5, $ctoken, $db){
 			require_once (SCRIPTS_DIR.'loadFiles.class.php');
 			require_once (SCRIPTS_DIR.'geoIP.class.php');
 			global $config;
 					try {
 						
-						$this->LauncherDB	= $LauncherDB;
+						//$this->LauncherDB	= $LauncherDB;
 						$this->db 			= $db;
 						$this->launchermd5  = $this->pregMatch($launchermd5);
 						$this->action 		= $this->pregMatch($action);
@@ -93,7 +93,7 @@
 							die(JSONanswer('type', 'error', 'message', 'Launcher was modifficated!'));
 						}
 			} catch(PDOException $pe) {
-				die(Security::encrypt("errorsql<$>".$pe, $config['key1']).$pe);
+				die(Security::encrypt("errorsql<$>", $config['key1']).$pe);
 			} 
 		}
 		
@@ -136,20 +136,17 @@
 		private function setSession() {
 			global $config;
 
-			if($this->inputUser == $this->realUser && $this->ctoken != "null") {
+			if($this->inputUser == $this->realUser) {
 				if($this->ctoken == "null") {
-					exit(Security::encrypt("Setting a Session", $config['key1']));
 					$stmt = $this->db->prepare("UPDATE usersession SET session = '".$this->sessID."', token = :token WHERE user = :login");
 					$stmt->bindValue(':token', $this->accessToken);
 				} else {
 					$stmt = $this->db->prepare("UPDATE usersession SET session = '".$this->sessID."' WHERE user = :login");
 				}
-
 				$stmt->bindValue(':login', $this->realUser);
 				$stmt->execute();
 
 			} else {
-
 				if($this->checkUserSession() === null || $this->inputUser != $this->realUser) {
 					$stmt = $this->db->prepare("INSERT INTO usersession (user, session, md5, token) VALUES (:login, '".$this->sessID."', :md5, '".$this->accessToken."')");
 					$stmt->bindValue(':login', $this->realUser);
@@ -176,13 +173,13 @@
 		}
 		
 		private function checkUserSession(){
+			global $config;
 				$userSession = '';
-				$stmt = $this->db->prepare("SELECT * FROM usersession WHERE user = :login");
-				$stmt->bindValue(':login', $this->realUser);
-				$stmt->bindColumn('name', $userSession);
-				$stmt->fetch();
+				$stmt = $this->db->prepare("SELECT * FROM usersession WHERE user = '".$this->realUser."'");
+				$stmt->execute();
+				$userSession = $stmt->fetch(PDO::FETCH_ASSOC);
 
-					if($userSession == null || $userSession == ''){
+					if(empty($userSession) || $userSession == null){
 						return null;
 					} else {
 						return $userSession;
