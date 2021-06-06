@@ -11,7 +11,7 @@
 -----------------------------------------------------
  File: auth.class.php
 -----------------------------------------------------
- Version: 0.0.2.7 Experimental
+ Version: 0.0.2.9 Experimental
 -----------------------------------------------------
  Usage: Auth + SetSession + LoadFiles
 =====================================================
@@ -36,6 +36,7 @@
 		protected $realUser;
 		protected $accessToken;
 		protected $sessID;
+		protected $realUserArr;
 		
 		/* ToCheck */
 		protected $checkPass;
@@ -69,16 +70,13 @@
 							}
 
 							$this->sessID = token();
-							$stmt = $this->db->prepare("SELECT user, token FROM usersession WHERE user= :login");
-							$stmt->bindValue(':login', $this->inputUser);
-							$stmt->execute();
-							$rU = $stmt->fetch(PDO::FETCH_ASSOC);
-							if(is_array($rU) && $rU['user'] != null) {
-								$this->realUser = $rU['user'];
+							$this->getRealUserData();
+							if(is_array($this->realUserArr) && $this->realUserArr['user'] != null) {
+								$this->realUser = $this->realUserArr['user'];
 							}
 
 							if($this->ctoken != "null") {
-								if($rU['token'] != $this->accessToken || $this->inputUser != $this->realUser) {
+								if($this->realUserArr['token'] != $this->accessToken || $this->inputUser != $this->realUser) {
 										exit(Security::encrypt("errorLogin<$>", $config['key1']));
 								}
 							}
@@ -136,7 +134,7 @@
 		private function setSession() {
 			global $config;
 
-			if($this->inputUser == $this->realUser) {
+			if($this->checkUserSession()) {
 				if($this->ctoken == "null") {
 					$stmt = $this->db->prepare("UPDATE usersession SET session = '".$this->sessID."', token = :token WHERE user = :login");
 					$stmt->bindValue(':token', $this->accessToken);
@@ -147,12 +145,10 @@
 				$stmt->execute();
 
 			} else {
-				if($this->checkUserSession() === null || $this->inputUser != $this->realUser) {
 					$stmt = $this->db->prepare("INSERT INTO usersession (user, session, md5, token) VALUES (:login, '".$this->sessID."', :md5, '".$this->accessToken."')");
 					$stmt->bindValue(':login', $this->realUser);
 					$stmt->bindValue(':md5', str_replace('-', '', uuidConvert($this->realUser)));
 					$stmt->execute();
-				}
 			}
 		}
 		
@@ -170,6 +166,13 @@
 				'Pass: <b>'. $this->realPass.'</b>';
 				}
 				$stmt->fetch();	
+		}
+		
+		private function getRealUserData(){
+			$stmt = $this->db->prepare("SELECT * FROM usersession WHERE user= :login");
+			$stmt->bindValue(':login', $this->inputUser);
+			$stmt->execute();
+			$this->realUserArr = $stmt->fetch(PDO::FETCH_ASSOC);
 		}
 		
 		private function checkUserSession(){

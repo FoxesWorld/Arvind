@@ -22,7 +22,7 @@
 
 	header('Content-Type: text/html; charset=utf-8');
 	define('INCLUDE_CHECK',true);
-	define('DEBUG_LOGS',true);
+	define('NO_DEBUG',true);
 	define('CONFIG', true);
 	require ('config.php');
 	require (SCRIPTS_DIR.'functions.inc.php');
@@ -46,8 +46,9 @@
 			if($inputValue == null) {
 				die('No info!');
 			} else {
-				$LauncherDB = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
+				//$LauncherDB = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
 				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
+				dbPrepare($db);
 			}
 
 			if($config['authJSON'] === false) {
@@ -57,7 +58,7 @@
 			}
 			
 				if($action == 'auth') {
-					$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken, $db, $LauncherDB);
+					$auth = new auth($action, $client, $login, $postPass, $launchermd5, $ctoken, $db);
 				}
 		}
 		

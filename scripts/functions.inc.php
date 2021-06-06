@@ -111,9 +111,8 @@
 			 * 
 			 * @param in - null
 			 */
-			function dbPrepare(){
-				global $config;
-				$db = new db($config['db_user'],$config['db_pass'],$config['dbname_launcher']);
+			function dbPrepare($db){
+
 				try {
 					$stmt = $db->prepare("
 					CREATE TABLE IF NOT EXISTS `usersession` (
@@ -131,6 +130,7 @@
 					  `time` varchar(255) NOT NULL,
 					  `id` int(11) NOT NULL AUTO_INCREMENT,
 					  `sip` varchar(16) DEFAULT NULL,
+					  `attempts` int(16) NOT NULL DEFAULT 1,
 					  PRIMARY KEY (`id`) USING BTREE
 					) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=0;
 					");
