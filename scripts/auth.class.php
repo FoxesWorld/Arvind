@@ -77,7 +77,7 @@
 
 							if($this->ctoken != "null") {
 								if($this->realUserArr['token'] != $this->accessToken || $this->inputUser != $this->realUser) {
-										exit(Security::encrypt("errorLogin<$>", $config['key1']));
+										exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
 								}
 							}
 							$this->setSession();
@@ -88,17 +88,17 @@
 								$loadFiles = new loadFiles($client, $this->sessID, $this->accessToken, $this->realUser);
 							}
 						} else {
-							die(JSONanswer('type', 'error', 'message', 'Launcher was modifficated!'));
+							die(Security::encrypt(JSONanswer('type', 'error', 'message', 'badlauncher<$>'), $config['key1']));
 						}
 			} catch(PDOException $pe) {
-				die(Security::encrypt("errorsql<$>", $config['key1']).$pe);
+				die(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorsql<$>'), $config['key1']).$pe);
 			} 
 		}
 		
 		private function pregMatch($toCheck){
 			global $config;
 			if (!preg_match("/^[a-zA-Z0-9_-]+$/", $toCheck)) {
-				exit(Security::encrypt("errorLogin<$>", $config['key1']));
+				exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
 			}
 			
 			return $toCheck;
@@ -111,22 +111,22 @@
 					$bannedIP = $stmt['sip'];
 					if(REMOTE_IP == $bannedIP) {
 						$stmt = $this->db->run("DELETE FROM sip WHERE time < '".CURRENT_TIME."';");
-						exit(Security::encrypt("temp<$>", $config['key1']));
+						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'temp<$>'), $config['key1']));
 					}
 						
 					if ($this->inputUser != $this->realUser) {
 						$stmt = $this->db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-						exit(Security::encrypt("errorLogin<$>", $config['key1']));
+						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
 					}
 					
 					if(!strcmp($this->realPass,$this->checkPass) == 0 || !$this->realPass) {
 						$stmt = $this->db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-						exit(Security::encrypt("errorLogin<$>", $config['key1']));
+						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
 					}
 
 				} else {
 					if ($this->checkPass != $this->realPass) {
-						die(Security::encrypt('errorLogin<$>', $config['key1']));
+						die(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
 				}
 			}
 		}
@@ -168,7 +168,7 @@
 				$stmt->fetch();	
 		}
 		
-		private function getRealUserData(){
+		private function getRealUserData() {
 			$stmt = $this->db->prepare("SELECT * FROM usersession WHERE user= :login");
 			$stmt->bindValue(':login', $this->inputUser);
 			$stmt->execute();

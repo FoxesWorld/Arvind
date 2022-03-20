@@ -44,7 +44,7 @@
 			} else {
 				$hash_md5 = hashcVersion($client);
 			}
-			echo Security::encrypt($usrsessions.$hash_md5, $config['key1']);
+			echo Security::encrypt(JSONanswer('type', 'success', 'message', $usrsessions.$hash_md5), $config['key1']);
 		}
 
 		private function checkStructure() {
@@ -58,7 +58,7 @@
 			
 			foreach($clientStructureCheck as $key) {
 				if(!file_exists($key)) {
-					die(Security::encrypt("client<$> ".$this->client."", $config['key1']));
+					die(Security::encrypt(JSONanswer('type', 'error', 'message', "client<$> ".$this->client), $config['key1']));
 				}
 			}
 		}

@@ -31,7 +31,7 @@ require ('mp3File.class.php');
 		private static $AbsolutesoundPath = FILES_DIR."eventSounds";
 		private static $currentDate = CURRENT_DATE;
 		private static $musMountPoint = 'mus';
-		private static $eventNow = 'common';
+		private static $eventNow = 'newFW';
 		private static $musFilesNum = 0;
 		private static $soundFilesNum = 0;
 		private static $easter = "";
@@ -77,7 +77,7 @@ require ('mp3File.class.php');
 		* @return String eventNow, String musRange, String soundRange
 		*/
 		private function eventNow() {
-			$eventName = 'common';
+			$eventName = 'newFW';
 			$musRange = 0;
 			$soundRange = 0;
 			$eventArray = array();
@@ -120,13 +120,18 @@ require ('mp3File.class.php');
 							case 1:
 							break;
 							
-							case 22:
+							case ($dayToday >= 21):
 								$eventName = "twistOfTheSun";
 							break;
 						}
 					break;
 					
 					case 7:
+						switch($dayToday){
+							case ($dayToday >= 5 && $dayToday < 15):
+								$eventName = "twistOfTheSun";
+							break;
+						}
 					break;
 					
 					case 8:

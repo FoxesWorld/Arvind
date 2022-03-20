@@ -11,7 +11,7 @@
 -----------------------------------------------------
  Файл: functions.inc.php
 -----------------------------------------------------
- Версия: 0.0.29.2 Release Candidate
+ Версия: 0.0.30.0 Release Candidate
 -----------------------------------------------------
  Назначение: Различные функции
 =====================================================
@@ -35,6 +35,7 @@
 	}
 	
 	require ('startUpSound.class.php');
+	require ('HWID.class.php');
 	
 	
 	/* Global Vars */
@@ -103,7 +104,7 @@
 					throw new Exception('Sent not all the data');
 				}
 				$array = array($typeName => $typeValue,$messageName => $messageValue);
-				return json_encode($array);
+				return json_encode($array, JSON_UNESCAPED_SLASHES);
 			}
 			
 			/**
@@ -172,6 +173,73 @@
 					$counter++;
 				}
 			}
+			
+			function loginNewLauncher ($login, $pass, $HWID){
+				global $config;
+					$logged = false;
+					$login = str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($login)));
+					$pass  = str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($pass)));
+					$HWID  = str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes($HWID)));
+				
+				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
+				$realName = json_decode(getUserData($login, 'name'))->name;
+				$realPass = json_decode(getUserData($login, 'password'))->password;
+				$fullname = json_decode(getUserData($login, 'fullname'))->fullname;
+				$userGroup = json_decode(getUserData($login, 'user_group'))->user_group;
+				$regDate = json_decode(getUserData($login, 'reg_date'))->reg_date;
+				$fullnameOut = $fullname ? $fullname : getRandomName();
+
+				if(isset($realName) && isset($realPass)) {
+					if(strlen($member_id['password']) == 32 && ctype_xdigit($member_id['password'])) {
+						if($realPass == md5(md5($pass))) {
+							$logged = true;
+						}
+					} else {
+						if(password_verify($pass, $realPass)) {
+							$logged = true;
+						}
+					}
+					if($logged) {
+						$hardwareCheck = new HWID($login, $HWID);
+						$HWIDresult = $hardwareCheck->checkHWID() ? 'true' : 'false';
+						if($HWIDresult === 'true'){
+							session_regenerate_id();
+							if (password_needs_rehash($realPass, PASSWORD_DEFAULT)) {
+								$realPass = password_hash($pass, PASSWORD_DEFAULT);
+								$new_pass_hash = 'password='.$db->safesql($realPass).', ';
+							} else {
+								$new_pass_hash = '';
+							}
+
+							$hash = generateLoginHash();
+							//$db->run("UPDATE LOW_PRIORITY dle_users SET {$new_pass_hash}hash='{$hash}' WHERE name='{$realName}'");
+							exit('{"login": "'.$login.'", "fullName":"'.$fullnameOut.'", "regDate": '.$regDate.', "userGroup": '.$userGroup.',  "balance": 100, "hardwareId":  '.$HWIDresult.'}');
+						} else {
+							exit('{"login"" "'.$login.'", "fullName":"'.$fullnameOut.'", "message": "Не с того ПК заходим!", "hardwareId": '.$HWIDresult.'}');
+						}
+
+					} else {
+						exit('Ошибка при авторизации');
+					}
+				} else {
+					exit('Данные не введены');
+				}
+			}
+			
+			function generateLoginHash(){
+				if(function_exists('openssl_random_pseudo_bytes')) {
+				$stronghash = md5(openssl_random_pseudo_bytes(15));
+				} else { 
+				$stronghash = md5(uniqid( mt_rand(), TRUE )); }
+				$salt = sha1( str_shuffle("abcdefghjkmnpqrstuvwxyz0123456789") . $stronghash );
+				$hash = '';					
+				for($i = 0; $i < 9; $i ++) {
+					$hash .= $salt[mt_rand( 0, 39 )];
+				}
+				$hash = md5( $hash );
+				
+				return $hash;
+			}
 
 			function hash_name($ncrypt, $realPass, $postPass) {
 					$cryptPass = false;
@@ -194,21 +262,6 @@
 				return $cryptPass;
 			}
 
-			function generateLoginHash(){
-				if(function_exists('openssl_random_pseudo_bytes')) {
-				$stronghash = md5(openssl_random_pseudo_bytes(15));
-				} else { 
-				$stronghash = md5(uniqid( mt_rand(), TRUE )); }
-				$salt = sha1( str_shuffle("abcdefghjkmnpqrstuvwxyz0123456789") . $stronghash );
-				$hash = '';					
-				for($i = 0; $i < 9; $i ++) {
-					$hash .= $salt[mt_rand( 0, 39 )];
-				}
-				$hash = md5( $hash );
-				
-				return $hash;
-			}
-
 			//Parses servers for any needs
 			function serversListArray($selector){
 				global $config;
@@ -226,10 +279,21 @@
 						'serverImage' => $row['srv_image'],
 						'story' => $row['story'],
 						'status' => $row['enabled']);
-						$counter++;
 					}
+					$counter++;
 				}
 				return $serversList;
+			}
+
+			function serversArrFull($login){
+				$srvArray = serversListArray(availableServers($login));
+				$jsonArray;
+				$counter = 0;
+				foreach($srvArray as $key) {
+					$jsonArray[] = '{"version": "'.$srvArray[$counter]['version'].'","assetIndex": "'.$srvArray[$counter]['version'].'","dir": "'.$srvArray[$counter]['serverName'].'","assetDir": "asset1.12","sortIndex": 0,"uuid": "d893746b-21be-4aa4-b62f-20800d4786bc","title": "FoxesWorld - '.$srvArray[$counter]['serverName'].'","info": "'.$srvArray[$counter]['story'].'","serverAddress": "'.$srvArray[$counter]['adress'].'","serverPort": '.$srvArray[$counter]['port'].',"update": ["servers.dat"],"updateExclusions": [],"updateShared": [],"updateVerify": ["libraries","natives","mods","minecraft.jar","forge.jar","liteloader.jar"],"updateOptional": [],"updateFastCheck": true,"mainClass": "'.$srvArray[$counter]['mainClass'].'","jvmArgs": ["-Dfml.ignorePatchDiscrepancies\u003dtrue","-Dfml.ignoreInvalidMinecraftCertificates\u003dtrue","-XX:+UseConcMarkSweepGC","-XX:+CMSIncrementalMode","-XX:-UseAdaptiveSizePolicy","-Xmn128M","-XX:+DisableAttachMechanism"],"classPath": ["forge.jar","liteloader.jar","minecraft.jar","libraries"],"altClassPath": [],"clientArgs": ["--tweakClass","net.minecraftforge.fml.common.launcher.FMLTweaker","--tweakClass","com.mumfrey.liteloader.launch.LiteLoaderTweaker"],"securityManagerConfig": "CLIENT","classLoaderConfig": "LAUNCHER"}';
+					$counter++;
+				}
+				return $jsonArray;
 			}
 
 			//Full JSON
@@ -380,15 +444,15 @@
 				$i = 0;
 				$outputArray = array();
 				$dirsArray = array(
-				"assets/indexes",
-				"assets/objects",
-				"versions/".$version);
+				'assets/indexes',
+				'assets/objects',
+				'versions/'.$version);
 				$fullArray = array_merge($dirsArray,dirsToCheckFullClient($client)); 
 
 					while($i < count($fullArray)) {
 						if($JSON === true){
 							//$outputArray[] = '{'.$dirsArray[$i].'}';
-							$outputArray[] = array('dir'.$i =>$fullArray[$i]);
+							$outputArray[] = array('dir'.$i => $fullArray[$i]);
 						} else {
 							$outputArray[] = $fullArray[$i];
 						}
@@ -488,7 +552,7 @@
 			//Full JSON
 			function getUserData($login,$data){
 				global $config;
-				$query = "SELECT $data FROM dle_users WHERE name = '$login'"; //$query = trim(str_replace($config['not_allowed_symbol'],'',strip_tags(stripslashes("SELECT $data FROM dle_users WHERE name = '$login'"))));
+				$query = "SELECT $data FROM dle_users WHERE name = '$login'";
 				$db = new db($config['db_user'],$config['db_pass'],$config['db_database']);
 				$selectedValue = $db->getRow($query);
 					if($selectedValue["$data"]){
