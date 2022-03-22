@@ -37,14 +37,23 @@
 				$md5ServersDat	  = @md5_file($config['clientsDir']."clients/".$client."/servers.dat");
 				$sizeServersDat   = @filesize($config['clientsDir']."clients/".$client."/servers.dat");
 				$usrsessions 	  = $config['md5launcherjar']."<:>".$md5user."<:>".$md5ServersDat."<>".$sizeServersDat."<:><br>".$realUser.'<:>'.strtoint(xorencode($sessid, $config['protectionKey'])).'<br>'.$acesstoken.'<br>';
+				$usrsessionsJSON  = '{
+					"launcherMD5":  "'.$config['md5launcherjar'].'",
+					"userMD5": "'.$md5user.'",
+					"md5ServersDat": "'.$md5ServersDat.'".
+					"serversDatSize": "'.$sizeServersDat.'",
+					"userLogin": "'.$realUser.'",
+					"strToInt": "'.strtoint(xorencode($sessid, $config['protectionKey'])).'",
+					"accessToken": "'.$acesstoken.'"}';
 
 			if($config['temp'] === true) {
 				checkWriteRights();
 				$this->writeTempFile($client);
 			} else {
-				$hash_md5 = hashcVersion($client);
+				$filesAndDirs = hashcVersion($client);
 			}
-			echo Security::encrypt(JSONanswer('type', 'success', 'message', $usrsessions.$hash_md5), $config['key1']);
+			$jsonOUT = '{"userData": "'.$usrsessions.'", "filesAndDirs": "'.$filesAndDirs.'"}';
+			echo Security::encrypt(JSONanswer('type', 'success', 'message', $jsonOUT), $config['key1']);
 		}
 
 		private function checkStructure() {

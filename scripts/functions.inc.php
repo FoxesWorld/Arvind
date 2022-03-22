@@ -434,8 +434,8 @@
 							'[{"filesToLoad":'.checkfiles($client, $version, true).'},'.
 							'{"dirsToCheck":'.dirsToCheck($client, $version).'}]';
 						} else {
-							$hash_md5 = checkfiles($client, $version).'<::>'.
-							dirsToCheck($client, $version, false);
+							$hash_md5 = '{\"filesToLoad\": \"'.checkfiles($client, $version).'\", \"dirsToCheck\": \"'.
+							dirsToCheck($client, $version, false).'\"}';
 						}
 				return $hash_md5;
 			}

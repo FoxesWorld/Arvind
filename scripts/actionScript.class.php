@@ -126,9 +126,8 @@
 							loginNewLauncher($_GET['login'],$_GET['password'], $_GET['hwid']);
 					   break;
 					   
-					   case 'tes':
-							$HWID = new HWID('fgfg', 'bhghh');
-							die(var_dump($HWID->checkHWID()));
+					   case 'client':
+							die(hashcVersion($_GET['client']));
 					   break;
 					   
 					   default:
