@@ -432,10 +432,10 @@
 						if($config['filesOutJSON'] === true || $forceJSON === true) {
 							$hash_md5 =
 							'[{"filesToLoad":'.checkfiles($client, $version, true).'},'.
-							'{"dirsToCheck":'.dirsToCheck($client, $version).'}]';
+							'{"dirsToCheck":'.dirsToCheck($client, $version, true).'}]';
 						} else {
 							$hash_md5 = '{\"filesToLoad\": \"'.checkfiles($client, $version).'\", \"dirsToCheck\": \"'.
-							dirsToCheck($client, $version, false).'\"}';
+							dirsToCheck($client, $version, $forceJSON).'\"}';
 						}
 				return $hash_md5;
 			}

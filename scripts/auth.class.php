@@ -11,7 +11,7 @@
 -----------------------------------------------------
  File: auth.class.php
 -----------------------------------------------------
- Version: 0.0.2.10 Experimental
+ Version: 0.0.2.13 Experimental
 -----------------------------------------------------
  Usage: Auth + SetSession + LoadFiles
 =====================================================
@@ -52,56 +52,68 @@
 						
 						//$this->LauncherDB	= $LauncherDB;
 						$this->db 			= $db;
-						$this->launchermd5  = $this->pregMatch($launchermd5);
+						$this->launchermd5  = $launchermd5;
 						$this->action 		= $this->pregMatch($action);
 						$this->inputUser 	= $this->pregMatch($login);
 						$this->inputPass 	= $this->pregMatch($postPass);
 						$this->ctoken		= $this->pregMatch($ctoken);
-						if($this->launchermd5 === $config['md5launcherjar']) {
-							if($this->ctoken == "null") {
-									if($config['crypt'] === 'hash_md5' || $config['crypt'] === 'hash_foxy') {
-										$this->selectRealData($this->inputUser);
-									}
-									$this->checkPass = hash_name($config['crypt'], $this->realPass, $this->inputPass);
-									$this->antiBrute();
-									$this->accessToken = token();
-							} else {
-								$this->accessToken = $this->inputPass;
-							}
-
-							$this->sessID = token();
-							$this->getRealUserData();
-							if(is_array($this->realUserArr) && $this->realUserArr['user'] != null) {
-								$this->realUser = $this->realUserArr['user'];
-							}
-
-							if($this->ctoken != "null") {
-								if($this->realUserArr['token'] != $this->accessToken || $this->inputUser != $this->realUser) {
-										exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
+						switch($this->launchermd5){
+							
+							case $config['md5launcherjar']:
+							case $config['protectionKey']:
+								if($this->ctoken == "null") {
+										if($config['crypt'] === 'hash_md5' || $config['crypt'] === 'hash_foxy') {
+											$this->selectRealData($this->inputUser);
+										}
+										$this->checkPass = hash_name($config['crypt'], $this->realPass, $this->inputPass);
+										$this->antiBrute();
+										$this->accessToken = token();
+								} else {
+									$this->accessToken = $this->inputPass;
 								}
-							}
-							$this->setSession();
 
-							$this->db->run("UPDATE LOW_PRIORITY ".$config['db_table']." SET lastdate='".CURRENT_TIME."', logged_ip='".REMOTE_IP."' WHERE name='$this->inputUser'");
-							if($this->action == 'auth') {
-								$geoplugin = new geoPlugin();
-								$loadFiles = new loadFiles($client, $this->sessID, $this->accessToken, $this->realUser);
-							}
-						} else {
-							die(Security::encrypt(JSONanswer('type', 'error', 'message', 'badlauncher<$>'), $config['key1']));
+								$this->sessID = token();
+								$this->getRealUserData();
+								if(is_array($this->realUserArr) && $this->realUserArr['user'] != null) {
+									$this->realUser = $this->realUserArr['user'];
+								}
+
+								if($this->ctoken != "null") {
+									if($this->realUserArr['token'] != $this->accessToken || $this->inputUser != $this->realUser) {
+										$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), "key1");
+									}
+								}
+								$this->setSession();
+
+								$this->db->run("UPDATE LOW_PRIORITY ".$config['db_table']." SET lastdate='".CURRENT_TIME."', logged_ip='".REMOTE_IP."' WHERE name='$this->inputUser'");
+								if($this->action == 'auth') {
+									$geoplugin = new geoPlugin();
+									$loadFiles = new loadFiles($client, $this->sessID, $this->accessToken, $this->realUser);
+								}
+							break;
+							
+							default:
+								$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'badlauncher<$>'), "key1");
+							break;
 						}
 			} catch(PDOException $pe) {
-				die(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorsql<$>'), $config['key1']).$pe);
+				$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorsql<$>'), "key1");
 			} 
 		}
 		
 		private function pregMatch($toCheck){
 			global $config;
 			if (!preg_match("/^[a-zA-Z0-9_-]+$/", $toCheck)) {
-				exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
+				$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), "key1");
 			}
 			
 			return $toCheck;
+		}
+		
+		private function encryptedAnswer($message, $key){
+			global $config;
+			$encrypted = Security::encrypt($message ,$config[$key]);
+			exit($encrypted);
 		}
 		
 		private function antiBrute() {
@@ -111,22 +123,22 @@
 					$bannedIP = $stmt['sip'];
 					if(REMOTE_IP == $bannedIP) {
 						$stmt = $this->db->run("DELETE FROM sip WHERE time < '".CURRENT_TIME."';");
-						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'temp<$>'), $config['key1']));
+						$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'temp<$>'), "key1");
 					}
 						
 					if ($this->inputUser != $this->realUser) {
 						$stmt = $this->db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
+						$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), "key1");
 					}
 					
 					if(!strcmp($this->realPass,$this->checkPass) == 0 || !$this->realPass) {
 						$stmt = $this->db->run("INSERT INTO sip (sip, time)VALUES ('".REMOTE_IP."', '".$config['bantime']."')");
-						exit(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
+						$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), "key1");
 					}
 
 				} else {
 					if ($this->checkPass != $this->realPass) {
-						die(Security::encrypt(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), $config['key1']));
+						$this->encryptedAnswer(JSONanswer('type', 'error', 'message', 'errorLogin<$>'), "key1");
 				}
 			}
 		}
